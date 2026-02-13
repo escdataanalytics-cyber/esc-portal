@@ -17,29 +17,18 @@
   --purple:#8b5cf6;
   --text:#e6f7ff;
   --muted:#9fb8c4;
-  --ok:#10b981;
   --err:#ef4444;
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
   min-height:100vh;
-  background:radial-gradient(800px 500px at 10% -10%,rgba(0,212,255,.08),transparent),
-             radial-gradient(800px 500px at 100% 0%,rgba(139,92,246,.08),transparent),
-             var(--bg);
+  background:var(--bg);
   font-family:Rajdhani;
   color:var(--text);
 }
-
 .hidden{display:none}
-
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:30px;
-}
-
+.container{max-width:1100px;margin:auto;padding:30px}
 .card{
   background:var(--card);
   border:1px solid var(--line);
@@ -47,28 +36,7 @@ body{
   padding:24px;
   margin-bottom:20px;
 }
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:30px;
-}
-
-.logo{
-  width:56px;
-  height:56px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  font-family:Orbitron;
-  font-weight:900;
-  background:linear-gradient(135deg,var(--neon),var(--purple));
-  color:#081018;
-}
-
-h1,h2{font-family:Orbitron}
-
+.header{display:flex;justify-content:space-between;align-items:center}
 input,select{
   width:100%;
   padding:12px;
@@ -78,7 +46,6 @@ input,select{
   color:white;
   margin-bottom:12px;
 }
-
 button{
   padding:12px 24px;
   border:none;
@@ -87,18 +54,9 @@ button{
   cursor:pointer;
   background:linear-gradient(135deg,var(--neon),var(--purple));
 }
-
 .btn-danger{
   background:linear-gradient(135deg,var(--err),#b91c1c);
-  color:white;
 }
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:20px;
-}
-
 .material{
   display:flex;
   justify-content:space-between;
@@ -111,20 +69,12 @@ button{
 </head>
 
 <body>
-
 <div class="container">
 
 <!-- LOGIN -->
 <div id="loginView">
   <div class="card" style="max-width:420px;margin:auto;">
-    <div style="display:flex;gap:15px;align-items:center;justify-content:center;margin-bottom:20px">
-      <div class="logo">ESC</div>
-      <div>
-        <h1>ESC</h1>
-        <p style="color:var(--muted)">Data Analytics</p>
-      </div>
-    </div>
-
+    <h1>ESC • Login</h1>
     <input id="email" type="email" placeholder="Email">
     <input id="password" type="password" placeholder="Senha">
     <button onclick="login()">Entrar</button>
@@ -133,54 +83,44 @@ button{
 
 <!-- ADMIN -->
 <div id="adminView" class="hidden">
-
   <div class="header">
-    <h1>👑 Painel Administrador</h1>
+    <h1>👑 Admin</h1>
     <button class="btn-danger" onclick="logout()">Sair</button>
   </div>
 
-  <div class="grid">
+  <div class="card">
+    <h2>Cursos</h2>
+    <select id="adminCourse" onchange="loadLessonsAdmin()"></select>
+  </div>
 
-    <div class="card">
-      <h2>📚 Cursos</h2>
-      <select id="adminCourse" onchange="loadLessonsAdmin()"></select>
-    </div>
+  <div class="card">
+    <h2>Aulas</h2>
+    <select id="adminLesson"></select>
+  </div>
 
-    <div class="card">
-      <h2>📌 Aulas</h2>
-      <select id="adminLesson"></select>
-    </div>
-
-    <div class="card">
-      <h2>📤 Upload Material</h2>
-      <input id="matTitle" placeholder="Título">
-      <input id="file" type="file">
-      <button onclick="uploadMaterial()">Enviar</button>
-    </div>
-
+  <div class="card">
+    <h2>Upload Material</h2>
+    <input id="matTitle" placeholder="Título">
+    <input id="file" type="file">
+    <button onclick="uploadMaterial()">Enviar</button>
   </div>
 </div>
 
 <!-- USER -->
 <div id="userView" class="hidden">
-
   <div class="header">
     <h1>📘 Portal do Aluno</h1>
     <button class="btn-danger" onclick="logout()">Sair</button>
   </div>
 
-  <div class="grid">
+  <div class="card">
+    <h2>Cursos</h2>
+    <select id="courseSelect" onchange="loadLessonsUser()"></select>
+  </div>
 
-    <div class="card">
-      <h2>Cursos</h2>
-      <select id="courseSelect" onchange="loadLessonsUser()"></select>
-    </div>
-
-    <div class="card">
-      <h2>Aulas</h2>
-      <select id="lessonSelect" onchange="openLesson()"></select>
-    </div>
-
+  <div class="card">
+    <h2>Aulas</h2>
+    <select id="lessonSelect" onchange="openLesson()"></select>
   </div>
 
   <div class="card">
@@ -191,40 +131,37 @@ button{
     <h2>Materiais</h2>
     <div id="materials"></div>
   </div>
-
 </div>
 
 </div>
 
 <script>
-const SUPABASE_URL = "https://eodbbndmclbgjemzjdju.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvZGJibmRtY2xiZ2plbXpqZGp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NDM2MDAsImV4cCI6MjA4NjUxOTYwMH0.ZDZaVXm-K_bX_xgHnH5YSZki-ftD3Sb5A-JT-2zFcPQ";
+const supabaseClient = supabase.createClient(
+  "https://eodbbndmclbgjemzjdju.supabase.co",
+  "SUA_CHAVE_ANON_AQUI"
+);
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUser = null;
+let currentUser=null;
 
 /* LOGIN */
 async function login(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email=emailInput.value;
+  const password=passwordInput.value;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-  if(error){ alert(error.message); return; }
-
-  currentUser = data.user;
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){alert(error.message);return;}
+  currentUser=data.user;
   routeUser();
 }
 
 /* ROUTE */
 async function routeUser(){
-  const { data } = await supabaseClient
+  loginView.classList.add("hidden");
+  const {data}=await supabaseClient
     .from("students")
     .select("is_admin")
-    .eq("id", currentUser.id)
+    .eq("id",currentUser.id)
     .single();
-
-  loginView.classList.add("hidden");
 
   if(data.is_admin){
     adminView.classList.remove("hidden");
@@ -243,74 +180,84 @@ async function logout(){
 
 /* ADMIN */
 async function loadCoursesAdmin(){
-  const { data } = await supabaseClient.from("courses").select("*");
-  adminCourse.innerHTML = "<option>Selecione</option>";
+  const {data}=await supabaseClient.from("courses").select("*");
+  adminCourse.innerHTML="<option>Selecione</option>";
   data.forEach(c=>adminCourse.innerHTML+=`<option value="${c.id}">${c.title}</option>`);
 }
 
 async function loadLessonsAdmin(){
-  const { data } = await supabaseClient
+  const {data}=await supabaseClient
     .from("lessons")
     .select("*")
-    .eq("course_id", adminCourse.value);
+    .eq("course_id",adminCourse.value);
   adminLesson.innerHTML="";
   data.forEach(l=>adminLesson.innerHTML+=`<option value="${l.id}">${l.title}</option>`);
 }
 
 async function uploadMaterial(){
-  const file=document.getElementById("file").files[0];
-  const title=document.getElementById("matTitle").value;
-  const lessonId=adminLesson.value;
-
-  const path=`${lessonId}/${Date.now()}_${file.name}`;
-
+  const file=fileInput.files[0];
+  const path=`${adminLesson.value}/${Date.now()}_${file.name}`;
   await supabaseClient.storage.from("materiais").upload(path,file);
-  await supabaseClient.from("materials").insert({lesson_id:lessonId,title,file_path:path});
-
+  await supabaseClient.from("materials").insert({
+    lesson_id:adminLesson.value,
+    title:matTitle.value,
+    file_path:path
+  });
   alert("Material enviado");
 }
 
 /* USER */
 async function loadCoursesUser(){
-  const { data } = await supabaseClient.from("courses").select("*");
+  const {data}=await supabaseClient.from("courses").select("*");
   courseSelect.innerHTML="<option>Selecione</option>";
   data.forEach(c=>courseSelect.innerHTML+=`<option value="${c.id}">${c.title}</option>`);
 }
 
 async function loadLessonsUser(){
-  const { data } = await supabaseClient
+  const {data}=await supabaseClient
     .from("lessons")
     .select("*")
-    .eq("course_id", courseSelect.value);
-  lessonSelect.innerHTML="";
+    .eq("course_id",courseSelect.value);
+  lessonSelect.innerHTML="<option>Selecione</option>";
   data.forEach(l=>lessonSelect.innerHTML+=`<option value="${l.id}">${l.title}</option>`);
 }
 
 async function openLesson(){
-  const id=lessonSelect.value;
-  const { data } = await supabaseClient.from("lessons").select("*").eq("id",id).single();
+  const {data}=await supabaseClient
+    .from("lessons")
+    .select("*")
+    .eq("id",lessonSelect.value)
+    .single();
 
-  lessonArea.innerHTML=`<iframe width="100%" height="320" src="${data.video_url}" allowfullscreen></iframe>`;
-  loadMaterials(id);
+  lessonArea.innerHTML=`
+    <h3>${data.title}</h3>
+    <iframe width="100%" height="320" src="${data.video_url}" allowfullscreen></iframe>
+  `;
+  loadMaterials(data.id);
 }
 
 async function loadMaterials(lessonId){
-  const { data } = await supabaseClient.from("materials").select("*").eq("lesson_id",lessonId);
+  const {data}=await supabaseClient
+    .from("materials")
+    .select("*")
+    .eq("lesson_id",lessonId);
   materials.innerHTML="";
   for(const m of data){
-    const signed = await supabaseClient.storage.from("materiais").createSignedUrl(m.file_path,3600);
+    const url=await supabaseClient
+      .storage.from("materiais")
+      .createSignedUrl(m.file_path,3600);
     materials.innerHTML+=`
       <div class="material">
         <span>${m.title}</span>
-        <a href="${signed.data.signedUrl}" target="_blank">Baixar</a>
+        <a href="${url.data.signedUrl}" target="_blank">Baixar</a>
       </div>`;
   }
 }
 
 /* AUTO SESSION */
 (async()=>{
-  const { data:{session} } = await supabaseClient.auth.getSession();
-  if(session){ currentUser=session.user; routeUser(); }
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(session){currentUser=session.user;routeUser();}
 })();
 </script>
 
