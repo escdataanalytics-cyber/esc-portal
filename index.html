@@ -5,13 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ESC • Plataforma de Ensino</title>
 <script>
-  // ============================================================
-  // CONFIGURAÇÃO SUPABASE — EDITE ESTAS 2 LINHAS
-  // 1. Acesse supabase.com > seu projeto > Settings > API
-  // 2. Copie "Project URL" e "anon public key"
-  // ============================================================
   const SUPABASE_URL = 'https://zycxnizgauollnafyotk.supabase.co';
-  const SUPABASE_KEY ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5Y3huaXpnYXVvbGxuYWZ5b3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDM4MjIsImV4cCI6MjA4NzExOTgyMn0.t7YJAOoJ3qbthikkwBDIL5nyp-wBEJFkkPbZMrRFcRM';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5Y3huaXpnYXVvbGxuYWZ5b3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDM4MjIsImV4cCI6MjA4NzExOTgyMn0.t7YJAOoJ3qbthikkwBDIL5nyp-wBEJFkkPbZMrRFcRM';
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
@@ -46,6 +41,11 @@ body{font-family:var(--fb);color:var(--text);background:var(--black);min-height:
 .bd:hover{background:rgba(239,68,68,.2)}
 .bs{background:rgba(15,186,129,.1);border:1px solid var(--green);color:var(--green);border-radius:var(--rs);padding:5px 11px;font-size:.82rem}
 .bs:hover{background:rgba(15,186,129,.2)}
+.blv{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 6px 24px rgba(239,68,68,.4);animation:livePulse 2s ease-in-out infinite}
+.blv:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(239,68,68,.6)}
+@keyframes livePulse{0%,100%{box-shadow:0 6px 24px rgba(239,68,68,.4)}50%{box-shadow:0 6px 32px rgba(239,68,68,.7),0 0 0 6px rgba(239,68,68,.1)}}
+.livedot{width:8px;height:8px;background:#fff;border-radius:50%;animation:dotBlink 1s ease-in-out infinite}
+@keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.3}}
 .btn-sm{padding:6px 13px;font-size:.85rem}.btn-xs{padding:4px 9px;font-size:.78rem}
 .fg{display:flex;flex-direction:column;gap:5px}
 .fl{font-size:.78rem;font-weight:700;color:var(--soft);letter-spacing:.5px;text-transform:uppercase}
@@ -72,7 +72,7 @@ select.fi{cursor:pointer}textarea.fi{resize:vertical}
 @keyframes tIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fi .2s}
 .modal{background:var(--surface);border:1px solid var(--border-hi);border-radius:16px;padding:26px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,.6);animation:mi .28s ease}
-.mt{font-family:var(--fd);font-size:1.05rem;color:var(--cyan);margin-bottom:18px}
+.mtt{font-family:var(--fd);font-size:1.05rem;color:var(--cyan);margin-bottom:18px}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 @keyframes mi{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
 .hdr{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:0 20px;height:58px;background:rgba(8,11,16,.93);border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
@@ -140,8 +140,27 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .ri{padding:11px 15px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:9px}
 .ri:last-child{border-bottom:none}
 .rav{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:.65rem;font-weight:900;color:#050d14;background:linear-gradient(135deg,var(--purple),var(--cyan))}
+.rav.adm{background:linear-gradient(135deg,var(--red),var(--purple));width:28px;height:28px;font-size:.7rem}
+.ri.adm-reply{background:rgba(124,92,252,.05);border-left:3px solid var(--purple)}
+.ri.pending-reply{background:rgba(245,158,11,.04);border-left:3px solid rgba(245,158,11,.4);opacity:.75}
 .nta{width:100%;min-height:170px;background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:var(--rs);padding:12px;color:var(--text);font-family:var(--fb);font-size:.93rem;resize:vertical;outline:none;transition:border .22s}
 .nta:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,255,.09)}
+/* LIVE CARD */
+.livecard{border:2px solid var(--red);border-radius:16px;padding:22px;background:linear-gradient(135deg,rgba(239,68,68,.07),rgba(220,38,38,.03));position:relative;overflow:hidden;margin-bottom:16px}
+.livecard::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(239,68,68,.1),transparent 70%)}
+.livecard-inner{position:relative;z-index:1}
+.livebadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--red);color:#fff;font-size:.78rem;font-weight:900;letter-spacing:.5px;margin-bottom:11px}
+/* COUNTDOWN */
+.cdcard{border:1px solid rgba(124,92,252,.3);border-radius:16px;padding:20px;background:linear-gradient(135deg,rgba(124,92,252,.06),rgba(0,200,255,.04));margin-bottom:16px}
+.cdgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:13px}
+.cdu{text-align:center;padding:13px 8px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--rs)}
+.cdv{font-family:var(--fd);font-size:1.6rem;font-weight:900;color:var(--cyan);line-height:1}
+.cdl{font-size:.68rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+/* MURAL */
+.muralcard{border:1px solid rgba(245,158,11,.25);border-radius:var(--r);padding:16px;background:rgba(245,158,11,.04);margin-bottom:11px;position:relative}
+.muralcard.fix{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.07)}
+.muralfix{position:absolute;top:11px;right:11px;font-size:.75rem;color:var(--amber);font-weight:800}
+/* LOGIN */
 #ls{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .lwrap{width:100%;max-width:430px}
 .llogobox{width:58px;height:58px;border-radius:15px;margin:0 auto 13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));border:1px solid rgba(0,200,255,.38);font-family:var(--fd);font-weight:900;font-size:1.05rem;color:#bff6ff;box-shadow:0 0 28px rgba(0,200,255,.18)}
@@ -155,13 +174,13 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 @media(max-width:1080px){.cgrid{grid-template-columns:1fr}}
 @media(max-width:880px){.l2,.ladm{grid-template-columns:1fr}.sbar,.abar{display:none}.fgrid{grid-template-columns:1fr}}
-@media(max-width:580px){.hdr{padding:0 12px}.bname{display:none}.mcont{padding:14px}}
+@media(max-width:580px){.hdr{padding:0 12px}.bname{display:none}.mcont{padding:14px}.cdv{font-size:1.2rem}}
 </style>
 </head>
-
 <body>
 <div id="tc"></div>
 
+<!-- LOGIN -->
 <div id="ls">
   <div class="lwrap">
     <div style="text-align:center;margin-bottom:28px">
@@ -183,7 +202,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       </div>
       <div id="lf-reg" class="hidden">
         <div style="padding:10px;border:1px solid rgba(0,200,255,.18);border-radius:var(--rs);background:rgba(0,200,255,.04);margin-bottom:14px;font-size:.84rem;color:var(--soft)">
-          ℹ️ Preencha seus dados. Após aprovação do admin, você receberá acesso à plataforma.
+          ℹ️ Preencha seus dados. Após aprovação do admin, você receberá acesso.
         </div>
         <div class="fgrid" style="margin-bottom:13px">
           <div class="fg"><label class="fl">Nome completo</label><input id="rNome" class="fi" placeholder="João da Silva"/></div>
@@ -198,9 +217,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
   </div>
 </div>
 
+<!-- STUDENT APP -->
 <div id="sa" class="hidden">
   <header class="hdr">
-    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub">Telemetria B30</div></div></div>
+    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Telemetria B30</div></div></div>
     <div class="hright">
       <div id="ew" class="expw hidden">⚠️ Expira em <span id="ed"></span>d</div>
       <div class="uchip"><div id="sAv" class="uav">?</div><span id="sNm" class="uname"></span></div>
@@ -212,7 +232,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="nsect">Navegação</div>
       <div class="ni act" data-pg="dash"><span class="nic">🏠</span>Meu Progresso</div>
       <div class="ni" data-pg="class"><span class="nic">🎓</span>Sala de Aula</div>
-      <div class="ni" data-pg="forum"><span class="nic">💬</span>Fórum<span id="fbadge" class="nbadge hidden">0</span></div>
+      <div class="ni" data-pg="mural"><span class="nic">📋</span>Mural</div>
+      <div class="ni" data-pg="forum"><span class="nic">💬</span>Fórum</div>
       <div class="nsect">Módulos</div>
       <div id="sML"></div>
       <div class="nsect" style="margin-top:18px">Progresso</div>
@@ -223,11 +244,48 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       </div>
     </nav>
     <div class="mcont">
+
+      <!-- DASHBOARD -->
       <div id="pg-dash" class="page act">
         <div style="margin-bottom:22px">
           <h1 style="font-family:var(--fd);font-size:1.3rem;color:#bff6ff;margin-bottom:3px">Olá, <span id="dWel"></span>! 👋</h1>
           <div style="color:var(--soft);font-size:.93rem">Continue de onde parou.</div>
         </div>
+
+        <!-- LIVE CARD -->
+        <div id="liveSection" class="hidden">
+          <div class="livecard">
+            <div class="livecard-inner">
+              <div class="livebadge"><div class="livedot"></div> AO VIVO AGORA</div>
+              <div style="font-family:var(--fd);font-size:1.05rem;color:#fff;margin-bottom:6px" id="liveTitulo">Aula ao Vivo</div>
+              <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-bottom:16px" id="liveDesc">Sua turma está em aula agora!</div>
+              <a id="liveBtn" href="#" target="_blank" rel="noopener" class="btn blv">
+                <div class="livedot"></div> ENTRAR NA AULA
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- COUNTDOWN -->
+        <div id="cdSection" class="hidden">
+          <div class="cdcard">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+              <div>
+                <div style="font-family:var(--fd);font-size:.88rem;color:var(--purple);margin-bottom:3px">⏱️ PRÓXIMA AULA</div>
+                <div style="font-weight:800;font-size:1rem" id="cdTitulo">—</div>
+                <div style="font-size:.82rem;color:var(--muted);margin-top:2px" id="cdData">—</div>
+              </div>
+              <span class="badge bpp" id="cdTurmaLabel"></span>
+            </div>
+            <div class="cdgrid">
+              <div class="cdu"><div class="cdv" id="cdD">00</div><div class="cdl">Dias</div></div>
+              <div class="cdu"><div class="cdv" id="cdH">00</div><div class="cdl">Horas</div></div>
+              <div class="cdu"><div class="cdv" id="cdM">00</div><div class="cdl">Min</div></div>
+              <div class="cdu"><div class="cdv" id="cdS">00</div><div class="cdl">Seg</div></div>
+            </div>
+          </div>
+        </div>
+
         <div class="sgrid" style="margin-bottom:20px">
           <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">📚</div><div class="sval" id="dPct">0%</div><div class="slbl">Concluído</div></div>
           <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">✅</div><div class="sval" id="dDone">0/0</div><div class="slbl">Módulos</div></div>
@@ -243,6 +301,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
 
+      <!-- CLASSROOM -->
       <div id="pg-class" class="page">
         <div class="cgrid">
           <div class="card">
@@ -276,7 +335,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
                   <h3 style="color:var(--cyan)">📝 Anotações</h3>
                   <button id="bNote" class="btn bo btn-sm">💾 Salvar</button>
                 </div>
-                <textarea id="nta" class="nta" placeholder="Suas anotações sobre este módulo...&#10;&#10;💡 Salvas automaticamente a cada 30s."></textarea>
+                <textarea id="nta" class="nta" placeholder="Suas anotações...&#10;&#10;💡 Salvas automaticamente a cada 30s."></textarea>
                 <div style="font-size:.75rem;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between"><span><span id="nch">0</span> chars</span><span>Salvo: <span id="nSv">nunca</span></span></div>
               </div>
               <div id="tab-fmod" class="tp">
@@ -302,9 +361,19 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
 
+      <!-- MURAL -->
+      <div id="pg-mural" class="page">
+        <div style="margin-bottom:20px">
+          <h1 style="font-family:var(--fd);font-size:1.2rem;color:#bff6ff;margin-bottom:3px">📋 Mural de Avisos</h1>
+          <div style="color:var(--soft);font-size:.88rem">Comunicados da sua turma</div>
+        </div>
+        <div id="muralList"></div>
+      </div>
+
+      <!-- FORUM -->
       <div id="pg-forum" class="page">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-          <div><h1 style="font-family:var(--fd);font-size:1.2rem;color:#bff6ff;margin-bottom:3px">💬 Fórum</h1><div style="color:var(--soft);font-size:.88rem">Tire dúvidas e interaja com outros alunos</div></div>
+          <div><h1 style="font-family:var(--fd);font-size:1.2rem;color:#bff6ff;margin-bottom:3px">💬 Fórum</h1><div style="color:var(--soft);font-size:.88rem">Tire dúvidas e interaja</div></div>
           <button id="bNP" class="btn bp">+ Nova Dúvida</button>
         </div>
         <div style="display:flex;gap:11px;margin-bottom:18px;flex-wrap:wrap">
@@ -313,10 +382,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
         <div id="fList"></div>
       </div>
+
     </div>
   </div>
 </div>
 
+<!-- ADMIN APP -->
 <div id="aa" class="hidden">
   <header class="hdr">
     <div class="brand"><div class="blog">ESC</div><div><div class="bname">Painel Admin</div><div class="bsub">Gerenciamento</div></div></div>
@@ -336,9 +407,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="mods">🎬 Módulos</div>
       <div class="ani" data-adm="mats">📎 Materiais</div>
       <div class="ani" data-adm="quiz">🎯 Quiz</div>
+      <div class="ani" data-adm="live">🔴 Aulas Ao Vivo</div>
+      <div class="ani" data-adm="mural">📋 Mural</div>
       <div class="ani" data-adm="forum">💬 Fórum</div>
     </nav>
     <div class="mcont">
+
+      <!-- ADM DASHBOARD -->
       <div id="adm-dash" class="page act">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">📊 Dashboard</div>
         <div class="sgrid" style="margin-bottom:20px">
@@ -353,11 +428,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
 
+      <!-- PENDENTES -->
       <div id="adm-pend" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🔔 Solicitações Pendentes</div>
         <div id="pendCont" class="card cp"></div>
       </div>
 
+      <!-- ALUNOS -->
       <div id="adm-alunos" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">👥 Gerenciar Alunos</div>
         <div class="card cp" style="margin-bottom:16px">
@@ -378,6 +455,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
 
+      <!-- TURMAS -->
       <div id="adm-turmas" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🏫 Turmas</div>
         <div class="card cp" style="margin-bottom:16px">
@@ -391,6 +469,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Turmas</div><div class="tw2"><table><thead><tr><th>Nome</th><th>Alunos</th><th>Módulos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="aTT"></tbody></table></div></div>
       </div>
 
+      <!-- MODULOS -->
       <div id="adm-mods" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🎬 Módulos</div>
         <div class="card cp" style="margin-bottom:16px">
@@ -411,6 +490,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Módulos</div><div class="tw2"><table><thead><tr><th>Ord</th><th>Módulo</th><th>Turma</th><th>Tipo</th><th>Duração</th><th>Ações</th></tr></thead><tbody id="aMT2"></tbody></table></div></div>
       </div>
 
+      <!-- MATERIAIS -->
       <div id="adm-mats" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">📎 Materiais</div>
         <div class="card cp" style="margin-bottom:16px">
@@ -427,13 +507,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Materiais</div><div class="tw2"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Módulo</th><th>URL</th><th></th></tr></thead><tbody id="aMatT"></tbody></table></div></div>
       </div>
 
+      <!-- QUIZ -->
       <div id="adm-quiz" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🎯 Quiz</div>
         <div class="card cp" style="margin-bottom:16px">
           <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">➕ Nova Questão</div>
           <div class="fgrid">
             <div class="fg full"><label class="fl">Enunciado</label><textarea id="qEn" class="fi" rows="2" placeholder="Qual métrica..."></textarea></div>
-            <div class="fg full"><label class="fl">Opções (rádio = correta)</label>
+            <div class="fg full"><label class="fl">Opções (marque a correta)</label>
               <div style="display:flex;flex-direction:column;gap:7px;margin-top:5px">
                 <div style="display:flex;align-items:center;gap:8px"><input type="radio" name="qC" value="0" style="accent-color:var(--cyan)"/><input id="qO0" class="fi" placeholder="Opção A"/></div>
                 <div style="display:flex;align-items:center;gap:8px"><input type="radio" name="qC" value="1" style="accent-color:var(--cyan)"/><input id="qO1" class="fi" placeholder="Opção B"/></div>
@@ -447,6 +528,68 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Questões</div><div id="aQL" style="display:flex;flex-direction:column;gap:9px"></div></div>
       </div>
 
+      <!-- AULAS AO VIVO -->
+      <div id="adm-live" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">🔴 Aulas Ao Vivo</div>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px">Configure a aula ao vivo e o contador da próxima aula por turma.</div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">🔴 Ativar / Desativar Aula Ao Vivo</div>
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Turma</label><select id="lvTurma" class="fi"><option value="">Selecione...</option></select></div>
+            <div class="fg"><label class="fl">Título da aula</label><input id="lvTit" class="fi" placeholder="Ex: Módulo 3 — Telemetria ao vivo"/></div>
+            <div class="fg full"><label class="fl">Link (YouTube Live / Google Meet)</label><input id="lvLink" class="fi" placeholder="https://youtube.com/live/..."/></div>
+            <div class="fg"><label class="fl">Descrição curta</label><input id="lvDesc" class="fi" placeholder="Ex: Análise de alarmes B30"/></div>
+            <div class="fg"><label class="fl">Status</label>
+              <select id="lvStatus" class="fi">
+                <option value="1">🔴 Ativar — Aula ao vivo AGORA</option>
+                <option value="0">⚫ Desativar</option>
+              </select>
+            </div>
+          </div>
+          <button id="bSLV" class="btn bp" style="margin-top:13px">💾 Salvar configuração</button>
+        </div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--purple);margin-bottom:13px">⏱️ Contador — Próxima Aula</div>
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Turma</label><select id="cdTurma" class="fi"><option value="">Selecione...</option></select></div>
+            <div class="fg"><label class="fl">Título da próxima aula</label><input id="cdTit" class="fi" placeholder="Ex: Aula 4 — Dashboards"/></div>
+            <div class="fg"><label class="fl">Data e hora</label><input id="cdDH" class="fi" type="datetime-local"/></div>
+            <div class="fg"><label class="fl">Ativo?</label>
+              <select id="cdAtivo" class="fi">
+                <option value="1">✅ Mostrar contador</option>
+                <option value="0">❌ Ocultar</option>
+              </select>
+            </div>
+          </div>
+          <button id="bSCD" class="btn bp" style="margin-top:13px">💾 Salvar contador</button>
+        </div>
+        <div class="card cp">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Configurações ativas por turma</div>
+          <div id="lvTable"></div>
+        </div>
+      </div>
+
+      <!-- MURAL ADMIN -->
+      <div id="adm-mural" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📋 Mural de Avisos</div>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px">Poste comunicados visíveis para alunos de cada turma.</div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">➕ Novo Aviso</div>
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Turma</label><select id="mrTurma" class="fi"><option value="">Todas as turmas</option></select></div>
+            <div class="fg"><label class="fl">Fixar no topo?</label><select id="mrFix" class="fi"><option value="0">Não</option><option value="1">📌 Sim</option></select></div>
+            <div class="fg full"><label class="fl">Título</label><input id="mrTit" class="fi" placeholder="Ex: Aula cancelada — reagendada"/></div>
+            <div class="fg full"><label class="fl">Conteúdo</label><textarea id="mrCont" class="fi" rows="4" placeholder="Texto do aviso..."></textarea></div>
+          </div>
+          <button id="bSMR" class="btn bp" style="margin-top:13px">📤 Publicar Aviso</button>
+        </div>
+        <div class="card cp">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Avisos publicados</div>
+          <div id="aMuralList"></div>
+        </div>
+      </div>
+
+      <!-- FORUM ADMIN -->
       <div id="adm-forum" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">💬 Moderação do Fórum</div>
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
@@ -455,20 +598,23 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
         <div id="aFL"></div>
       </div>
+
     </div>
   </div>
 </div>
 
 <div id="mBg" class="mbg hidden"><div id="mCont" class="modal"></div></div>
+
 <script>
 let sb=null;
 try{sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
-let CU=null,CTurma=null,mods=[],actMod=null,wTimer=null,wSec=0;
+let CU=null,CTurma=null,mods=[],actMod=null,wTimer=null,wSec=0,cdTimer=null;
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 function ft(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60,p=n=>String(n).padStart(2,'0');return h>0?`${h}:${p(m)}:${p(sec)}`:`${p(m)}:${p(sec)}`;}
 function pct(a,b){return b>0?Math.round((a/b)*100):0;}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 function fd(d){return d?new Date(d).toLocaleDateString('pt-BR'):'—';}
+function fdt(d){return d?new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';}
 function du(d){return d?Math.ceil((new Date(d)-new Date())/(864e5)):null;}
 function ti(t){return{pdf:'📊',doc:'📋',xlsx:'📈',link:'🔗',other:'📦'}[t]||'📦';}
 function toast(msg,tp='i'){const el=document.createElement('div');el.className=`toast t${tp}`;el.textContent=msg;$('#tc').appendChild(el);setTimeout(()=>{el.style.animation='tIn .3s ease reverse';setTimeout(()=>el.remove(),300);},3000);}
@@ -507,7 +653,6 @@ $('#rBtn').addEventListener('click',async()=>{
   const n=$('#rNome').value.trim(),e=$('#rEmail').value.trim(),l=$('#rLogin').value.trim(),p=$('#rPass').value.trim(),err=$('#rErr');
   if(!n||!e||!l||!p){err.textContent='⚠️ Preencha todos os campos.';return;}
   if(p.length<6){err.textContent='⚠️ Senha mínimo 6 caracteres.';return;}
-  err.textContent='';
   if(!sb){toast('Configure o Supabase.','w');return;}
   $('#rBtn').disabled=true;
   const hash=await sha(p);
@@ -516,9 +661,10 @@ $('#rBtn').addEventListener('click',async()=>{
   if(error){err.textContent=error.message.includes('unique')?'❌ Login ou email já em uso.':'❌ Erro ao enviar.';return;}
   toast('✅ Solicitação enviada! Aguarde aprovação.','s');document.querySelector('[data-lt="login"]').click();
 });
-function doLogout(){CU=null;CTurma=null;actMod=null;mods=[];if(wTimer)clearInterval(wTimer);$('#sa').classList.add('hidden');$('#aa').classList.add('hidden');$('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';}
+function doLogout(){CU=null;CTurma=null;actMod=null;mods=[];if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);$('#sa').classList.add('hidden');$('#aa').classList.add('hidden');$('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';}
 $('#sOut').addEventListener('click',doLogout);$('#aOut').addEventListener('click',doLogout);
 
+/* ===== STUDENT ===== */
 async function showStudent(){
   $('#ls').style.display='none';$('#sa').classList.remove('hidden');
   const ini=CU.nome.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -526,11 +672,12 @@ async function showStudent(){
   $('#cAU').textContent=fd(CU.validade_acesso);
   const d=du(CU.validade_acesso);
   if(d!==null&&d<=30&&d>0){$('#ew').classList.remove('hidden');$('#ed').textContent=d;}
-  await loadMods();renderDash();renderSML();
+  await loadMods();renderDash();renderSML();loadLiveSection();loadCountdown();
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
     const pg=item.dataset.pg;$$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
     $$('#sa .page').forEach(p=>p.classList.remove('act'));$(`#pg-${pg}`).classList.add('act');
     if(pg==='forum')loadFPage();
+    if(pg==='mural')loadMural();
   }));
   $$('.tb').forEach(b=>b.addEventListener('click',()=>{
     const tab=b.dataset.tab;$$('.tb').forEach(x=>x.classList.remove('act'));b.classList.add('act');
@@ -538,10 +685,43 @@ async function showStudent(){
     if(tab==='note')loadNote();if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();
   }));
 }
+
+async function loadLiveSection(){
+  if(!sb||!CU.turma_id){$('#liveSection').classList.add('hidden');return;}
+  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('ativa',true).single();
+  if(!data){$('#liveSection').classList.add('hidden');return;}
+  $('#liveTitulo').textContent=data.titulo||'Aula Ao Vivo';
+  $('#liveDesc').textContent=data.descricao||'Sua turma está em aula agora!';
+  $('#liveBtn').href=data.link||'#';
+  $('#liveSection').classList.remove('hidden');
+}
+
+async function loadCountdown(){
+  if(cdTimer)clearInterval(cdTimer);
+  if(!sb||!CU.turma_id){$('#cdSection').classList.add('hidden');return;}
+  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','countdown').eq('ativa',true).single();
+  if(!data||!data.data_hora){$('#cdSection').classList.add('hidden');return;}
+  const target=new Date(data.data_hora);
+  if(target<new Date()){$('#cdSection').classList.add('hidden');return;}
+  $('#cdTitulo').textContent=data.titulo||'Próxima Aula';
+  $('#cdData').textContent=fdt(data.data_hora);
+  $('#cdTurmaLabel').textContent=CTurma?.nome||'';
+  $('#cdSection').classList.remove('hidden');
+  function tick(){
+    const now=new Date(),diff=target-now;
+    if(diff<=0){$('#cdSection').classList.add('hidden');clearInterval(cdTimer);return;}
+    const dd=Math.floor(diff/864e5),hh=Math.floor((diff%864e5)/36e5),mm=Math.floor((diff%36e5)/6e4),ss=Math.floor((diff%6e4)/1e3);
+    const p=n=>String(n).padStart(2,'0');
+    $('#cdD').textContent=p(dd);$('#cdH').textContent=p(hh);$('#cdM').textContent=p(mm);$('#cdS').textContent=p(ss);
+  }
+  tick();cdTimer=setInterval(tick,1000);
+}
+
 async function loadMods(){
-  if(!sb){mods=[{id:'dm1',titulo:'Introdução e objetivos',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visão geral\nConceitos de telemetria',ordem:1},{id:'dm2',titulo:'Parâmetros de telemetria',icone:'📊',duracao_seg:840,video_type:'youtube',video_url:'',topicos:'Tipos de parâmetros',ordem:2}];CTurma={nome:'Demo'};return;}
+  if(!sb){mods=[{id:'dm1',titulo:'Introdução e objetivos',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visão geral\nConceitos de telemetria',ordem:1},{id:'dm2',titulo:'Parâmetros de telemetria',icone:'📊',duracao_seg:840,video_type:'youtube',video_url:'',topicos:'Tipos de parâmetros',ordem:2}];CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;}
   if(CU.turma_id){
     const{data:t}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();CTurma=t;
+    if(t)$('#sTurmaHdr').textContent=t.nome;
     const{data:m}=await sb.from('modules').select('*').eq('turma_id',CU.turma_id).eq('ativo',true).order('ordem');mods=m||[];
   }else{CTurma=null;mods=[];}
 }
@@ -629,12 +809,13 @@ $('#bNote').addEventListener('click',async()=>{
   $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('✅ Anotações salvas!','s');
 });
 setInterval(async()=>{if(sb&&CU&&actMod&&$('#nta').value)await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});},30000);
+
 async function loadQuiz(){
   const c=$('#qCont');if(!actMod)return;
   if(sb&&CU){const{data:pr}=await sb.from('progress').select('quiz_score,quiz_total').eq('user_id',CU.id).eq('modulo_id',actMod).single();if(pr?.quiz_score!==null&&pr?.quiz_score!==undefined){c.innerHTML=`<div style="padding:15px;border:1px solid var(--green);border-radius:var(--r);background:rgba(15,186,129,.07)"><div style="font-weight:800;color:var(--green);margin-bottom:5px">✅ Quiz respondido!</div><div>Nota: <strong>${pr.quiz_score}/${pr.quiz_total}</strong></div></div>`;return;}}
   let qs=[];if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
   if(!qs.length){c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">🎯 Nenhuma questão para este módulo.</div>';return;}
-  c.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}" data-cor="${q.correct_option}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:all .18s" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
+  c.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:all .18s" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
   c.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){const qb=this.closest('[data-qid]');qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';}));
   $('#bSQ2').addEventListener('click',async()=>{
     let sc=0,ok=true;qs.forEach(q=>{const s=c.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){ok=false;return;}if(parseInt(s.value)===parseInt(q.correct_option))sc++;});
@@ -642,6 +823,28 @@ async function loadQuiz(){
     if(sb&&CU)await sb.from('progress').upsert({user_id:CU.id,modulo_id:actMod,segundos_vistos:wSec,quiz_score:sc,quiz_total:qs.length,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
     toast(`🎯 ${sc}/${qs.length} corretas!`,sc===qs.length?'s':'i');loadQuiz();renderDash();
   });
+}
+
+/* MURAL ALUNO */
+async function loadMural(){
+  const l=$('#muralList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
+  let q=sb.from('mural_avisos').select('*').eq('ativo',true).order('fixado',{ascending:false}).order('criado_em',{ascending:false});
+  if(CU.turma_id)q=q.or(`turma_id.eq.${CU.turma_id},turma_id.is.null`);else q=q.is('turma_id',null);
+  const{data}=await q.limit(30);
+  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">📭 Nenhum aviso no momento.</div>';return;}
+  l.innerHTML=data.map(av=>`
+    <div class="muralcard${av.fixado?' fix':''}">
+      ${av.fixado?'<div class="muralfix">📌 FIXADO</div>':''}
+      <div style="display:flex;align-items:start;gap:11px">
+        <div style="font-size:1.5rem;flex-shrink:0">📢</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:1rem;margin-bottom:5px">${av.titulo}</div>
+          <div style="color:var(--soft);font-size:.9rem;line-height:1.6;margin-bottom:9px">${av.conteudo}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${fdt(av.criado_em)}</div>
+        </div>
+      </div>
+    </div>`).join('');
 }
 
 /* FORUM */
@@ -657,21 +860,21 @@ async function renderFL(){
   if(sf==='mine')q=q.eq('user_id',CU.id);else q=q.eq('aprovado',true);
   if(mi)q=q.eq('modulo_id',mi);else if(mods.length)q=q.in('modulo_id',mods.map(m=>m.id));
   const{data:posts}=await q.limit(50);
-  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem encontrada.</div>';return;}
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem.</div>';return;}
   l.innerHTML='';
   for(const p of posts){
     const ini=(p.users?.nome||'?').substring(0,2).toUpperCase();
     const mn=mods.find(m=>m.id===p.modulo_id)?.titulo||'Geral';
-    const{data:rps}=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).order('criado_em');
+    const{data:rps}=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).eq('aprovado',true).order('criado_em');
     const card=document.createElement('div');card.className=`pc${p.fixado?' pin':''}`;
-    card.innerHTML=`<div class="phead"><div class="pav">${ini}</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">${p.fixado?'📌 ':''}${p.titulo}</div><div style="font-size:.78rem;color:var(--muted)">por <strong>${p.users?.nome||'?'}</strong> · ${fd(p.criado_em)} · <span class="badge bc" style="font-size:.68rem">${mn}</span>${!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">⏳ Pendente</span>':''}</div></div></div><div class="pbody">${p.conteudo}</div><div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 ${(rps||[]).length}</span><button class="btn bg2 btn-xs" onclick="togR('rp-${p.id}')">Respostas</button>${p.user_id===CU.id?`<button class="btn bd btn-xs" onclick="delP('${p.id}')">🗑️</button>`:''}</div><div id="rp-${p.id}" class="rlist hidden">${(rps||[]).map(r=>`<div class="ri"><div class="rav">${(r.users?.nome||'?').substring(0,2).toUpperCase()}</div><div><div style="font-weight:700;font-size:.83rem">${r.users?.nome||'?'} <span style="font-weight:400;color:var(--muted)">${fd(r.criado_em)}</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">${r.conteudo}</div></div></div>`).join('')}${p.aprovado?`<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea id="ri-${p.id}" class="fi" rows="2" placeholder="Sua resposta..."></textarea><button class="btn bp btn-sm" style="margin-top:7px" onclick="subRep('${p.id}')">Responder</button></div>`:''}</div>`;
+    card.innerHTML=`<div class="phead"><div class="pav">${ini}</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">${p.fixado?'📌 ':''}${p.titulo}</div><div style="font-size:.78rem;color:var(--muted)">por <strong>${p.users?.nome||'?'}</strong> · ${fd(p.criado_em)} · <span class="badge bc" style="font-size:.68rem">${mn}</span>${!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">⏳ Pendente</span>':''}</div></div></div><div class="pbody">${p.conteudo}</div><div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 ${(rps||[]).length}</span><button class="btn bg2 btn-xs" onclick="togR('rp-${p.id}')">Respostas</button>${p.user_id===CU.id?`<button class="btn bd btn-xs" onclick="delP('${p.id}')">🗑️</button>`:''}</div><div id="rp-${p.id}" class="rlist hidden">${(rps||[]).map(r=>`<div class="ri${r.is_admin?'  adm-reply':''}"><div class="rav${r.is_admin?' adm':''}">${r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase()}</div><div><div style="font-weight:700;font-size:.83rem">${r.is_admin?'<span style="color:var(--purple)">👨‍💼 Admin</span>':r.users?.nome||'?'} <span style="font-weight:400;color:var(--muted)">${fd(r.criado_em)}</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">${r.conteudo}</div></div></div>`).join('')}${p.aprovado?`<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea id="ri-${p.id}" class="fi" rows="2" placeholder="Sua resposta...&#10;⏳ Aguarda aprovação antes de aparecer."></textarea><button class="btn bp btn-sm" style="margin-top:7px" onclick="subRep('${p.id}')">Responder</button></div>`:''}</div>`;
     l.appendChild(card);
   }
 }
 window.togR=id=>$(`#${id}`).classList.toggle('hidden');
 window.delP=async function(id){if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',id);toast('🗑️ Excluído.','i');renderFL();};
-window.subRep=async function(pid){const t=$(`#ri-${pid}`).value.trim();if(!t)return;await sb.from('forum_replies').insert({post_id:pid,user_id:CU.id,conteudo:t});toast('✅ Resposta enviada!','s');renderFL();};
-function openNP(mid){showModal(`<div class="mt">💬 Nova Dúvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Título</label><input id="npT" class="fi" placeholder="Ex: Dúvida sobre parâmetros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteúdo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua dúvida com detalhes..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button class="btn bp" onclick="subPost('${mid}')">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>`);}
+window.subRep=async function(pid){const t=$(`#ri-${pid}`).value.trim();if(!t)return;await sb.from('forum_replies').insert({post_id:pid,user_id:CU.id,conteudo:t,aprovado:false,is_admin:false});toast('✅ Resposta enviada! Aguarda aprovação.','i');renderFL();};
+function openNP(mid){showModal(`<div class="mtt">💬 Nova Dúvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Título</label><input id="npT" class="fi" placeholder="Ex: Dúvida sobre parâmetros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteúdo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua dúvida..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button class="btn bp" onclick="subPost('${mid}')">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>`);}
 $('#bNP').addEventListener('click',()=>openNP(actMod||''));
 $('#bNPM').addEventListener('click',()=>openNP(actMod||''));
 window.subPost=async function(mid){
@@ -691,14 +894,14 @@ async function loadFMod(){
   l.innerHTML=posts.map(p=>`<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">${(p.users?.nome||'?').substring(0,2).toUpperCase()}</div><div><div style="font-weight:800;font-size:.9rem">${p.titulo}</div><div style="font-size:.76rem;color:var(--muted)">${p.users?.nome} · ${fd(p.criado_em)}</div></div></div><div class="pbody" style="font-size:.87rem">${p.conteudo}</div></div>`).join('');
 }
 
-/* ADMIN */
+/* ===== ADMIN ===== */
 async function showAdmin(){
   $('#ls').style.display='none';$('#aa').classList.remove('hidden');
   $$('.ani').forEach(i=>i.addEventListener('click',()=>{
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
     const adm=i.dataset.adm;$(`#adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,forum:loadAForum};
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,live:loadALive,mural:loadAMural,forum:loadAForum};
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();
@@ -752,7 +955,7 @@ async function loadAAlunos(){
   const{data:alunos}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
   $('#aAT').innerHTML=(alunos||[]).map(a=>{
     const d=du(a.validade_acesso),sb_badge={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';
-    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-family:var(--fm);font-size:.75rem;color:var(--muted)">${a.login}</span></td><td class="mono" style="font-size:.85rem">${a.login}</td><td>${a.turmas?.nome||'—'}</td><td style="font-size:.85rem${d!==null&&d<=30?';color:var(--amber)':''}">${fd(a.validade_acesso)}${d!==null&&d<=30&&d>0?` (${d}d)`:''}</td><td><span class="badge ${sb_badge}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;
+    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-family:var(--fm);font-size:.75rem;color:var(--muted)">${a.login}</span></td><td style="font-size:.85rem">${a.login}</td><td>${a.turmas?.nome||'—'}</td><td style="font-size:.85rem${d!==null&&d<=30?';color:var(--amber)':''}">${fd(a.validade_acesso)}${d!==null&&d<=30&&d>0?` (${d}d)`:''}</td><td><span class="badge ${sb_badge}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;
   }).join('');
 }
 $('#bCA').addEventListener('click',async()=>{
@@ -769,7 +972,7 @@ window.editA=async function(id){
   const{data:a}=await sb.from('users').select('*').eq('id',id).single();
   const{data:turmas}=await sb.from('turmas').select('*');
   const opts=(turmas||[]).map(t=>`<option value="${t.id}"${a.turma_id===t.id?' selected':''}>${t.nome}</option>`).join('');
-  showModal(`<div class="mt">✏️ Editar Aluno: ${a.nome}</div>
+  showModal(`<div class="mtt">✏️ Editar: ${a.nome}</div>
     <div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>${opts}</select></div>
     <div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"${a.status==='active'?' selected':''}>Ativo</option><option value="blocked"${a.status==='blocked'?' selected':''}>Bloqueado</option><option value="expired"${a.status==='expired'?' selected':''}>Expirado</option></select></div>
     <div class="fg" style="margin-bottom:12px"><label class="fl">Renovar acesso (meses a partir de hoje)</label><input id="eMes" class="fi" type="number" value="${a.meses_acesso||12}" min="1"/></div>
@@ -785,7 +988,7 @@ window.saveA=async function(id){
   toast('✅ Atualizado!','s');closeModal();loadAAlunos();loadADash();
 };
 window.delA=async function(id){
-  if(!confirm('Remover aluno? Todo progresso será apagado.'))return;
+  if(!confirm('Remover aluno?'))return;
   await Promise.all([sb.from('progress').delete().eq('user_id',id),sb.from('notes').delete().eq('user_id',id)]);
   await sb.from('users').delete().eq('id',id);
   toast('🗑️ Aluno removido.','i');loadAAlunos();loadADash();
@@ -812,11 +1015,14 @@ async function loadTurmaSelects(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
-  ['mTur','aTurma'].forEach(id=>{const el=$(`#${id}`);if(el)el.innerHTML=(id==='aTurma'?'<option value="">Sem turma</option>':'<option value="">Selecione...</option>')+opts;});
+  ['mTur','aTurma','lvTurma','cdTurma','mrTurma'].forEach(id=>{
+    const el=$(`#${id}`);if(!el)return;
+    const pre=id==='aTurma'?'<option value="">Sem turma</option>':id==='mrTurma'?'<option value="">Todas as turmas</option>':'<option value="">Selecione...</option>';
+    el.innerHTML=pre+opts;
+  });
 }
 async function loadAMods(){
-  if(!sb)return;
-  await loadTurmaSelects();
+  if(!sb)return;await loadTurmaSelects();
   const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('ordem');
   $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
 }
@@ -862,7 +1068,7 @@ async function loadAQuiz(){
   const{data:qs}=await sb.from('quiz').select('*,modules(titulo)').order('criado_em',{ascending:false});
   const l=$('#aQL');
   if(!qs?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão.</div>';return;}
-  l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18)"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt} ${oi===q.correct_option?'<span class="badge bg3" style="font-size:.7rem">✓</span>':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Módulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
+  l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18)"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt}${oi===q.correct_option?' <span class="badge bg3" style="font-size:.7rem">✓</span>':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Módulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
 }
 $('#bSQ').addEventListener('click',async()=>{
   const q=$('#qEn').value.trim(),o0=$('#qO0').value.trim(),o1=$('#qO1').value.trim(),o2=$('#qO2').value.trim(),cs=document.querySelector('input[name="qC"]:checked'),m=$('#qMod').value;
@@ -873,30 +1079,138 @@ $('#bSQ').addEventListener('click',async()=>{
   toast('✅ Questão adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(id=>$(`#${id}`).value='');document.querySelectorAll('input[name="qC"]').forEach(r=>r.checked=false);loadAQuiz();
 });
 window.delQ=async function(id){if(!confirm('Excluir questão?'))return;await sb.from('quiz').delete().eq('id',id);toast('🗑️ Excluída.','i');loadAQuiz();};
+
+/* AULAS AO VIVO ADMIN */
+async function loadALive(){
+  if(!sb)return;await loadTurmaSelects();
+  const{data:rows}=await sb.from('aulas_ao_vivo').select('*,turmas(nome)').order('criado_em',{ascending:false});
+  const tb=$('#lvTable');
+  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuração ainda.</div>';return;}
+  tb.innerHTML=`<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Título</th><th>Data/Link</th><th>Status</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'🔴 Ao vivo':'⏱️ Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td style="font-size:.8rem;color:var(--muted)">${r.tipo==='countdown'?fdt(r.data_hora):r.link?r.link.substring(0,35)+'...':'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+$('#bSLV').addEventListener('click',async()=>{
+  const tu=$('#lvTurma').value,tt=$('#lvTit').value.trim(),lk=$('#lvLink').value.trim(),ds=$('#lvDesc').value.trim(),at=parseInt($('#lvStatus').value);
+  if(!tu||!tt||!lk){toast('⚠️ Turma, título e link obrigatórios.','w');return;}
+  if(!sb)return;
+  await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'live',titulo:tt,link:lk,descricao:ds,ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
+  toast('✅ Configuração salva!','s');loadALive();
+});
+$('#bSCD').addEventListener('click',async()=>{
+  const tu=$('#cdTurma').value,tt=$('#cdTit').value.trim(),dh=$('#cdDH').value,at=parseInt($('#cdAtivo').value);
+  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, título e data/hora.','w');return;}
+  if(!sb)return;
+  await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'countdown',titulo:tt,data_hora:new Date(dh).toISOString(),ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
+  toast('✅ Contador salvo!','s');loadALive();
+});
+window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);toast(a?'▶️ Ativado!':'⏸️ Desativado.','i');loadALive();};
+window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);toast('🗑️ Excluído.','i');loadALive();};
+
+/* MURAL ADMIN */
+async function loadAMural(){
+  if(!sb)return;await loadTurmaSelects();
+  const{data}=await sb.from('mural_avisos').select('*,turmas(nome)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
+  const l=$('#aMuralList');
+  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum aviso publicado.</div>';return;}
+  l.innerHTML=data.map(av=>`
+    <div style="border:1px solid ${av.fixado?'rgba(245,158,11,.4)':'var(--border)'};border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)">
+      <div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px">
+        <div>
+          <div style="font-weight:800">${av.fixado?'📌 ':''}${av.titulo}</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${av.turmas?.nome||'Todas as turmas'} · ${fdt(av.criado_em)}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="btn bg2 btn-xs" onclick="togMR('${av.id}',${!av.fixado})">${av.fixado?'📌':'📍'}</button>
+          <button class="btn bd btn-xs" onclick="delMR('${av.id}')">🗑️</button>
+        </div>
+      </div>
+      <div style="font-size:.88rem;color:var(--soft);line-height:1.5">${av.conteudo}</div>
+    </div>`).join('');
+}
+$('#bSMR').addEventListener('click',async()=>{
+  const tu=$('#mrTurma').value,ti=$('#mrTit').value.trim(),co=$('#mrCont').value.trim(),fi=parseInt($('#mrFix').value);
+  if(!ti||!co){toast('⚠️ Título e conteúdo obrigatórios.','w');return;}
+  if(!sb)return;
+  await sb.from('mural_avisos').insert({turma_id:tu||null,titulo:ti,conteudo:co,fixado:fi===1,ativo:true});
+  toast('✅ Aviso publicado!','s');['mrTit','mrCont'].forEach(id=>$(`#${id}`).value='');$('#mrFix').value='0';loadAMural();
+});
+window.togMR=async function(id,f){await sb.from('mural_avisos').update({fixado:f}).eq('id',id);toast(f?'📌 Fixado!':'Desfixado.','i');loadAMural();};
+window.delMR=async function(id){if(!confirm('Excluir aviso?'))return;await sb.from('mural_avisos').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAMural();};
+
+/* FORUM ADMIN */
 async function loadAForum(){
   if(!sb)return;
   const f=$('#aFF').value;
-  let q=sb.from('forum_posts').select('*,users(nome,login),modules(titulo)').order('criado_em',{ascending:false});
+  let q=sb.from('forum_posts').select('*,users(nome,login),modules(titulo)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
   if(f==='pending')q=q.eq('aprovado',false);else if(f==='approved')q=q.eq('aprovado',true);
   const{data:posts}=await q.limit(100);
   const l=$('#aFL');
-  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum post.</div>';return;}
-  l.innerHTML=posts.map(p=>`<div class="pc${p.fixado?' pin':''}"><div class="phead"><div class="pav" style="width:28px;height:28px;font-size:.72rem">${(p.users?.nome||'?').substring(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-weight:800;font-size:.92rem">${p.titulo}</div><div style="font-size:.76rem;color:var(--muted)">${p.users?.nome} · ${p.modules?.titulo||'Geral'} · ${fd(p.criado_em)} ${!p.aprovado?'<span class="badge ba" style="font-size:.68rem">⏳ Pendente</span>':''}${p.fixado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">📌</span>':''}</div></div><div style="display:flex;gap:6px;flex-shrink:0">${!p.aprovado?`<button class="btn bs btn-xs" onclick="aprvP('${p.id}')">✅</button>`:''}<button class="btn bg2 btn-xs" onclick="pinP('${p.id}',${!p.fixado})">${p.fixado?'📌':'📍'}</button><button class="btn bd btn-xs" onclick="admDelP('${p.id}')">🗑️</button></div></div><div class="pbody" style="font-size:.86rem">${p.conteudo}</div></div>`).join('');
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum post encontrado.</div>';return;}
+  l.innerHTML='';
+  for(const p of posts){
+    const ini=(p.users?.nome||'?').substring(0,2).toUpperCase();
+    const{data:rps}=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).order('criado_em');
+    const pendReps=(rps||[]).filter(r=>!r.aprovado&&!r.is_admin).length;
+    const card=document.createElement('div');card.className=`pc${p.fixado?' pin':''}`;
+    card.innerHTML=`
+      <div class="phead">
+        <div class="pav" style="width:30px;height:30px;font-size:.75rem">${ini}</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:.93rem">${p.fixado?'📌 ':''}${p.titulo}</div>
+          <div style="font-size:.76rem;color:var(--muted)">${p.users?.nome||'?'} · ${p.modules?.titulo||'Geral'} · ${fd(p.criado_em)}
+            ${!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">⏳ Post pendente</span>':''}
+            ${pendReps>0?`<span class="badge ba" style="font-size:.68rem;margin-left:4px">⏳ ${pendReps} resp. pendente(s)</span>`:''}
+            ${p.fixado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">📌</span>':''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          ${!p.aprovado?`<button class="btn bs btn-xs" onclick="aprvP('${p.id}')">✅ Aprovar post</button>`:''}
+          <button class="btn bg2 btn-xs" onclick="pinP('${p.id}',${!p.fixado})">${p.fixado?'📌':'📍'}</button>
+          <button class="btn bd btn-xs" onclick="admDelP('${p.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">${p.conteudo}</div>
+      <div style="padding:11px 15px">
+        <div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas (${(rps||[]).length})</div>
+        <div id="adm-rps-${p.id}">
+          ${(rps||[]).map(r=>`
+            <div class="ri${r.is_admin?' adm-reply':!r.aprovado?' pending-reply':''}">
+              <div class="rav${r.is_admin?' adm':''}">${r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase()}</div>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <div style="font-weight:700;font-size:.82rem">${r.is_admin?'<span style="color:var(--purple)">👨‍💼 Admin</span>':r.users?.nome||'?'}
+                    <span style="font-weight:400;color:var(--muted)">${fd(r.criado_em)}</span>
+                    ${!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem">⏳ Pendente</span>':''}
+                  </div>
+                  <div style="display:flex;gap:4px;flex-shrink:0">
+                    ${!r.aprovado&&!r.is_admin?`<button class="btn bs btn-xs" onclick="aprvRep('${r.id}','${p.id}')">✅</button>`:''}
+                    <button class="btn bd btn-xs" onclick="delRep('${r.id}','${p.id}')">🗑️</button>
+                  </div>
+                </div>
+                <div style="font-size:.87rem;color:var(--soft);margin-top:3px">${r.conteudo}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨‍💼 Responder como Admin</div>
+          <textarea id="adm-rep-${p.id}" class="fi" rows="2" placeholder="Digite sua resposta (publicada imediatamente)..."></textarea>
+          <button class="btn bp btn-sm" style="margin-top:7px" onclick="admRep('${p.id}')">📤 Enviar resposta</button>
+        </div>
+      </div>`;
+    l.appendChild(card);
+  }
 }
 $('#aFF').addEventListener('change',loadAForum);$('#bRF').addEventListener('click',loadAForum);
-window.aprvP=async function(id){await sb.from('forum_posts').update({aprovado:true}).eq('id',id);toast('✅ Aprovado!','s');loadAForum();};
+window.aprvP=async function(id){await sb.from('forum_posts').update({aprovado:true}).eq('id',id);toast('✅ Post aprovado!','s');loadAForum();};
 window.pinP=async function(id,f){await sb.from('forum_posts').update({fixado:f}).eq('id',id);toast(f?'📌 Fixado!':'Desfixado.','i');loadAForum();};
-window.admDelP=async function(id){if(!confirm('Excluir post?'))return;await sb.from('forum_replies').delete().eq('post_id',id);await sb.from('forum_posts').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAForum();};
-
-/* INIT */
-window.addEventListener('load',()=>{
-  if(SUPABASE_URL==='COLE_SUA_URL_AQUI'){
-    const w=document.createElement('div');
-    w.style.cssText='position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#1a0a00;padding:10px;text-align:center;font-weight:800;font-size:.9rem;z-index:99999';
-    w.innerHTML='⚠️ SUPABASE NÃO CONFIGURADO — Cole sua URL e chave no início do arquivo. <a href="https://supabase.com" target="_blank" style="text-decoration:underline">Criar conta grátis →</a>';
-    document.body.prepend(w);
-  }
-});
+window.admDelP=async function(id){if(!confirm('Excluir post e todas as respostas?'))return;await sb.from('forum_replies').delete().eq('post_id',id);await sb.from('forum_posts').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAForum();};
+window.aprvRep=async function(rid,pid){await sb.from('forum_replies').update({aprovado:true}).eq('id',rid);toast('✅ Resposta aprovada!','s');loadAForum();};
+window.delRep=async function(rid,pid){if(!confirm('Excluir resposta?'))return;await sb.from('forum_replies').delete().eq('id',rid);toast('🗑️ Resposta removida.','i');loadAForum();};
+window.admRep=async function(pid){
+  const t=$(`#adm-rep-${pid}`).value.trim();
+  if(!t){toast('⚠️ Digite uma resposta.','w');return;}
+  await sb.from('forum_replies').insert({post_id:pid,user_id:CU.id,conteudo:t,aprovado:true,is_admin:true});
+  toast('✅ Resposta publicada!','s');loadAForum();
+};
 </script>
 </body>
 </html>
