@@ -10,6 +10,7 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23080b10'/><rect width='64' height='64' rx='14' fill='url(%23g)' opacity='.9'/><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300c8ff' stop-opacity='.25'/><stop offset='1' stop-color='%237c5cfc' stop-opacity='.25'/></linearGradient></defs><rect x='3' y='3' width='58' height='58' rx='12' fill='none' stroke='%2300c8ff' stroke-width='1.5' stroke-opacity='.5'/><text x='32' y='42' font-family='Arial Black,sans-serif' font-weight='900' font-size='22' fill='%2300c8ff' text-anchor='middle' letter-spacing='-1'>ESC</text></svg>"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -850,6 +851,7 @@ async function loadMural(){
 /* FORUM */
 async function loadFPage(){
   const sf=$('#fMF');sf.innerHTML='<option value="">Todos os módulos</option>'+mods.map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
+  // recarrega posts toda vez que abre o fórum
   await renderFL();$('#fMF').onchange=renderFL;$('#fSF').onchange=renderFL;
 }
 async function renderFL(){
@@ -857,8 +859,19 @@ async function renderFL(){
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
   const mi=$('#fMF').value,sf=$('#fSF').value;
   let q=sb.from('forum_posts').select('*,users(nome,login)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  if(sf==='mine')q=q.eq('user_id',CU.id);else q=q.eq('aprovado',true);
-  if(mi)q=q.eq('modulo_id',mi);else if(mods.length)q=q.in('modulo_id',mods.map(m=>m.id));
+  if(sf==='mine'){
+    q=q.eq('user_id',CU.id);
+  } else {
+    q=q.eq('aprovado',true);
+    if(mi){
+      q=q.eq('modulo_id',mi);
+    } else if(CU.turma_id&&mods.length){
+      // posts dos módulos da turma OU posts sem módulo (gerais para todos)
+      const modIds=mods.map(m=>m.id);
+      q=q.or('modulo_id.is.null,'+modIds.map(id=>`modulo_id.eq.${id}`).join(','));
+    }
+    // sem turma ou sem módulos: vê todos os posts aprovados
+  }
   const{data:posts}=await q.limit(50);
   if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem.</div>';return;}
   l.innerHTML='';
@@ -889,7 +902,7 @@ window.subPost=async function(mid){
 async function loadFMod(){
   const l=$('#fML');if(!actMod){l.innerHTML='<div style="color:var(--muted)">Selecione um módulo.</div>';return;}
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
-  const{data:posts}=await sb.from('forum_posts').select('*,users(nome)').eq('modulo_id',actMod).eq('aprovado',true).order('criado_em',{ascending:false}).limit(15);
+  const{data:posts}=await sb.from('forum_posts').select('*,users(nome)').eq('aprovado',true).or(`modulo_id.eq.${actMod},modulo_id.is.null`).order('criado_em',{ascending:false}).limit(15);
   if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem dúvidas. Seja o primeiro!</div>';return;}
   l.innerHTML=posts.map(p=>`<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">${(p.users?.nome||'?').substring(0,2).toUpperCase()}</div><div><div style="font-weight:800;font-size:.9rem">${p.titulo}</div><div style="font-size:.76rem;color:var(--muted)">${p.users?.nome} · ${fd(p.criado_em)}</div></div></div><div class="pbody" style="font-size:.87rem">${p.conteudo}</div></div>`).join('');
 }
