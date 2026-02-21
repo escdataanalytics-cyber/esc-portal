@@ -623,49 +623,57 @@ function showModal(html){$('#mCont').innerHTML=html;$('#mBg').classList.remove('
 function closeModal(){$('#mBg').classList.add('hidden');}
 $('#mBg').addEventListener('click',e=>{if(e.target===$('#mBg'))closeModal();});
 
+/* LOGIN */
 $$('.ltab').forEach(t=>t.addEventListener('click',()=>{
   $$('.ltab').forEach(x=>x.classList.remove('act'));t.classList.add('act');
-  const tb=t.dataset.lt;$('#lf-login').classList.toggle('hidden',tb!=='login');$('#lf-reg').classList.toggle('hidden',tb!=='reg');
+  const tb=t.dataset.lt;
+  $('#lf-login').classList.toggle('hidden',tb!=='login');
+  $('#lf-reg').classList.toggle('hidden',tb!=='reg');
 }));
-
 $('#lBtn').addEventListener('click',doLogin);
 $('#lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 async function doLogin(){
   const lg=$('#lUser').value.trim(),pw=$('#lPass').value.trim(),err=$('#lErr');
-  if(!lg||!pw){err.textContent='⚠️ Preencha login e senha.';return;}
+  if(!lg||!pw){err.textContent='Preencha login e senha.';return;}
   err.textContent='';
   if(!sb){
     if(lg==='admin'&&pw==='admin2024'){CU={id:'da',nome:'Administrador',login:'admin',role:'admin',status:'active'};showAdmin();}
     else if(lg==='aluno1'&&pw==='123456'){CU={id:'ds1',nome:'Carlos Demo',login:'aluno1',role:'student',status:'active',turma_id:null,validade_acesso:'2027-01-01'};showStudent();}
-    else{err.textContent='❌ Demo: admin/admin2024 ou aluno1/123456';}
+    else{err.textContent='Demo: admin/admin2024 ou aluno1/123456';}
     return;
   }
   $('#lBtn').disabled=true;
   const hash=await sha(pw);
   const{data,error}=await sb.from('users').select('*').eq('login',lg).eq('senha',hash).single();
   $('#lBtn').disabled=false;
-  if(error||!data){err.textContent='❌ Login ou senha incorretos.';return;}
-  if(data.status==='pending'){err.textContent='⏳ Cadastro aguardando aprovação.';return;}
-  if(data.status==='blocked'){err.textContent='🚫 Acesso bloqueado. Contate o admin.';return;}
-  if(data.status==='expired'||(data.validade_acesso&&new Date(data.validade_acesso)<new Date())){err.textContent='⏰ Acesso expirado.';return;}
+  if(error||!data){err.textContent='Login ou senha incorretos.';return;}
+  if(data.status==='pending'){err.textContent='Cadastro aguardando aprovacao.';return;}
+  if(data.status==='blocked'){err.textContent='Acesso bloqueado. Contate o admin.';return;}
+  if(data.status==='expired'||(data.validade_acesso&&new Date(data.validade_acesso)<new Date())){err.textContent='Acesso expirado.';return;}
   CU=data;data.role==='admin'?showAdmin():showStudent();
 }
 $('#rBtn').addEventListener('click',async()=>{
   const n=$('#rNome').value.trim(),e=$('#rEmail').value.trim(),l=$('#rLogin').value.trim(),p=$('#rPass').value.trim(),err=$('#rErr');
-  if(!n||!e||!l||!p){err.textContent='⚠️ Preencha todos os campos.';return;}
-  if(p.length<6){err.textContent='⚠️ Senha mínimo 6 caracteres.';return;}
+  if(!n||!e||!l||!p){err.textContent='Preencha todos os campos.';return;}
+  if(p.length<6){err.textContent='Senha minimo 6 caracteres.';return;}
   if(!sb){toast('Configure o Supabase.','w');return;}
   $('#rBtn').disabled=true;
   const hash=await sha(p);
   const{error}=await sb.from('users').insert({nome:n,email:e,login:l,senha:hash,role:'student',status:'pending'});
   $('#rBtn').disabled=false;
-  if(error){err.textContent=error.message.includes('unique')?'❌ Login ou email já em uso.':'❌ Erro ao enviar.';return;}
-  toast('✅ Solicitação enviada! Aguarde aprovação.','s');document.querySelector('[data-lt="login"]').click();
+  if(error){$('#rErr').textContent=error.message.includes('unique')?'Login ou email ja em uso.':'Erro ao enviar.';return;}
+  toast('Solicitacao enviada! Aguarde aprovacao.','s');document.querySelector('[data-lt="login"]').click();
 });
-function doLogout(){CU=null;CTurma=null;actMod=null;mods=[];if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);$('#sa').classList.add('hidden');$('#aa').classList.add('hidden');$('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';}
-$('#sOut').addEventListener('click',doLogout);$('#aOut').addEventListener('click',doLogout);
+function doLogout(){
+  CU=null;CTurma=null;actMod=null;mods=[];
+  if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);
+  $('#sa').classList.add('hidden');$('#aa').classList.add('hidden');
+  $('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';
+}
+$('#sOut').addEventListener('click',doLogout);
+$('#aOut').addEventListener('click',doLogout);
 
-/* ===== STUDENT ===== */
+/* STUDENT */
 async function showStudent(){
   $('#ls').style.display='none';$('#sa').classList.remove('hidden');
   const ini=CU.nome.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -675,41 +683,29 @@ async function showStudent(){
   if(d!==null&&d<=30&&d>0){$('#ew').classList.remove('hidden');$('#ed').textContent=d;}
   await loadMods();renderDash();renderSML();loadLiveSection();loadCountdown();
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
-    const pg=item.dataset.pg;$$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
-    $$('#sa .page').forEach(p=>p.classList.remove('act'));$(`#pg-${pg}`).classList.add('act');
-    if(pg==='forum')loadFPage();
-    if(pg==='mural')loadMural();
+    const pg=item.dataset.pg;
+    $$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
+    $$('#sa .page').forEach(p=>p.classList.remove('act'));
+    document.querySelector(`#pg-${pg}`).classList.add('act');
+    if(pg==='forum')loadFPage();if(pg==='mural')loadMural();
   }));
   $$('.tb').forEach(b=>b.addEventListener('click',()=>{
-    const tab=b.dataset.tab;$$('.tb').forEach(x=>x.classList.remove('act'));b.classList.add('act');
-    $$('.tp').forEach(p=>p.classList.remove('act'));$(`#tab-${tab}`).classList.add('act');
+    const tab=b.dataset.tab;
+    $$('.tb').forEach(x=>x.classList.remove('act'));b.classList.add('act');
+    $$('.tp').forEach(p=>p.classList.remove('act'));
+    document.querySelector(`#tab-${tab}`).classList.add('act');
     if(tab==='note')loadNote();if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();
   }));
 }
-
-/* ===== ADMIN ===== */
-async function showAdmin(){
-  $('#ls').style.display='none';$('#aa').classList.remove('hidden');
-  $$('.ani').forEach(i=>i.addEventListener('click',()=>{
-    $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
-    $$('#aa .page').forEach(p=>p.classList.remove('act'));
-    const adm=i.dataset.adm;$(`#adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,live:loadALive,mural:loadAMural,forum:loadAForum};
-    if(fns[adm])fns[adm]();
-  }));
-  await loadADash();await loadPend();
-}
-
 async function loadLiveSection(){
   if(!sb||!CU.turma_id){$('#liveSection').classList.add('hidden');return;}
-  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('ativa',true).single();
+  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','live').eq('ativa',true).single();
   if(!data){$('#liveSection').classList.add('hidden');return;}
   $('#liveTitulo').textContent=data.titulo||'Aula Ao Vivo';
-  $('#liveDesc').textContent=data.descricao||'Sua turma está em aula agora!';
+  $('#liveDesc').textContent=data.descricao||'Sua turma esta em aula agora!';
   $('#liveBtn').href=data.link||'#';
   $('#liveSection').classList.remove('hidden');
 }
-
 async function loadCountdown(){
   if(cdTimer)clearInterval(cdTimer);
   if(!sb||!CU.turma_id){$('#cdSection').classList.add('hidden');return;}
@@ -717,7 +713,7 @@ async function loadCountdown(){
   if(!data||!data.data_hora){$('#cdSection').classList.add('hidden');return;}
   const target=new Date(data.data_hora);
   if(target<new Date()){$('#cdSection').classList.add('hidden');return;}
-  $('#cdTitulo').textContent=data.titulo||'Próxima Aula';
+  $('#cdTitulo').textContent=data.titulo||'Proxima Aula';
   $('#cdData').textContent=fdt(data.data_hora);
   $('#cdTurmaLabel').textContent=CTurma?.nome||'';
   $('#cdSection').classList.remove('hidden');
@@ -730,13 +726,16 @@ async function loadCountdown(){
   }
   tick();cdTimer=setInterval(tick,1000);
 }
-
 async function loadMods(){
-  if(!sb){mods=[{id:'dm1',titulo:'Introdução e objetivos',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visão geral\nConceitos de telemetria',ordem:1},{id:'dm2',titulo:'Parâmetros de telemetria',icone:'📊',duracao_seg:840,video_type:'youtube',video_url:'',topicos:'Tipos de parâmetros',ordem:2}];CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;}
+  if(!sb){
+    mods=[{id:'dm1',titulo:'Introducao',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visao geral',ordem:1},{id:'dm2',titulo:'Parametros',icone:'📊',duracao_seg:840,video_type:'youtube',video_url:'',topicos:'Tipos',ordem:2}];
+    CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;
+  }
   if(CU.turma_id){
-    const{data:t}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();CTurma=t;
-    if(t)$('#sTurmaHdr').textContent=t.nome;
-    const{data:m}=await sb.from('modules').select('*').eq('turma_id',CU.turma_id).eq('ativo',true).order('ordem');mods=m||[];
+    const{data:t}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
+    CTurma=t;if(t)$('#sTurmaHdr').textContent=t.nome;
+    const{data:m}=await sb.from('modules').select('*').eq('turma_id',CU.turma_id).eq('ativo',true).order('ordem');
+    mods=m||[];
   }else{CTurma=null;mods=[];}
 }
 async function getProg(){
@@ -749,37 +748,46 @@ async function renderDash(){
   const pm=await getProg();
   const done=mods.filter(m=>pm[m.id]?.concluido).length,total=mods.length;
   const p=pct(done,total),ts=Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0);
-  const qs=Object.values(pm).filter(x=>x.quiz_score!==null);
+  const qs=Object.values(pm).filter(x=>x.quiz_score!==null&&x.quiz_score!==undefined);
   $('#dPct').textContent=p+'%';$('#dDone').textContent=`${done}/${total}`;
   $('#dTime').textContent=(ts/3600).toFixed(1)+'h';$('#dQuiz').textContent=qs.length?`${qs[qs.length-1].quiz_score}/${qs[qs.length-1].quiz_total||'?'}`:'—';
-  $('#sPct').textContent=p+'%';$('#sBar').style.width=p+'%';$('#sLbl').textContent=`${done} de ${total} módulos`;
+  $('#sPct').textContent=p+'%';$('#sBar').style.width=p+'%';$('#sLbl').textContent=`${done} de ${total} modulos`;
   const tr=$('#trail');tr.innerHTML='';
   mods.forEach(m=>{
     const mp=pm[m.id]||{segundos_vistos:0,concluido:false},pp=pct(mp.segundos_vistos||0,m.duracao_seg||1),isDone=mp.concluido,isCur=actMod===m.id;
     const el=document.createElement('div');el.className='tri';
-    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${m.titulo}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento · ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
+    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${m.titulo}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg)}</span>${isDone?'<span class="badge bg3">Concluido</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Nao iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
     tr.appendChild(el);
   });
-  if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
+  if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum modulo disponivel para sua turma.</div>';
 }
 function renderSML(){
   const l=$('#sML');l.innerHTML='';
-  mods.forEach(m=>{const el=document.createElement('div');el.className=`ni${actMod===m.id?' act':''}`;el.innerHTML=`<span class="nic">${m.icone}</span><span style="font-size:.84rem">${m.titulo}</span>`;el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);});
+  mods.forEach(m=>{
+    const el=document.createElement('div');el.className=`ni${actMod===m.id?' act':''}`;
+    el.innerHTML=`<span class="nic">${m.icone}</span><span style="font-size:.84rem">${m.titulo}</span>`;
+    el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);
+  });
 }
 window.openMod=function(id){
-  actMod=id;$$('[data-pg]').forEach(x=>x.classList.remove('act'));document.querySelector('[data-pg="class"]').classList.add('act');
-  $$('#sa .page').forEach(p=>p.classList.remove('act'));$('#pg-class').classList.add('act');
+  actMod=id;
+  $$('[data-pg]').forEach(x=>x.classList.remove('act'));
+  document.querySelector('[data-pg="class"]').classList.add('act');
+  $$('#sa .page').forEach(p=>p.classList.remove('act'));
+  $('#pg-class').classList.add('act');
   const m=mods.find(x=>x.id===id);if(!m)return;
   $('#pMod').textContent=`${m.icone} ${m.titulo}`;$('#cMT').textContent=m.titulo;
-  $('#cTop').innerHTML=(m.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem tópicos.</span>';
-  loadVideo(m);renderCML();loadCMats(id);loadQuiz();$('#nta').oninput=()=>{$('#nch').textContent=$('#nta').value.length;};renderDash();renderSML();
+  $('#cTop').innerHTML=(m.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem topicos.</span>';
+  loadVideo(m);renderCML();loadCMats(id);loadQuiz();
+  $('#nta').oninput=()=>{$('#nch').textContent=$('#nta').value.length;};
+  renderDash();renderSML();
 };
 function loadVideo(m){
-  const c=$('#vc');if(wTimer)clearInterval(wTimer);
-  if(!m.video_url){c.innerHTML=`<div style="color:var(--muted)">📹 Vídeo em breve</div>`;startWT(m);return;}
-  if(m.video_type==='youtube'){const vid=ytId(m.video_url);c.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'';}
-  else if(m.video_type==='vimeo'){const vid=vmId(m.video_url);c.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'';}
-  else{c.innerHTML=`<video class="vif" controls preload="metadata"><source src="${m.video_url}" type="video/mp4"/></video>`;}
+  const vc=$('#vc');if(wTimer)clearInterval(wTimer);
+  if(!m.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Video em breve</div>';startWT(m);return;}
+  if(m.video_type==='youtube'){const vid=ytId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'';}
+  else if(m.video_type==='vimeo'){const vid=vmId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'';}
+  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${m.video_url}" type="video/mp4"/></video>`;}
   startWT(m);
 }
 function ytId(u){const m=u.match(/(?:v=|youtu\.be\/|embed\/)([^#&?]{11})/);return m?m[1]:null;}
@@ -799,16 +807,21 @@ $('#bDone').addEventListener('click',async()=>{
   const m=mods.find(x=>x.id===actMod);if(!m)return;
   const p=pct(wSec,m.duracao_seg);
   if(p<80&&!confirm(`Assistiu apenas ${p}%. Concluir mesmo assim?`))return;
-  await svP(m,true);toast('✅ Módulo concluído!','s');renderDash();
+  await svP(m,true);toast('Modulo concluido!','s');renderDash();
 });
 function renderCML(){
   const l=$('#cML');l.innerHTML='';
-  mods.forEach(m=>{const el=document.createElement('div');el.style.cssText=`display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:all .18s;border:1px solid ${m.id===actMod?'rgba(0,200,255,.28)':'transparent'};background:${m.id===actMod?'rgba(0,200,255,.07)':'transparent'}`;el.innerHTML=`<span>${m.icone}</span><span style="font-size:.85rem;font-weight:700">${m.titulo}</span>`;el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);});
+  mods.forEach(m=>{
+    const el=document.createElement('div');
+    el.style.cssText=`display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:all .18s;border:1px solid ${m.id===actMod?'rgba(0,200,255,.28)':'transparent'};background:${m.id===actMod?'rgba(0,200,255,.07)':'transparent'}`;
+    el.innerHTML=`<span>${m.icone}</span><span style="font-size:.85rem;font-weight:700">${m.titulo}</span>`;
+    el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);
+  });
 }
 async function loadCMats(id){
   const l=$('#cMat');if(!sb){l.innerHTML='<div style="color:var(--muted)">Conecte o Supabase.</div>';return;}
   const{data}=await sb.from('materials').select('*').or(`modulo_id.eq.${id},modulo_id.is.null`);
-  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">📭 Nenhum material.</div>';return;}
+  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum material.</div>';return;}
   l.innerHTML=data.map(mat=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;background:rgba(0,0,0,.18)"><div><div style="font-weight:700">${ti(mat.tipo)} ${mat.nome}</div><div style="font-size:.82rem;color:var(--muted)">${mat.descricao||''}</div></div><a class="btn bp btn-sm" href="${mat.url}" target="_blank" rel="noopener">Acessar</a></div>`).join('');
 }
 async function loadNote(){
@@ -820,22 +833,33 @@ async function loadNote(){
 $('#bNote').addEventListener('click',async()=>{
   if(!sb||!actMod||!CU)return;
   await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
-  $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('✅ Anotações salvas!','s');
+  $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('Anotacoes salvas!','s');
 });
-setInterval(async()=>{if(sb&&CU&&actMod&&$('#nta').value)await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});},30000);
-
+setInterval(async()=>{
+  if(sb&&CU&&actMod&&$('#nta').value)
+    await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
+},30000);
 async function loadQuiz(){
-  const c=$('#qCont');if(!actMod)return;
-  if(sb&&CU){const{data:pr}=await sb.from('progress').select('quiz_score,quiz_total').eq('user_id',CU.id).eq('modulo_id',actMod).single();if(pr?.quiz_score!==null&&pr?.quiz_score!==undefined){c.innerHTML=`<div style="padding:15px;border:1px solid var(--green);border-radius:var(--r);background:rgba(15,186,129,.07)"><div style="font-weight:800;color:var(--green);margin-bottom:5px">✅ Quiz respondido!</div><div>Nota: <strong>${pr.quiz_score}/${pr.quiz_total}</strong></div></div>`;return;}}
-  let qs=[];if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
-  if(!qs.length){c.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">🎯 Nenhuma questão para este módulo.</div>';return;}
-  c.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:all .18s" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
-  c.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){const qb=this.closest('[data-qid]');qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';}));
-  $('#bSQ2').addEventListener('click',async()=>{
-    let sc=0,ok=true;qs.forEach(q=>{const s=c.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){ok=false;return;}if(parseInt(s.value)===parseInt(q.correct_option))sc++;});
-    if(!ok){toast('⚠️ Responda todas!','w');return;}
+  const qc=$('#qCont');if(!actMod)return;
+  if(sb&&CU){
+    const{data:pr}=await sb.from('progress').select('quiz_score,quiz_total').eq('user_id',CU.id).eq('modulo_id',actMod).single();
+    if(pr?.quiz_score!==null&&pr?.quiz_score!==undefined){qc.innerHTML=`<div style="padding:15px;border:1px solid var(--green);border-radius:var(--r);background:rgba(15,186,129,.07)"><div style="font-weight:800;color:var(--green);margin-bottom:5px">Quiz respondido!</div><div>Nota: <strong>${pr.quiz_score}/${pr.quiz_total}</strong></div></div>`;return;}
+  }
+  let qs=[];
+  if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
+  if(!qs.length){qc.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao para este modulo.</div>';return;}
+  qc.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
+  qc.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){
+    const qb=this.closest('[data-qid]');
+    qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});
+    this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';
+  }));
+  document.getElementById('bSQ2').addEventListener('click',async()=>{
+    let sc=0,ok=true;
+    qs.forEach(q=>{const s=qc.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){ok=false;return;}if(parseInt(s.value)===parseInt(q.correct_option))sc++;});
+    if(!ok){toast('Responda todas!','w');return;}
     if(sb&&CU)await sb.from('progress').upsert({user_id:CU.id,modulo_id:actMod,segundos_vistos:wSec,quiz_score:sc,quiz_total:qs.length,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
-    toast(`🎯 ${sc}/${qs.length} corretas!`,sc===qs.length?'s':'i');loadQuiz();renderDash();
+    toast(`${sc}/${qs.length} corretas!`,sc===qs.length?'s':'i');loadQuiz();renderDash();
   });
 }
 
@@ -844,156 +868,114 @@ async function loadMural(){
   const l=$('#muralList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
   let q=sb.from('mural_avisos').select('*').eq('ativo',true).order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  if(CU.turma_id)q=q.or(`turma_id.eq.${CU.turma_id},turma_id.is.null`);else q=q.is('turma_id',null);
+  if(CU.turma_id)q=q.or('turma_id.eq.'+CU.turma_id+',turma_id.is.null');else q=q.is('turma_id',null);
   const{data}=await q.limit(30);
-  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">📭 Nenhum aviso no momento.</div>';return;}
-  l.innerHTML=data.map(av=>`
-    <div class="muralcard${av.fixado?' fix':''}">
-      ${av.fixado?'<div class="muralfix">📌 FIXADO</div>':''}
-      <div style="display:flex;align-items:start;gap:11px">
-        <div style="font-size:1.5rem;flex-shrink:0">📢</div>
-        <div style="flex:1">
-          <div style="font-weight:800;font-size:1rem;margin-bottom:5px">${av.titulo}</div>
-          <div style="color:var(--soft);font-size:.9rem;line-height:1.6;margin-bottom:9px">${av.conteudo}</div>
-          <div style="font-size:.75rem;color:var(--muted)">${fdt(av.criado_em)}</div>
-        </div>
-      </div>
-    </div>`).join('');
+  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum aviso no momento.</div>';return;}
+  l.innerHTML=data.map(av=>
+    '<div class="muralcard'+(av.fixado?' fix':'')+'">'+
+    (av.fixado?'<div class="muralfix">📌 FIXADO</div>':'')+
+    '<div style="display:flex;align-items:start;gap:11px">'+
+    '<div style="font-size:1.5rem;flex-shrink:0">📢</div>'+
+    '<div style="flex:1">'+
+    '<div style="font-weight:800;font-size:1rem;margin-bottom:5px">'+av.titulo+'</div>'+
+    '<div style="color:var(--soft);font-size:.9rem;line-height:1.6;margin-bottom:9px">'+av.conteudo+'</div>'+
+    '<div style="font-size:.75rem;color:var(--muted)">'+fdt(av.criado_em)+'</div>'+
+    '</div></div></div>'
+  ).join('');
 }
 
-/* FORUM */
+/* FORUM ALUNO */
 async function loadFPage(){
-  var sf=document.querySelector('#fMF');
-  sf.innerHTML='<option value="">Todos os módulos</option>'+mods.map(function(m){return '<option value="'+m.id+'">'+m.icone+' '+m.titulo+'</option>';}).join('');
+  $('#fMF').innerHTML='<option value="">Todos os modulos</option>'+mods.map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
   await renderFL();
-  document.querySelector('#fMF').onchange=renderFL;
-  document.querySelector('#fSF').onchange=renderFL;
+  $('#fMF').onchange=renderFL;$('#fSF').onchange=renderFL;
 }
 async function renderFL(){
-  var l=document.querySelector('#fList');
-  l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#fList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
-  var mi=document.querySelector('#fMF').value, sf=document.querySelector('#fSF').value;
-  var q=sb.from('forum_posts').select('*,users(nome,login)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  if(sf==='mine'){
-    q=q.eq('user_id',CU.id);
-  } else {
+  const mi=$('#fMF').value,sf=$('#fSF').value;
+  let q=sb.from('forum_posts').select('*,users(nome,login)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
+  if(sf==='mine'){q=q.eq('user_id',CU.id);}
+  else{
     q=q.eq('aprovado',true);
-    if(mi){
-      q=q.eq('modulo_id',mi);
-    } else if(CU.turma_id&&mods.length){
-      var modIds=mods.map(function(m){return m.id;});
-      q=q.or('modulo_id.is.null,'+modIds.map(function(id){return 'modulo_id.eq.'+id;}).join(','));
+    if(mi){q=q.eq('modulo_id',mi);}
+    else if(CU.turma_id&&mods.length){
+      const ids=mods.map(m=>m.id);
+      q=q.or('modulo_id.is.null,'+ids.map(id=>'modulo_id.eq.'+id).join(','));
     }
   }
-  var res=await q.limit(50);
-  var posts=res.data;
+  const{data:posts}=await q.limit(50);
   l.innerHTML='';
-  if(!posts||!posts.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem encontrada.</div>';return;}
-  for(var i=0;i<posts.length;i++){
-    var p=posts[i];
-    var ini=(p.users&&p.users.nome?p.users.nome:'?').substring(0,2).toUpperCase();
-    var mn='Geral'; for(var j=0;j<mods.length;j++){if(mods[j].id===p.modulo_id){mn=mods[j].titulo;break;}}
-    var rr=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).eq('aprovado',true).order('criado_em');
-    var rps=rr.data||[];
-    var card=document.createElement('div');
-    card.className='pc'+(p.fixado?' pin':'');
-    var rpsHtml='';
-    for(var k=0;k<rps.length;k++){
-      var r=rps[k];
-      var rNome=r.is_admin?'<span style="color:var(--purple)">👨\u200d💼 Admin</span>':(r.users&&r.users.nome?r.users.nome:'?');
-      var rAv=r.is_admin?'ADM':(r.users&&r.users.nome?r.users.nome:'?').substring(0,2).toUpperCase();
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem encontrada.</div>';return;}
+  for(const p of posts){
+    const ini=(p.users?.nome||'?').substring(0,2).toUpperCase();
+    const mn=mods.find(m=>m.id===p.modulo_id)?.titulo||'Geral';
+    const{data:rps}=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).eq('aprovado',true).order('criado_em');
+    const card=document.createElement('div');card.className='pc'+(p.fixado?' pin':'');
+    let rpsHtml='';
+    for(const r of(rps||[])){
+      const rAv=r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase();
+      const rNome=r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?');
       rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':'')+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div><div style="font-weight:700;font-size:.83rem">'+rNome+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">'+r.conteudo+'</div></div></div>';
     }
-    var replyForm='';
-    if(p.aprovado){
-      replyForm='<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta..."></textarea><div style="font-size:.75rem;color:var(--amber);margin:4px 0">⏳ Aguarda aprovação antes de aparecer.</div><button class="btn bp btn-sm rep-btn" style="margin-top:5px">Responder</button></div>';
-    }
     card.innerHTML=
-      '<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+p.titulo+'</div><div style="font-size:.78rem;color:var(--muted)">por <strong>'+(p.users&&p.users.nome?p.users.nome:'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">⏳ Pendente</span>':'')+'</div></div></div>'+
+      '<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+p.titulo+'</div>'+
+      '<div style="font-size:.78rem;color:var(--muted)">por <strong>'+(p.users?.nome||'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">Pendente</span>':'')+'</div></div></div>'+
       '<div class="pbody">'+p.conteudo+'</div>'+
-      '<div class="pfooter">'+
-        '<span style="font-size:.82rem;color:var(--muted)">💬 '+rps.length+'</span>'+
-        '<button class="btn bg2 btn-xs tog-rep-btn">Ver respostas</button>'+
-        (p.user_id===CU.id?'<button class="btn bd btn-xs del-post-btn">🗑️</button>':'')+
-      '</div>'+
-      '<div class="rlist hidden rep-list">'+rpsHtml+replyForm+'</div>';
-    (function(post,cardEl){
-      cardEl.querySelector('.tog-rep-btn').addEventListener('click',function(){cardEl.querySelector('.rep-list').classList.toggle('hidden');});
-      var delBtn=cardEl.querySelector('.del-post-btn');
-      if(delBtn)delBtn.addEventListener('click',async function(){if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',post.id);toast('🗑️ Excluído.','i');renderFL();});
-      var repBtn=cardEl.querySelector('.rep-btn');
-      if(repBtn)repBtn.addEventListener('click',async function(){
-        var ta=cardEl.querySelector('.rep-ta');
-        var txt=ta.value.trim();
-        if(!txt){toast('⚠️ Digite sua resposta.','w');return;}
-        await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:false,is_admin:false});
-        ta.value='';
-        toast('✅ Resposta enviada! Aguarda aprovação.','i');
-        renderFL();
-      });
-    })(p,card);
+      '<div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 '+(rps||[]).length+'</span>'+
+      '<button class="btn bg2 btn-xs tog-rep">Ver respostas</button>'+(p.user_id===CU.id?'<button class="btn bd btn-xs del-post">🗑️</button>':'')+'</div>'+
+      '<div class="rlist hidden rep-area">'+rpsHtml+
+      (p.aprovado?'<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta... (aguarda aprovacao)"></textarea><button class="btn bp btn-sm rep-send" style="margin-top:7px">Responder</button></div>':'')+
+      '</div>';
+    card.querySelector('.tog-rep').onclick=()=>card.querySelector('.rep-area').classList.toggle('hidden');
+    const delBtn=card.querySelector('.del-post');
+    if(delBtn)delBtn.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',p.id);toast('Excluido.','i');renderFL();};
+    const sendBtn=card.querySelector('.rep-send');
+    if(sendBtn)sendBtn.onclick=async()=>{
+      const ta=card.querySelector('.rep-ta'),txt=ta.value.trim();
+      if(!txt){toast('Digite sua resposta.','w');return;}
+      await sb.from('forum_replies').insert({post_id:p.id,user_id:CU.id,conteudo:txt,aprovado:false,is_admin:false});
+      ta.value='';toast('Resposta enviada! Aguarda aprovacao.','i');renderFL();
+    };
     l.appendChild(card);
   }
 }
 function openNP(mid){
-  showModal(
-    '<div class="mtt">💬 Nova Dúvida</div>'+
-    '<div class="fg" style="margin-bottom:12px"><label class="fl">Título</label><input id="npT" class="fi" placeholder="Ex: Dúvida sobre parâmetros"/></div>'+
-    '<div class="fg" style="margin-bottom:14px"><label class="fl">Conteúdo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua dúvida..."></textarea></div>'+
-    '<div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div>'+
-    '<div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>'
-  );
-  document.getElementById('btnNPS').addEventListener('click',function(){subPost(mid||'');});
+  showModal('<div class="mtt">💬 Nova Duvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Titulo</label><input id="npT" class="fi" placeholder="Ex: Duvida sobre parametros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteudo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua duvida..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem sera revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+  document.getElementById('btnNPS').onclick=()=>subPost(mid||'');
 }
-document.querySelector('#bNP').addEventListener('click',function(){openNP(actMod||'');});
-document.querySelector('#bNPM').addEventListener('click',function(){openNP(actMod||'');});
+$('#bNP').addEventListener('click',()=>openNP(actMod||''));
+$('#bNPM').addEventListener('click',()=>openNP(actMod||''));
 async function subPost(mid){
-  var t=document.querySelector('#npT').value.trim(), c2=document.querySelector('#npC').value.trim();
-  if(!t||!c2){toast('⚠️ Preencha tudo.','w');return;}
-  if(!sb){toast('Configure o Supabase.','w');return;}
+  const t=$('#npT').value.trim(),c2=$('#npC').value.trim();
+  if(!t||!c2){toast('Preencha tudo.','w');return;}
   await sb.from('forum_posts').insert({modulo_id:mid||null,user_id:CU.id,titulo:t,conteudo:c2,aprovado:false,fixado:false});
-  toast('✅ Enviado para aprovação!','s');
-  closeModal();
-  if(document.querySelector('#pg-forum').classList.contains('act'))renderFL();
-  if(document.querySelector('#tab-fmod').classList.contains('act'))loadFMod();
+  toast('Enviado para aprovacao!','s');closeModal();
+  if($('#pg-forum').classList.contains('act'))renderFL();
+  if($('#tab-fmod').classList.contains('act'))loadFMod();
 }
 async function loadFMod(){
-  var l=document.querySelector('#fML');
-  if(!actMod){l.innerHTML='<div style="color:var(--muted)">Selecione um módulo.</div>';return;}
-  if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
-  var res=await sb.from('forum_posts').select('*,users(nome)').eq('aprovado',true).or('modulo_id.eq.'+actMod+',modulo_id.is.null').order('criado_em',{ascending:false}).limit(15);
-  var posts=res.data||[];
-  if(!posts.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem dúvidas. Seja o primeiro!</div>';return;}
-  l.innerHTML=posts.map(function(p){return '<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">'+(p.users&&p.users.nome?p.users.nome:'?').substring(0,2).toUpperCase()+'</div><div><div style="font-weight:800;font-size:.9rem">'+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users&&p.users.nome?p.users.nome:'?')+' · '+fd(p.criado_em)+'</div></div></div><div class="pbody" style="font-size:.87rem">'+p.conteudo+'</div></div>';}).join('');
+  const l=$('#fML');
+  if(!actMod){l.innerHTML='<div style="color:var(--muted)">Selecione um modulo.</div>';return;}
+  if(!sb)return;
+  const{data:posts}=await sb.from('forum_posts').select('*,users(nome)').eq('aprovado',true).or('modulo_id.eq.'+actMod+',modulo_id.is.null').order('criado_em',{ascending:false}).limit(15);
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem duvidas. Seja o primeiro!</div>';return;}
+  l.innerHTML=posts.map(p=>'<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">'+(p.users?.nome||'?').substring(0,2).toUpperCase()+'</div><div><div style="font-weight:800;font-size:.9rem">'+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+fd(p.criado_em)+'</div></div></div><div class="pbody" style="font-size:.87rem">'+p.conteudo+'</div></div>').join('');
 }
 
-async function loadALive(){
-  if(!sb)return;await loadTurmaSelects();
-  const{data:rows}=await sb.from('aulas_ao_vivo').select('*,turmas(nome)').order('criado_em',{ascending:false});
-  const tb=$('#lvTable');
-  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuração ainda.</div>';return;}
-  tb.innerHTML=`<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Título</th><th>Data/Link</th><th>Status</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'🔴 Ao vivo':'⏱️ Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td style="font-size:.8rem;color:var(--muted)">${r.tipo==='countdown'?fdt(r.data_hora):r.link?r.link.substring(0,35)+'...':'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')}</tbody></table></div>`;
+/* ADMIN */
+async function showAdmin(){
+  $('#ls').style.display='none';$('#aa').classList.remove('hidden');
+  $$('.ani').forEach(i=>i.addEventListener('click',()=>{
+    $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
+    $$('#aa .page').forEach(p=>p.classList.remove('act'));
+    const adm=i.dataset.adm;
+    document.querySelector(`#adm-${adm}`).classList.add('act');
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,live:loadALive,mural:loadAMural,forum:loadAForum};
+    if(fns[adm])fns[adm]();
+  }));
+  await loadADash();await loadPend();
 }
-$('#bSLV').addEventListener('click',async()=>{
-  const tu=$('#lvTurma').value,tt=$('#lvTit').value.trim(),lk=$('#lvLink').value.trim(),ds=$('#lvDesc').value.trim(),at=parseInt($('#lvStatus').value);
-  if(!tu||!tt||!lk){toast('⚠️ Turma, título e link obrigatórios.','w');return;}
-  if(!sb)return;
-  await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'live',titulo:tt,link:lk,descricao:ds,ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
-  toast('✅ Configuração salva!','s');loadALive();
-});
-$('#bSCD').addEventListener('click',async()=>{
-  const tu=$('#cdTurma').value,tt=$('#cdTit').value.trim(),dh=$('#cdDH').value,at=parseInt($('#cdAtivo').value);
-  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, título e data/hora.','w');return;}
-  if(!sb)return;
-  await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'countdown',titulo:tt,data_hora:new Date(dh).toISOString(),ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
-  toast('✅ Contador salvo!','s');loadALive();
-});
-window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);toast(a?'▶️ Ativado!':'⏸️ Desativado.','i');loadALive();};
-window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);toast('🗑️ Excluído.','i');loadALive();};
-
-
-/* ===== ADMIN DATA FUNCTIONS ===== */
 async function loadADash(){
   if(!sb)return;
   const[{data:al},{data:pe},{data:mo}]=await Promise.all([
@@ -1003,8 +985,7 @@ async function loadADash(){
   ]);
   const alunos=al||[],pc=(pe||[]).length,mc=(mo||[]).length;
   $('#aA').textContent=alunos.length;$('#aP').textContent=pc;$('#aMo').textContent=mc;
-  if(pc>0){$('#pBadge').textContent=pc;$('#pBadge').classList.remove('hidden');}
-  else{$('#pBadge').classList.add('hidden');}
+  if(pc>0){$('#pBadge').textContent=pc;$('#pBadge').classList.remove('hidden');}else $('#pBadge').classList.add('hidden');
   let tot=0;
   for(const a of alunos){const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);tot+=pct((pr||[]).filter(x=>x.concluido).length,mc);}
   $('#aMd').textContent=alunos.length?Math.round(tot/alunos.length)+'%':'0%';
@@ -1012,20 +993,20 @@ async function loadADash(){
   for(const a of alunos){
     const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);
     const dn=(pr||[]).filter(x=>x.concluido).length,p2=pct(dn,mc),d2=du(a.validade_acesso),dc=d2!==null&&d2<=30?'color:var(--amber)':'';
-    tb.innerHTML+=`<tr><td><strong>${a.nome}</strong><br/><span style="font-family:var(--fm);font-size:.75rem;color:var(--muted)">${a.login}</span></td><td><span class="badge bc">${a.turmas?.nome||'—'}</span></td><td><div style="display:flex;align-items:center;gap:7px"><div class="pw" style="width:75px"><div class="pf" style="width:${p2}%"></div></div><span style="font-size:.82rem;font-weight:700">${p2}%</span></div></td><td>${dn}/${mc}</td><td class="${dc}" style="font-size:.85rem">${fd(a.validade_acesso)}</td><td><span class="badge bg3">Ativo</span></td></tr>`;
+    tb.innerHTML+=`<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td><span class="badge bc">${a.turmas?.nome||'—'}</span></td><td><div style="display:flex;align-items:center;gap:7px"><div class="pw" style="width:75px"><div class="pf" style="width:${p2}%"></div></div><span style="font-size:.82rem;font-weight:700">${p2}%</span></div></td><td>${dn}/${mc}</td><td class="${dc}" style="font-size:.85rem">${fd(a.validade_acesso)}</td><td><span class="badge bg3">Ativo</span></td></tr>`;
   }
 }
 async function loadPend(){
   if(!sb)return;
   const{data}=await sb.from('users').select('*').eq('status','pending').order('criado_em');
   const c2=$('#pendCont');
-  if(!data?.length){c2.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma solicitacao pendente.</div>';return;}
+  if(!data?.length){c2.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">✅ Nenhuma solicitacao pendente.</div>';return;}
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const to=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
-  c2.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:13px">${data.length} solicitacao(oes)</div>`;
+  c2.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:13px">🔔 ${data.length} solicitacao(oes)</div>`;
   data.forEach(u=>{
     const d2=document.createElement('div');d2.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:11px;background:rgba(0,0,0,.18)';
-    d2.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:11px"><div><div style="font-weight:800">${u.nome}</div><div style="font-size:.82rem;color:var(--muted)">${u.email||''} - ${u.login}</div></div><div style="font-size:.75rem;color:var(--muted)">${fd(u.criado_em)}</div></div><div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center"><select id="ts-${u.id}" class="fi" style="width:auto;min-width:180px"><option value="">Sem turma</option>${to}</select><input type="number" id="ms-${u.id}" class="fi" value="12" min="1" style="width:95px"/><button class="btn bs" onclick="aprovA('${u.id}')">Aprovar</button><button class="btn bd" onclick="rejA('${u.id}')">Rejeitar</button></div>`;
+    d2.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:11px"><div><div style="font-weight:800">${u.nome}</div><div style="font-size:.82rem;color:var(--muted)">${u.email||''} · ${u.login}</div></div><div style="font-size:.75rem;color:var(--muted)">${fd(u.criado_em)}</div></div><div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center"><select id="ts-${u.id}" class="fi" style="width:auto;min-width:180px"><option value="">Sem turma</option>${to}</select><input type="number" id="ms-${u.id}" class="fi" value="12" min="1" style="width:95px"/><button class="btn bs" onclick="aprovA('${u.id}')">✅ Aprovar</button><button class="btn bd" onclick="rejA('${u.id}')">❌ Rejeitar</button></div>`;
     c2.appendChild(d2);
   });
 }
@@ -1033,39 +1014,35 @@ window.aprovA=async function(id){
   const ti=document.getElementById('ts-'+id)?.value||null,ms=parseInt(document.getElementById('ms-'+id)?.value)||12;
   const v=new Date();v.setMonth(v.getMonth()+ms);
   await sb.from('users').update({status:'active',turma_id:ti||null,validade_acesso:v.toISOString(),meses_acesso:ms}).eq('id',id);
-  toast('Aluno aprovado!','s');loadPend();loadADash();
+  toast('✅ Aluno aprovado!','s');loadPend();loadADash();
 };
-window.rejA=async function(id){
-  if(!confirm('Rejeitar?'))return;
-  await sb.from('users').update({status:'blocked'}).eq('id',id);
-  toast('Rejeitado.','i');loadPend();
-};
+window.rejA=async function(id){if(!confirm('Rejeitar?'))return;await sb.from('users').update({status:'blocked'}).eq('id',id);toast('Rejeitado.','i');loadPend();};
 async function loadAAlunos(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*');
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
   $('#aTurma').innerHTML='<option value="">Sem turma</option>'+opts;
-  const{data:alunos}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
-  $('#aAT').innerHTML=(alunos||[]).map(a=>{
+  const{data:al}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
+  $('#aAT').innerHTML=(al||[]).map(a=>{
     const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';
-    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td>${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="${d2!==null&&d2<=30?'color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">Editar</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">Del</button></td></tr>`;
+    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td style="font-size:.85rem">${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="font-size:.85rem${d2!==null&&d2<=30?';color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;
   }).join('');
 }
 $('#bCA').addEventListener('click',async()=>{
   const n=$('#aNome').value.trim(),e=$('#aEmail').value.trim(),l=$('#aLogin').value.trim(),p=$('#aPass').value.trim(),ti=$('#aTurma').value,ms=parseInt($('#aMes').value)||12;
-  if(!n||!e||!l||!p){toast('Preencha todos os campos.','w');return;}
+  if(!n||!e||!l||!p){toast('⚠️ Preencha todos os campos.','w');return;}
   if(!sb)return;
   const hash=await sha(p),v=new Date();v.setMonth(v.getMonth()+ms);
   const{error}=await sb.from('users').insert({nome:n,email:e,login:l,senha:hash,role:'student',status:'active',turma_id:ti||null,validade_acesso:v.toISOString(),meses_acesso:ms});
-  if(error){toast('Erro: '+error.message,'e');return;}
-  toast('Aluno criado!','s');['aNome','aEmail','aLogin','aPass'].forEach(id=>document.getElementById(id).value='');$('#aMes').value='12';loadAAlunos();
+  if(error){toast('❌ '+error.message,'e');return;}
+  toast('✅ Aluno criado!','s');['aNome','aEmail','aLogin','aPass'].forEach(id=>document.getElementById(id).value='');$('#aMes').value='12';loadAAlunos();
 });
 window.editA=async function(id){
   if(!sb)return;
   const{data:a}=await sb.from('users').select('*').eq('id',id).single();
   const{data:turmas}=await sb.from('turmas').select('*');
   const opts=(turmas||[]).map(t=>`<option value="${t.id}"${a.turma_id===t.id?' selected':''}>${t.nome}</option>`).join('');
-  showModal('<div class="mtt">Editar: '+a.nome+'</div><div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>'+opts+'</select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"'+(a.status==='active'?' selected':'')+'>Ativo</option><option value="blocked"'+(a.status==='blocked'?' selected':'')+'>Bloqueado</option></select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Meses de acesso</label><input id="eMes" class="fi" type="number" value="'+(a.meses_acesso||12)+'" min="1"/></div><div class="fg" style="margin-bottom:16px"><label class="fl">Nova senha</label><input id="ePass" class="fi" type="password" placeholder="Vazio = nao altera"/></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveA(''+id+'')">Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+  showModal('<div class="mtt">✏️ Editar: '+a.nome+'</div><div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>'+opts+'</select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"'+(a.status==='active'?' selected':'')+'>Ativo</option><option value="blocked"'+(a.status==='blocked'?' selected':'')+'>Bloqueado</option></select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Meses de acesso</label><input id="eMes" class="fi" type="number" value="'+(a.meses_acesso||12)+'" min="1"/></div><div class="fg" style="margin-bottom:16px"><label class="fl">Nova senha (vazio = nao altera)</label><input id="ePass" class="fi" type="password" placeholder="Nova senha..."/></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveA(\''+id+'\')">💾 Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
 };
 window.saveA=async function(id){
   const ti=$('#eTurma').value,st=$('#eStatus').value,ms=parseInt($('#eMes').value)||12,np=$('#ePass').value.trim();
@@ -1073,13 +1050,12 @@ window.saveA=async function(id){
   const pay={turma_id:ti||null,status:st,validade_acesso:v.toISOString(),meses_acesso:ms};
   if(np&&np.length>=6)pay.senha=await sha(np);
   await sb.from('users').update(pay).eq('id',id);
-  toast('Atualizado!','s');closeModal();loadAAlunos();loadADash();
+  toast('✅ Atualizado!','s');closeModal();loadAAlunos();loadADash();
 };
 window.delA=async function(id){
   if(!confirm('Remover aluno?'))return;
   await Promise.all([sb.from('progress').delete().eq('user_id',id),sb.from('notes').delete().eq('user_id',id)]);
-  await sb.from('users').delete().eq('id',id);
-  toast('Aluno removido.','i');loadAAlunos();loadADash();
+  await sb.from('users').delete().eq('id',id);toast('🗑️ Removido.','i');loadAAlunos();loadADash();
 };
 async function loadATurmas(){
   if(!sb)return;
@@ -1087,15 +1063,15 @@ async function loadATurmas(){
   const tb=$('#aTT');tb.innerHTML='';
   for(const t of turmas||[]){
     const[{data:al},{data:mo}]=await Promise.all([sb.from('users').select('id').eq('turma_id',t.id).eq('status','active'),sb.from('modules').select('id').eq('turma_id',t.id)]);
-    tb.innerHTML+=`<tr><td><strong>${t.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${t.descricao||''}</span></td><td>${(al||[]).length}</td><td>${(mo||[]).length}</td><td><span class="badge ${t.ativa?'bg3':'bw2'}">${t.ativa?'Ativa':'Inativa'}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="togT('${t.id}',${!t.ativa})">${t.ativa?'Pausar':'Ativar'}</button><button class="btn bd btn-xs" onclick="delT('${t.id}')">Del</button></td></tr>`;
+    tb.innerHTML+=`<tr><td><strong>${t.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${t.descricao||''}</span></td><td>${(al||[]).length}</td><td>${(mo||[]).length}</td><td><span class="badge ${t.ativa?'bg3':'bw2'}">${t.ativa?'Ativa':'Inativa'}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="togT('${t.id}',${!t.ativa})">${t.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delT('${t.id}')">🗑️</button></td></tr>`;
   }
 }
 $('#bST').addEventListener('click',async()=>{
   const n=$('#tNome').value.trim(),d=$('#tDesc').value.trim();
-  if(!n){toast('Nome obrigatorio.','w');return;}
+  if(!n){toast('⚠️ Nome obrigatorio.','w');return;}
   if(!sb)return;
   await sb.from('turmas').insert({nome:n,descricao:d,ativa:true});
-  toast('Turma criada!','s');$('#tNome').value='';$('#tDesc').value='';loadATurmas();loadTurmaSelects();
+  toast('✅ Turma criada!','s');$('#tNome').value='';$('#tDesc').value='';loadATurmas();loadTurmaSelects();
 });
 window.togT=async function(id,a){await sb.from('turmas').update({ativa:a}).eq('id',id);loadATurmas();};
 window.delT=async function(id){if(!confirm('Excluir turma?'))return;await sb.from('turmas').delete().eq('id',id);loadATurmas();};
@@ -1103,7 +1079,7 @@ async function loadTurmaSelects(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
-  ['mTur','aTurma','lvTurma','cdTurma','mrTurma'].forEach(function(id){
+  ['mTur','aTurma','lvTurma','cdTurma','mrTurma'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const pre=id==='aTurma'?'<option value="">Sem turma</option>':id==='mrTurma'?'<option value="">Todas as turmas</option>':'<option value="">Selecione...</option>';
     el.innerHTML=pre+opts;
@@ -1112,42 +1088,41 @@ async function loadTurmaSelects(){
 async function loadAMods(){
   if(!sb)return;await loadTurmaSelects();
   const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('ordem');
-  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">Editar</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">Del</button></td></tr>`).join('');
+  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
 }
 $('#bSM').addEventListener('click',async()=>{
-  const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'ok',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||10)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
-  if(!tt||!tu){toast('Titulo e turma obrigatorios.','w');return;}
+  const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'📖',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||10)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
+  if(!tt||!tu){toast('⚠️ Titulo e turma obrigatorios.','w');return;}
   if(!sb)return;
-  if(eid){await sb.from('modules').update({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('Modulo atualizado!','s');}
-  else{await sb.from('modules').insert({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('Modulo criado!','s');}
+  if(eid){await sb.from('modules').update({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('✅ Modulo atualizado!','s');}
+  else{await sb.from('modules').insert({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('✅ Modulo criado!','s');}
   clearMF();loadAMods();loadAMats();loadAQuiz();
 });
 $('#bCM').addEventListener('click',clearMF);
-function clearMF(){['mTit','mIco','mVU','mDur','mOrd','mTop','mEId'].forEach(function(id){const e=document.getElementById(id);if(e)e.value='';});$('#mVT').value='youtube';}
+function clearMF(){['mTit','mIco','mVU','mDur','mOrd','mTop','mEId'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});$('#mVT').value='youtube';}
 window.editM=async function(id){
-  if(!sb)return;
   const{data:m}=await sb.from('modules').select('*').eq('id',id).single();
-  $('#mTit').value=m.titulo;$('#mIco').value=m.icone||'ok';$('#mTur').value=m.turma_id||'';$('#mVT').value=m.video_type||'youtube';
+  $('#mTit').value=m.titulo;$('#mIco').value=m.icone||'📖';$('#mTur').value=m.turma_id||'';$('#mVT').value=m.video_type||'youtube';
   $('#mVU').value=m.video_url||'';$('#mDur').value=Math.round((m.duracao_seg||600)/60);$('#mOrd').value=m.ordem||1;$('#mTop').value=m.topicos||'';$('#mEId').value=m.id;
-  toast('Editando: '+m.titulo,'i');
+  toast('📝 Editando: '+m.titulo,'i');
 };
-window.delM=async function(id){if(!confirm('Excluir modulo?'))return;await sb.from('modules').delete().eq('id',id);toast('Excluido.','i');loadAMods();};
+window.delM=async function(id){if(!confirm('Excluir modulo?'))return;await sb.from('modules').delete().eq('id',id);toast('🗑️ Excluido.','i');loadAMods();};
 async function loadAMats(){
   if(!sb)return;
   const{data:mds}=await sb.from('modules').select('id,titulo,icone');
   const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
   $('#matM').innerHTML='<option value="">Todos os modulos</option>'+opts;
   const{data:mats}=await sb.from('materials').select('*,modules(titulo)').order('criado_em',{ascending:false});
-  $('#aMatT').innerHTML=(mats||[]).map(m=>`<tr><td><strong>${ti(m.tipo)} ${m.nome}</strong></td><td>${m.tipo}</td><td>${m.modules?.titulo||'Todos'}</td><td><a href="${m.url}" target="_blank" style="color:var(--cyan);font-size:.78rem">${m.url.substring(0,40)}</a></td><td><button class="btn bd btn-xs" onclick="delMat('${m.id}')">Del</button></td></tr>`).join('');
+  $('#aMatT').innerHTML=(mats||[]).map(m=>`<tr><td><strong>${ti(m.tipo)} ${m.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${m.descricao||''}</span></td><td><span class="badge bc">${m.tipo}</span></td><td>${m.modules?.titulo||'Todos'}</td><td><a href="${m.url}" target="_blank" style="color:var(--cyan);font-size:.78rem;word-break:break-all">${m.url.substring(0,40)}</a></td><td><button class="btn bd btn-xs" onclick="delMat('${m.id}')">🗑️</button></td></tr>`).join('');
 }
 $('#bSMat').addEventListener('click',async()=>{
   const n=$('#matN').value.trim(),t2=$('#matT').value,u=$('#matU').value.trim(),d=$('#matD').value.trim(),m=$('#matM').value;
-  if(!n||!u){toast('Nome e URL obrigatorios.','w');return;}
+  if(!n||!u){toast('⚠️ Nome e URL obrigatorios.','w');return;}
   if(!sb)return;
   await sb.from('materials').insert({nome:n,tipo:t2,url:u,descricao:d,modulo_id:m||null});
-  toast('Material adicionado!','s');['matN','matU','matD'].forEach(function(id){document.getElementById(id).value='';});$('#matM').value='';loadAMats();
+  toast('✅ Material adicionado!','s');['matN','matU','matD'].forEach(id=>document.getElementById(id).value='');$('#matM').value='';loadAMats();
 });
-window.delMat=async function(id){if(!confirm('Remover?'))return;await sb.from('materials').delete().eq('id',id);toast('Removido.','i');loadAMats();};
+window.delMat=async function(id){if(!confirm('Remover?'))return;await sb.from('materials').delete().eq('id',id);toast('🗑️ Removido.','i');loadAMats();};
 async function loadAQuiz(){
   if(!sb)return;
   const{data:mds}=await sb.from('modules').select('id,titulo,icone');
@@ -1155,222 +1130,140 @@ async function loadAQuiz(){
   $('#qMod').innerHTML='<option value="">Geral</option>'+opts;
   const{data:qs}=await sb.from('quiz').select('*,modules(titulo)').order('criado_em',{ascending:false});
   const l=$('#aQL');
-  if(!qs||!qs.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao.</div>';return;}
-  l.innerHTML=qs.map(function(q,i){return '<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">'+(i+1)+'. '+q.question+'</div><button class="btn bd btn-xs" onclick="delQ(''+q.id+'')">Del</button></div><div style="display:flex;flex-direction:column;gap:5px">'+(q.options||[]).map(function(opt,oi){return '<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid '+(oi===q.correct_option?'var(--green)':'var(--border)')+';background:'+(oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)')+'">'+String.fromCharCode(65+oi)+') '+opt+(oi===q.correct_option?' OK':'')+'</div>';}).join('')+'</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Modulo: '+(q.modules&&q.modules.titulo?q.modules.titulo:'Geral')+'</div></div>';}).join('');
+  if(!qs?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao.</div>';return;}
+  l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt}${oi===q.correct_option?' ✓':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Modulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
 }
 $('#bSQ').addEventListener('click',async()=>{
   const q=$('#qEn').value.trim(),o0=$('#qO0').value.trim(),o1=$('#qO1').value.trim(),o2=$('#qO2').value.trim(),cs=document.querySelector('input[name="qC"]:checked'),m=$('#qMod').value;
-  if(!q||!o0||!o1||!o2){toast('Preencha enunciado e 3 opcoes.','w');return;}
-  if(!cs){toast('Marque a opcao correta.','w');return;}
+  if(!q||!o0||!o1||!o2){toast('⚠️ Preencha enunciado e 3 opcoes.','w');return;}
+  if(!cs){toast('⚠️ Marque a opcao correta.','w');return;}
   if(!sb)return;
   await sb.from('quiz').insert({question:q,options:[o0,o1,o2],correct_option:parseInt(cs.value),modulo_id:m||null});
-  toast('Questao adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(function(id){document.getElementById(id).value='';});document.querySelectorAll('input[name="qC"]').forEach(function(r){r.checked=false;});loadAQuiz();
+  toast('✅ Questao adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(id=>document.getElementById(id).value='');document.querySelectorAll('input[name="qC"]').forEach(r=>r.checked=false);loadAQuiz();
 });
-window.delQ=async function(id){if(!confirm('Excluir?'))return;await sb.from('quiz').delete().eq('id',id);toast('Excluida.','i');loadAQuiz();};
+window.delQ=async function(id){if(!confirm('Excluir?'))return;await sb.from('quiz').delete().eq('id',id);loadAQuiz();};
 
-/* MURAL ADMIN */
-async function loadAMural(){
-  if(!sb)return;await loadTurmaSelects();
-  const{data}=await sb.from('mural_avisos').select('*,turmas(nome)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  const l=$('#aMuralList');
-  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum aviso publicado.</div>';return;}
-  l.innerHTML=data.map(av=>`
-    <div style="border:1px solid ${av.fixado?'rgba(245,158,11,.4)':'var(--border)'};border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)">
-      <div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px">
-        <div>
-          <div style="font-weight:800">${av.fixado?'📌 ':''}${av.titulo}</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${av.turmas?.nome||'Todas as turmas'} · ${fdt(av.criado_em)}</div>
-        </div>
-        <div style="display:flex;gap:5px;flex-shrink:0">
-          <button class="btn bg2 btn-xs" onclick="togMR('${av.id}',${!av.fixado})">${av.fixado?'📌':'📍'}</button>
-          <button class="btn bd btn-xs" onclick="delMR('${av.id}')">🗑️</button>
-        </div>
-      </div>
-      <div style="font-size:.88rem;color:var(--soft);line-height:1.5">${av.conteudo}</div>
-    </div>`).join('');
-}
-$('#bSMR').addEventListener('click',async()=>{
-  const tu=$('#mrTurma').value,ti=$('#mrTit').value.trim(),co=$('#mrCont').value.trim(),fi=parseInt($('#mrFix').value);
-  if(!ti||!co){toast('⚠️ Título e conteúdo obrigatórios.','w');return;}
-  if(!sb)return;
-  await sb.from('mural_avisos').insert({turma_id:tu||null,titulo:ti,conteudo:co,fixado:fi===1,ativo:true});
-  toast('✅ Aviso publicado!','s');['mrTit','mrCont'].forEach(id=>$(`#${id}`).value='');$('#mrFix').value='0';loadAMural();
-});
-window.togMR=async function(id,f){await sb.from('mural_avisos').update({fixado:f}).eq('id',id);toast(f?'📌 Fixado!':'Desfixado.','i');loadAMural();};
-window.delMR=async function(id){if(!confirm('Excluir aviso?'))return;await sb.from('mural_avisos').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAMural();};
-
-/* FORUM ADMIN */
-async function loadAForum(){
-  if(!sb)return;
-  var f=document.querySelector('#aFF').value;
-  var q=sb.from('forum_posts').select('*,users(nome,login),modules(titulo)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  if(f==='pending')q=q.eq('aprovado',false);
-  else if(f==='approved')q=q.eq('aprovado',true);
-  var res=await q.limit(100);
-  var posts=res.data||[];
-  var l=document.querySelector('#aFL');
-  l.innerHTML='';
-  if(!posts.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum post encontrado.</div>';return;}
-  for(var i=0;i<posts.length;i++){
-    var p=posts[i];
-    var ini=(p.users&&p.users.nome?p.users.nome:'?').substring(0,2).toUpperCase();
-    var rr=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).order('criado_em');
-    var rps=rr.data||[];
-    var pendReps=rps.filter(function(r){return !r.aprovado&&!r.is_admin;}).length;
-    var rpsHtml='';
-    for(var k=0;k<rps.length;k++){
-      var r=rps[k];
-      var rNome=r.is_admin?'<span style="color:var(--purple)">👨\u200d💼 Admin</span>':(r.users&&r.users.nome?r.users.nome:'?');
-      var rAv=r.is_admin?'ADM':(r.users&&r.users.nome?r.users.nome:'?').substring(0,2).toUpperCase();
-      rpsHtml+=
-        '<div class="ri'+(r.is_admin?' adm-reply':!r.aprovado?' pending-reply':'')+'" data-rid="'+r.id+'">'+
-          '<div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div>'+
-          '<div style="flex:1">'+
-            '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'+
-              '<div style="font-weight:700;font-size:.82rem">'+rNome+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span>'+(!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem;margin-left:4px">⏳ Pendente</span>':'')+'</div>'+
-              '<div style="display:flex;gap:4px">'+
-                (!r.aprovado&&!r.is_admin?'<button class="btn bs btn-xs aprv-rep-btn">✅ Aprovar</button>':'')+
-                '<button class="btn bd btn-xs del-rep-btn">🗑️</button>'+
-              '</div>'+
-            '</div>'+
-            '<div style="font-size:.87rem;color:var(--soft);margin-top:3px">'+r.conteudo+'</div>'+
-          '</div>'+
-        '</div>';
-    }
-    var card=document.createElement('div');
-    card.className='pc'+(p.fixado?' pin':'');
-    card.innerHTML=
-      '<div class="phead">'+
-        '<div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div>'+
-        '<div style="flex:1">'+
-          '<div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+p.titulo+'</div>'+
-          '<div style="font-size:.76rem;color:var(--muted)">'+(p.users&&p.users.nome?p.users.nome:'?')+' · '+(p.modules&&p.modules.titulo?p.modules.titulo:'Geral')+' · '+fd(p.criado_em)+
-            (!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">⏳ Post pendente</span>':'')+
-            (pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">⏳ '+pendReps+' resp. pendente(s)</span>':'')+
-          '</div>'+
-        '</div>'+
-        '<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
-          (!p.aprovado?'<button class="btn bs btn-xs aprv-post-btn">✅ Aprovar</button>':'')+
-          '<button class="btn bg2 btn-xs pin-btn">'+(p.fixado?'📌':'📍')+'</button>'+
-          '<button class="btn bd btn-xs del-post-btn">🗑️</button>'+
-        '</div>'+
-      '</div>'+
-      '<div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+p.conteudo+'</div>'+
-      '<div style="padding:11px 15px">'+
-        '<div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+rps.length+')</div>'+
-        '<div class="rep-container">'+rpsHtml+'</div>'+
-        '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'+
-          '<div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨\u200d💼 Responder como Admin</div>'+
-          '<textarea class="fi adm-ta" rows="2" placeholder="Digite sua resposta (publicada imediatamente)..."></textarea>'+
-          '<button class="btn bp btn-sm adm-rep-btn" style="margin-top:7px">📤 Enviar resposta</button>'+
-        '</div>'+
-      '</div>';
-    // attach all events using closures — NO inline onclick
-    (function(post, cardEl, replies){
-      var aprvPost=cardEl.querySelector('.aprv-post-btn');
-      if(aprvPost)aprvPost.addEventListener('click',async function(){
-        await sb.from('forum_posts').update({aprovado:true}).eq('id',post.id);
-        toast('✅ Post aprovado!','s');loadAForum();
-      });
-      cardEl.querySelector('.pin-btn').addEventListener('click',async function(){
-        await sb.from('forum_posts').update({fixado:!post.fixado}).eq('id',post.id);
-        toast(!post.fixado?'📌 Fixado!':'Desfixado.','i');loadAForum();
-      });
-      cardEl.querySelector('.del-post-btn').addEventListener('click',async function(){
-        if(!confirm('Excluir post e todas as respostas?'))return;
-        await sb.from('forum_replies').delete().eq('post_id',post.id);
-        await sb.from('forum_posts').delete().eq('id',post.id);
-        toast('🗑️ Excluído.','i');loadAForum();
-      });
-      // reply buttons
-      replies.forEach(function(r){
-        var rDiv=cardEl.querySelector('[data-rid="'+r.id+'"]');
-        if(!rDiv)return;
-        var aprvBtn=rDiv.querySelector('.aprv-rep-btn');
-        if(aprvBtn)aprvBtn.addEventListener('click',async function(){
-          await sb.from('forum_replies').update({aprovado:true}).eq('id',r.id);
-          toast('✅ Resposta aprovada!','s');loadAForum();
-        });
-        var delBtn=rDiv.querySelector('.del-rep-btn');
-        if(delBtn)delBtn.addEventListener('click',async function(){
-          if(!confirm('Excluir resposta?'))return;
-          await sb.from('forum_replies').delete().eq('id',r.id);
-          toast('🗑️ Removida.','i');loadAForum();
-        });
-      });
-      // admin reply
-      cardEl.querySelector('.adm-rep-btn').addEventListener('click',async function(){
-        var ta=cardEl.querySelector('.adm-ta');
-        var txt=ta.value.trim();
-        if(!txt){toast('⚠️ Digite uma resposta.','w');return;}
-        var ins=await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:true,is_admin:true});
-        if(ins.error){toast('❌ Erro: '+ins.error.message,'e');return;}
-        ta.value='';
-        toast('✅ Resposta publicada!','s');
-        loadAForum();
-      });
-    })(p, card, rps);
-    l.appendChild(card);
-  }
-}
-document.querySelector('#aFF').addEventListener('change',loadAForum);
-document.querySelector('#bRF').addEventListener('click',loadAForum);
-
+/* ADMIN LIVE */
 async function loadALive(){
   if(!sb)return;await loadTurmaSelects();
   const{data:rows}=await sb.from('aulas_ao_vivo').select('*,turmas(nome)').order('criado_em',{ascending:false});
   const tb=$('#lvTable');
-  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuração ainda.</div>';return;}
-  tb.innerHTML=`<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Título</th><th>Data/Link</th><th>Status</th><th></th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'🔴 Ao vivo':'⏱️ Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td style="font-size:.8rem;color:var(--muted)">${r.tipo==='countdown'?fdt(r.data_hora):r.link?r.link.substring(0,35)+'...':'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')}</tbody></table></div>`;
+  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuracao ainda.</div>';return;}
+  tb.innerHTML='<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Titulo</th><th>Status</th><th></th></tr></thead><tbody>'+rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'Ao vivo':'Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'Pausar':'Ativar'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')+'</tbody></table></div>';
 }
 $('#bSLV').addEventListener('click',async()=>{
   const tu=$('#lvTurma').value,tt=$('#lvTit').value.trim(),lk=$('#lvLink').value.trim(),ds=$('#lvDesc').value.trim(),at=parseInt($('#lvStatus').value);
-  if(!tu||!tt||!lk){toast('⚠️ Turma, título e link obrigatórios.','w');return;}
+  if(!tu||!tt||!lk){toast('⚠️ Turma, titulo e link obrigatorios.','w');return;}
   if(!sb)return;
   await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'live',titulo:tt,link:lk,descricao:ds,ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
-  toast('✅ Configuração salva!','s');loadALive();
+  toast('✅ Configuracao salva!','s');loadALive();
 });
 $('#bSCD').addEventListener('click',async()=>{
   const tu=$('#cdTurma').value,tt=$('#cdTit').value.trim(),dh=$('#cdDH').value,at=parseInt($('#cdAtivo').value);
-  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, título e data/hora.','w');return;}
+  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, titulo e data/hora.','w');return;}
   if(!sb)return;
   await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'countdown',titulo:tt,data_hora:new Date(dh).toISOString(),ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
   toast('✅ Contador salvo!','s');loadALive();
 });
-window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);toast(a?'▶️ Ativado!':'⏸️ Desativado.','i');loadALive();};
-window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);toast('🗑️ Excluído.','i');loadALive();};
+window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);loadALive();};
+window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);loadALive();};
 
-/* MURAL ADMIN */
+/* ADMIN MURAL */
 async function loadAMural(){
   if(!sb)return;await loadTurmaSelects();
   const{data}=await sb.from('mural_avisos').select('*,turmas(nome)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
   const l=$('#aMuralList');
   if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum aviso publicado.</div>';return;}
-  l.innerHTML=data.map(av=>`
-    <div style="border:1px solid ${av.fixado?'rgba(245,158,11,.4)':'var(--border)'};border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)">
-      <div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px">
-        <div>
-          <div style="font-weight:800">${av.fixado?'📌 ':''}${av.titulo}</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${av.turmas?.nome||'Todas as turmas'} · ${fdt(av.criado_em)}</div>
-        </div>
-        <div style="display:flex;gap:5px;flex-shrink:0">
-          <button class="btn bg2 btn-xs" onclick="togMR('${av.id}',${!av.fixado})">${av.fixado?'📌':'📍'}</button>
-          <button class="btn bd btn-xs" onclick="delMR('${av.id}')">🗑️</button>
-        </div>
-      </div>
-      <div style="font-size:.88rem;color:var(--soft);line-height:1.5">${av.conteudo}</div>
-    </div>`).join('');
+  l.innerHTML=data.map(av=>
+    '<div style="border:1px solid '+(av.fixado?'rgba(245,158,11,.4)':'var(--border)')+';border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)">'+
+    '<div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px">'+
+    '<div><div style="font-weight:800">'+(av.fixado?'📌 ':'')+av.titulo+'</div>'+
+    '<div style="font-size:.78rem;color:var(--muted);margin-top:2px">'+(av.turmas?.nome||'Todas as turmas')+' · '+fdt(av.criado_em)+'</div></div>'+
+    '<div style="display:flex;gap:5px;flex-shrink:0"><button class="btn bg2 btn-xs" onclick="togMR(\''+av.id+'\','+!av.fixado+')">'+(av.fixado?'Desafixar':'Fixar')+'</button><button class="btn bd btn-xs" onclick="delMR(\''+av.id+'\')">🗑️</button></div></div>'+
+    '<div style="font-size:.88rem;color:var(--soft);line-height:1.5">'+av.conteudo+'</div></div>'
+  ).join('');
 }
 $('#bSMR').addEventListener('click',async()=>{
-  const tu=$('#mrTurma').value,ti=$('#mrTit').value.trim(),co=$('#mrCont').value.trim(),fi=parseInt($('#mrFix').value);
-  if(!ti||!co){toast('⚠️ Título e conteúdo obrigatórios.','w');return;}
+  const tu=$('#mrTurma').value,ti2=$('#mrTit').value.trim(),co=$('#mrCont').value.trim(),fi=parseInt($('#mrFix').value);
+  if(!ti2||!co){toast('⚠️ Titulo e conteudo obrigatorios.','w');return;}
   if(!sb)return;
-  await sb.from('mural_avisos').insert({turma_id:tu||null,titulo:ti,conteudo:co,fixado:fi===1,ativo:true});
-  toast('✅ Aviso publicado!','s');['mrTit','mrCont'].forEach(id=>$(`#${id}`).value='');$('#mrFix').value='0';loadAMural();
+  await sb.from('mural_avisos').insert({turma_id:tu||null,titulo:ti2,conteudo:co,fixado:fi===1,ativo:true});
+  toast('✅ Aviso publicado!','s');['mrTit','mrCont'].forEach(id=>document.getElementById(id).value='');$('#mrFix').value='0';loadAMural();
 });
-window.togMR=async function(id,f){await sb.from('mural_avisos').update({fixado:f}).eq('id',id);toast(f?'📌 Fixado!':'Desfixado.','i');loadAMural();};
-window.delMR=async function(id){if(!confirm('Excluir aviso?'))return;await sb.from('mural_avisos').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAMural();};
+window.togMR=async function(id,f){await sb.from('mural_avisos').update({fixado:f}).eq('id',id);loadAMural();};
+window.delMR=async function(id){if(!confirm('Excluir aviso?'))return;await sb.from('mural_avisos').delete().eq('id',id);loadAMural();};
 
+/* ADMIN FORUM */
+async function loadAForum(){
+  if(!sb)return;
+  const f=$('#aFF').value;
+  let q=sb.from('forum_posts').select('*,users(nome,login),modules(titulo)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
+  if(f==='pending')q=q.eq('aprovado',false);else if(f==='approved')q=q.eq('aprovado',true);
+  const{data:posts}=await q.limit(100);
+  const l=$('#aFL');l.innerHTML='';
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum post encontrado.</div>';return;}
+  for(const p of posts){
+    const ini=(p.users?.nome||'?').substring(0,2).toUpperCase();
+    const{data:rps}=await sb.from('forum_replies').select('*,users(nome)').eq('post_id',p.id).order('criado_em');
+    const pendReps=(rps||[]).filter(r=>!r.aprovado&&!r.is_admin).length;
+    let rpsHtml='';
+    for(const r of(rps||[])){
+      const rAv=r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase();
+      const rNome=r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?');
+      rpsHtml+=
+        '<div class="ri'+(r.is_admin?' adm-reply':!r.aprovado?' pending-reply':'')+'" data-rid="'+r.id+'">'+
+        '<div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div>'+
+        '<div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'+
+        '<div style="font-weight:700;font-size:.82rem">'+rNome+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span>'+
+        (!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem;margin-left:4px">Pendente</span>':'')+
+        '</div><div style="display:flex;gap:4px">'+
+        (!r.aprovado&&!r.is_admin?'<button class="btn bs btn-xs aprv-rep">✅ Aprovar</button>':'')+
+        '<button class="btn bd btn-xs del-rep">🗑️</button></div></div>'+
+        '<div style="font-size:.87rem;color:var(--soft);margin-top:3px">'+r.conteudo+'</div></div></div>';
+    }
+    const card=document.createElement('div');card.className='pc'+(p.fixado?' pin':'');
+    card.innerHTML=
+      '<div class="phead"><div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div>'+
+      '<div style="flex:1"><div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+p.titulo+'</div>'+
+      '<div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+(p.modules?.titulo||'Geral')+' · '+fd(p.criado_em)+
+      (!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">Post pendente</span>':'')+
+      (pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">'+pendReps+' resp. pendente(s)</span>':'')+
+      '</div></div>'+
+      '<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
+      (!p.aprovado?'<button class="btn bs btn-xs aprv-post">✅ Aprovar</button>':'')+
+      '<button class="btn bg2 btn-xs pin-post">'+(p.fixado?'Desafixar':'📌 Fixar')+'</button>'+
+      '<button class="btn bd btn-xs del-post">🗑️</button></div></div>'+
+      '<div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+p.conteudo+'</div>'+
+      '<div style="padding:11px 15px">'+
+      '<div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+((rps||[]).length)+')</div>'+
+      '<div class="rep-con">'+rpsHtml+'</div>'+
+      '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'+
+      '<div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨 Responder como Admin</div>'+
+      '<textarea class="fi adm-ta" rows="2" placeholder="Digite sua resposta (publicada imediatamente)..."></textarea>'+
+      '<button class="btn bp btn-sm adm-rep" style="margin-top:7px">📤 Enviar resposta</button></div></div>';
+    (function(post,cardEl,replies){
+      const ap=cardEl.querySelector('.aprv-post');
+      if(ap)ap.onclick=async()=>{await sb.from('forum_posts').update({aprovado:true}).eq('id',post.id);toast('✅ Post aprovado!','s');loadAForum();};
+      cardEl.querySelector('.pin-post').onclick=async()=>{await sb.from('forum_posts').update({fixado:!post.fixado}).eq('id',post.id);loadAForum();};
+      cardEl.querySelector('.del-post').onclick=async()=>{if(!confirm('Excluir post e respostas?'))return;await sb.from('forum_replies').delete().eq('post_id',post.id);await sb.from('forum_posts').delete().eq('id',post.id);toast('🗑️ Excluido.','i');loadAForum();};
+      replies.forEach(r=>{
+        const rd=cardEl.querySelector('[data-rid="'+r.id+'"]');if(!rd)return;
+        const ab=rd.querySelector('.aprv-rep');if(ab)ab.onclick=async()=>{await sb.from('forum_replies').update({aprovado:true}).eq('id',r.id);toast('✅ Aprovado!','s');loadAForum();};
+        const db=rd.querySelector('.del-rep');if(db)db.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_replies').delete().eq('id',r.id);loadAForum();};
+      });
+      cardEl.querySelector('.adm-rep').onclick=async()=>{
+        const ta=cardEl.querySelector('.adm-ta'),txt=ta.value.trim();
+        if(!txt){toast('⚠️ Digite uma resposta.','w');return;}
+        const res=await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:true,is_admin:true});
+        if(res.error){toast('❌ Erro: '+res.error.message,'e');return;}
+        ta.value='';toast('✅ Resposta publicada!','s');loadAForum();
+      };
+    })(p,card,rps||[]);
+    l.appendChild(card);
+  }
+}
+$('#aFF').addEventListener('change',loadAForum);
+$('#bRF').addEventListener('click',loadAForum);
 </script>
 </body>
 </html>
