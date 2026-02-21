@@ -687,6 +687,19 @@ async function showStudent(){
   }));
 }
 
+/* ===== ADMIN ===== */
+async function showAdmin(){
+  $('#ls').style.display='none';$('#aa').classList.remove('hidden');
+  $$('.ani').forEach(i=>i.addEventListener('click',()=>{
+    $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
+    $$('#aa .page').forEach(p=>p.classList.remove('act'));
+    const adm=i.dataset.adm;$(`#adm-${adm}`).classList.add('act');
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,live:loadALive,mural:loadAMural,forum:loadAForum};
+    if(fns[adm])fns[adm]();
+  }));
+  await loadADash();await loadPend();
+}
+
 async function loadLiveSection(){
   if(!sb||!CU.turma_id){$('#liveSection').classList.add('hidden');return;}
   const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('ativa',true).single();
