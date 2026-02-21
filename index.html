@@ -992,6 +992,182 @@ $('#bSCD').addEventListener('click',async()=>{
 window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);toast(a?'▶️ Ativado!':'⏸️ Desativado.','i');loadALive();};
 window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);toast('🗑️ Excluído.','i');loadALive();};
 
+
+/* ===== ADMIN DATA FUNCTIONS ===== */
+async function loadADash(){
+  if(!sb)return;
+  const[{data:al},{data:pe},{data:mo}]=await Promise.all([
+    sb.from('users').select('*,turmas(nome)').eq('role','student').eq('status','active'),
+    sb.from('users').select('id').eq('status','pending'),
+    sb.from('modules').select('id')
+  ]);
+  const alunos=al||[],pc=(pe||[]).length,mc=(mo||[]).length;
+  $('#aA').textContent=alunos.length;$('#aP').textContent=pc;$('#aMo').textContent=mc;
+  if(pc>0){$('#pBadge').textContent=pc;$('#pBadge').classList.remove('hidden');}
+  else{$('#pBadge').classList.add('hidden');}
+  let tot=0;
+  for(const a of alunos){const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);tot+=pct((pr||[]).filter(x=>x.concluido).length,mc);}
+  $('#aMd').textContent=alunos.length?Math.round(tot/alunos.length)+'%':'0%';
+  const tb=$('#aDT');tb.innerHTML='';
+  for(const a of alunos){
+    const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);
+    const dn=(pr||[]).filter(x=>x.concluido).length,p2=pct(dn,mc),d2=du(a.validade_acesso),dc=d2!==null&&d2<=30?'color:var(--amber)':'';
+    tb.innerHTML+=`<tr><td><strong>${a.nome}</strong><br/><span style="font-family:var(--fm);font-size:.75rem;color:var(--muted)">${a.login}</span></td><td><span class="badge bc">${a.turmas?.nome||'—'}</span></td><td><div style="display:flex;align-items:center;gap:7px"><div class="pw" style="width:75px"><div class="pf" style="width:${p2}%"></div></div><span style="font-size:.82rem;font-weight:700">${p2}%</span></div></td><td>${dn}/${mc}</td><td class="${dc}" style="font-size:.85rem">${fd(a.validade_acesso)}</td><td><span class="badge bg3">Ativo</span></td></tr>`;
+  }
+}
+async function loadPend(){
+  if(!sb)return;
+  const{data}=await sb.from('users').select('*').eq('status','pending').order('criado_em');
+  const c2=$('#pendCont');
+  if(!data?.length){c2.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma solicitacao pendente.</div>';return;}
+  const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
+  const to=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  c2.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:13px">${data.length} solicitacao(oes)</div>`;
+  data.forEach(u=>{
+    const d2=document.createElement('div');d2.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:11px;background:rgba(0,0,0,.18)';
+    d2.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:11px"><div><div style="font-weight:800">${u.nome}</div><div style="font-size:.82rem;color:var(--muted)">${u.email||''} - ${u.login}</div></div><div style="font-size:.75rem;color:var(--muted)">${fd(u.criado_em)}</div></div><div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center"><select id="ts-${u.id}" class="fi" style="width:auto;min-width:180px"><option value="">Sem turma</option>${to}</select><input type="number" id="ms-${u.id}" class="fi" value="12" min="1" style="width:95px"/><button class="btn bs" onclick="aprovA('${u.id}')">Aprovar</button><button class="btn bd" onclick="rejA('${u.id}')">Rejeitar</button></div>`;
+    c2.appendChild(d2);
+  });
+}
+window.aprovA=async function(id){
+  const ti=document.getElementById('ts-'+id)?.value||null,ms=parseInt(document.getElementById('ms-'+id)?.value)||12;
+  const v=new Date();v.setMonth(v.getMonth()+ms);
+  await sb.from('users').update({status:'active',turma_id:ti||null,validade_acesso:v.toISOString(),meses_acesso:ms}).eq('id',id);
+  toast('Aluno aprovado!','s');loadPend();loadADash();
+};
+window.rejA=async function(id){
+  if(!confirm('Rejeitar?'))return;
+  await sb.from('users').update({status:'blocked'}).eq('id',id);
+  toast('Rejeitado.','i');loadPend();
+};
+async function loadAAlunos(){
+  if(!sb)return;
+  const{data:turmas}=await sb.from('turmas').select('*');
+  const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  $('#aTurma').innerHTML='<option value="">Sem turma</option>'+opts;
+  const{data:alunos}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
+  $('#aAT').innerHTML=(alunos||[]).map(a=>{
+    const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';
+    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td>${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="${d2!==null&&d2<=30?'color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">Editar</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">Del</button></td></tr>`;
+  }).join('');
+}
+$('#bCA').addEventListener('click',async()=>{
+  const n=$('#aNome').value.trim(),e=$('#aEmail').value.trim(),l=$('#aLogin').value.trim(),p=$('#aPass').value.trim(),ti=$('#aTurma').value,ms=parseInt($('#aMes').value)||12;
+  if(!n||!e||!l||!p){toast('Preencha todos os campos.','w');return;}
+  if(!sb)return;
+  const hash=await sha(p),v=new Date();v.setMonth(v.getMonth()+ms);
+  const{error}=await sb.from('users').insert({nome:n,email:e,login:l,senha:hash,role:'student',status:'active',turma_id:ti||null,validade_acesso:v.toISOString(),meses_acesso:ms});
+  if(error){toast('Erro: '+error.message,'e');return;}
+  toast('Aluno criado!','s');['aNome','aEmail','aLogin','aPass'].forEach(id=>document.getElementById(id).value='');$('#aMes').value='12';loadAAlunos();
+});
+window.editA=async function(id){
+  if(!sb)return;
+  const{data:a}=await sb.from('users').select('*').eq('id',id).single();
+  const{data:turmas}=await sb.from('turmas').select('*');
+  const opts=(turmas||[]).map(t=>`<option value="${t.id}"${a.turma_id===t.id?' selected':''}>${t.nome}</option>`).join('');
+  showModal('<div class="mtt">Editar: '+a.nome+'</div><div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>'+opts+'</select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"'+(a.status==='active'?' selected':'')+'>Ativo</option><option value="blocked"'+(a.status==='blocked'?' selected':'')+'>Bloqueado</option></select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Meses de acesso</label><input id="eMes" class="fi" type="number" value="'+(a.meses_acesso||12)+'" min="1"/></div><div class="fg" style="margin-bottom:16px"><label class="fl">Nova senha</label><input id="ePass" class="fi" type="password" placeholder="Vazio = nao altera"/></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveA(''+id+'')">Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+};
+window.saveA=async function(id){
+  const ti=$('#eTurma').value,st=$('#eStatus').value,ms=parseInt($('#eMes').value)||12,np=$('#ePass').value.trim();
+  const v=new Date();v.setMonth(v.getMonth()+ms);
+  const pay={turma_id:ti||null,status:st,validade_acesso:v.toISOString(),meses_acesso:ms};
+  if(np&&np.length>=6)pay.senha=await sha(np);
+  await sb.from('users').update(pay).eq('id',id);
+  toast('Atualizado!','s');closeModal();loadAAlunos();loadADash();
+};
+window.delA=async function(id){
+  if(!confirm('Remover aluno?'))return;
+  await Promise.all([sb.from('progress').delete().eq('user_id',id),sb.from('notes').delete().eq('user_id',id)]);
+  await sb.from('users').delete().eq('id',id);
+  toast('Aluno removido.','i');loadAAlunos();loadADash();
+};
+async function loadATurmas(){
+  if(!sb)return;
+  const{data:turmas}=await sb.from('turmas').select('*').order('criado_em');
+  const tb=$('#aTT');tb.innerHTML='';
+  for(const t of turmas||[]){
+    const[{data:al},{data:mo}]=await Promise.all([sb.from('users').select('id').eq('turma_id',t.id).eq('status','active'),sb.from('modules').select('id').eq('turma_id',t.id)]);
+    tb.innerHTML+=`<tr><td><strong>${t.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${t.descricao||''}</span></td><td>${(al||[]).length}</td><td>${(mo||[]).length}</td><td><span class="badge ${t.ativa?'bg3':'bw2'}">${t.ativa?'Ativa':'Inativa'}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="togT('${t.id}',${!t.ativa})">${t.ativa?'Pausar':'Ativar'}</button><button class="btn bd btn-xs" onclick="delT('${t.id}')">Del</button></td></tr>`;
+  }
+}
+$('#bST').addEventListener('click',async()=>{
+  const n=$('#tNome').value.trim(),d=$('#tDesc').value.trim();
+  if(!n){toast('Nome obrigatorio.','w');return;}
+  if(!sb)return;
+  await sb.from('turmas').insert({nome:n,descricao:d,ativa:true});
+  toast('Turma criada!','s');$('#tNome').value='';$('#tDesc').value='';loadATurmas();loadTurmaSelects();
+});
+window.togT=async function(id,a){await sb.from('turmas').update({ativa:a}).eq('id',id);loadATurmas();};
+window.delT=async function(id){if(!confirm('Excluir turma?'))return;await sb.from('turmas').delete().eq('id',id);loadATurmas();};
+async function loadTurmaSelects(){
+  if(!sb)return;
+  const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
+  const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  ['mTur','aTurma','lvTurma','cdTurma','mrTurma'].forEach(function(id){
+    const el=document.getElementById(id);if(!el)return;
+    const pre=id==='aTurma'?'<option value="">Sem turma</option>':id==='mrTurma'?'<option value="">Todas as turmas</option>':'<option value="">Selecione...</option>';
+    el.innerHTML=pre+opts;
+  });
+}
+async function loadAMods(){
+  if(!sb)return;await loadTurmaSelects();
+  const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('ordem');
+  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">Editar</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">Del</button></td></tr>`).join('');
+}
+$('#bSM').addEventListener('click',async()=>{
+  const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'ok',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||10)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
+  if(!tt||!tu){toast('Titulo e turma obrigatorios.','w');return;}
+  if(!sb)return;
+  if(eid){await sb.from('modules').update({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('Modulo atualizado!','s');}
+  else{await sb.from('modules').insert({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('Modulo criado!','s');}
+  clearMF();loadAMods();loadAMats();loadAQuiz();
+});
+$('#bCM').addEventListener('click',clearMF);
+function clearMF(){['mTit','mIco','mVU','mDur','mOrd','mTop','mEId'].forEach(function(id){const e=document.getElementById(id);if(e)e.value='';});$('#mVT').value='youtube';}
+window.editM=async function(id){
+  if(!sb)return;
+  const{data:m}=await sb.from('modules').select('*').eq('id',id).single();
+  $('#mTit').value=m.titulo;$('#mIco').value=m.icone||'ok';$('#mTur').value=m.turma_id||'';$('#mVT').value=m.video_type||'youtube';
+  $('#mVU').value=m.video_url||'';$('#mDur').value=Math.round((m.duracao_seg||600)/60);$('#mOrd').value=m.ordem||1;$('#mTop').value=m.topicos||'';$('#mEId').value=m.id;
+  toast('Editando: '+m.titulo,'i');
+};
+window.delM=async function(id){if(!confirm('Excluir modulo?'))return;await sb.from('modules').delete().eq('id',id);toast('Excluido.','i');loadAMods();};
+async function loadAMats(){
+  if(!sb)return;
+  const{data:mds}=await sb.from('modules').select('id,titulo,icone');
+  const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
+  $('#matM').innerHTML='<option value="">Todos os modulos</option>'+opts;
+  const{data:mats}=await sb.from('materials').select('*,modules(titulo)').order('criado_em',{ascending:false});
+  $('#aMatT').innerHTML=(mats||[]).map(m=>`<tr><td><strong>${ti(m.tipo)} ${m.nome}</strong></td><td>${m.tipo}</td><td>${m.modules?.titulo||'Todos'}</td><td><a href="${m.url}" target="_blank" style="color:var(--cyan);font-size:.78rem">${m.url.substring(0,40)}</a></td><td><button class="btn bd btn-xs" onclick="delMat('${m.id}')">Del</button></td></tr>`).join('');
+}
+$('#bSMat').addEventListener('click',async()=>{
+  const n=$('#matN').value.trim(),t2=$('#matT').value,u=$('#matU').value.trim(),d=$('#matD').value.trim(),m=$('#matM').value;
+  if(!n||!u){toast('Nome e URL obrigatorios.','w');return;}
+  if(!sb)return;
+  await sb.from('materials').insert({nome:n,tipo:t2,url:u,descricao:d,modulo_id:m||null});
+  toast('Material adicionado!','s');['matN','matU','matD'].forEach(function(id){document.getElementById(id).value='';});$('#matM').value='';loadAMats();
+});
+window.delMat=async function(id){if(!confirm('Remover?'))return;await sb.from('materials').delete().eq('id',id);toast('Removido.','i');loadAMats();};
+async function loadAQuiz(){
+  if(!sb)return;
+  const{data:mds}=await sb.from('modules').select('id,titulo,icone');
+  const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
+  $('#qMod').innerHTML='<option value="">Geral</option>'+opts;
+  const{data:qs}=await sb.from('quiz').select('*,modules(titulo)').order('criado_em',{ascending:false});
+  const l=$('#aQL');
+  if(!qs||!qs.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao.</div>';return;}
+  l.innerHTML=qs.map(function(q,i){return '<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">'+(i+1)+'. '+q.question+'</div><button class="btn bd btn-xs" onclick="delQ(''+q.id+'')">Del</button></div><div style="display:flex;flex-direction:column;gap:5px">'+(q.options||[]).map(function(opt,oi){return '<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid '+(oi===q.correct_option?'var(--green)':'var(--border)')+';background:'+(oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)')+'">'+String.fromCharCode(65+oi)+') '+opt+(oi===q.correct_option?' OK':'')+'</div>';}).join('')+'</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Modulo: '+(q.modules&&q.modules.titulo?q.modules.titulo:'Geral')+'</div></div>';}).join('');
+}
+$('#bSQ').addEventListener('click',async()=>{
+  const q=$('#qEn').value.trim(),o0=$('#qO0').value.trim(),o1=$('#qO1').value.trim(),o2=$('#qO2').value.trim(),cs=document.querySelector('input[name="qC"]:checked'),m=$('#qMod').value;
+  if(!q||!o0||!o1||!o2){toast('Preencha enunciado e 3 opcoes.','w');return;}
+  if(!cs){toast('Marque a opcao correta.','w');return;}
+  if(!sb)return;
+  await sb.from('quiz').insert({question:q,options:[o0,o1,o2],correct_option:parseInt(cs.value),modulo_id:m||null});
+  toast('Questao adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(function(id){document.getElementById(id).value='';});document.querySelectorAll('input[name="qC"]').forEach(function(r){r.checked=false;});loadAQuiz();
+});
+window.delQ=async function(id){if(!confirm('Excluir?'))return;await sb.from('quiz').delete().eq('id',id);toast('Excluida.','i');loadAQuiz();};
+
 /* MURAL ADMIN */
 async function loadAMural(){
   if(!sb)return;await loadTurmaSelects();
