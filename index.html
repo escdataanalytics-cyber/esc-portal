@@ -235,6 +235,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ni" data-pg="class"><span class="nic">🎓</span>Sala de Aula</div>
       <div class="ni" data-pg="mural"><span class="nic">📋</span>Mural</div>
       <div class="ni" data-pg="forum"><span class="nic">💬</span>Fórum</div>
+      <div class="ni" id="navProjeto" data-pg="projeto" style="display:none"><span class="nic">🎓</span>Projeto Final</div>
       <div class="nsect">Módulos</div>
       <div id="sML"></div>
       <div class="nsect" style="margin-top:18px">Progresso</div>
@@ -313,6 +314,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
               </div>
             </div>
             <div class="tbar">
+              <button class="tb" data-tab="aulas" id="tabAulas">📚 Aulas</button>
               <button class="tb act" data-tab="cont">📖 Conteúdo</button>
               <button class="tb" data-tab="mat">📎 Materiais</button>
               <button class="tb" data-tab="quiz">🎯 Quiz</button>
@@ -320,6 +322,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
               <button class="tb" data-tab="fmod">💬 Fórum</button>
             </div>
             <div>
+              <div id="tab-aulas" class="tp">
+                <h3 style="color:var(--cyan);margin-bottom:14px">📚 Aulas deste Módulo</h3>
+                <div id="aulasList"></div>
+              </div>
               <div id="tab-cont" class="tp act">
                 <h3 style="color:var(--cyan);margin-bottom:11px" id="cMT">—</h3>
                 <div id="cTop" style="color:var(--soft);line-height:2"></div>
@@ -360,6 +366,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- PROJETO -->
+      <div id="pg-projeto" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🎓 Projeto Final</div>
+        <div id="projetoContent"></div>
       </div>
 
       <!-- MURAL -->
@@ -406,8 +418,11 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="alunos">👥 Alunos</div>
       <div class="ani" data-adm="turmas">🏫 Turmas</div>
       <div class="ani" data-adm="mods">🎬 Módulos</div>
+      <div class="ani" data-adm="aulas">📚 Aulas</div>
       <div class="ani" data-adm="mats">📎 Materiais</div>
       <div class="ani" data-adm="quiz">🎯 Quiz</div>
+      <div class="ani" data-adm="qstats">📊 Analytics Quiz</div>
+      <div class="ani" data-adm="projetos">🎓 Projetos</div>
       <div class="ani" data-adm="live">🔴 Aulas Ao Vivo</div>
       <div class="ani" data-adm="mural">📋 Mural</div>
       <div class="ani" data-adm="forum">💬 Fórum</div>
@@ -600,30 +615,130 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div id="aFL"></div>
       </div>
 
+      <!-- AULAS ADMIN -->
+      <div id="adm-aulas" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">📚 Gerenciar Aulas</div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">➕ Adicionar / Editar Aula</div>
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Módulo</label><select id="aulaModulo" class="fi"><option value="">Selecione o módulo...</option></select></div>
+            <div class="fg"><label class="fl">Título da Aula</label><input id="aulaTit" class="fi" placeholder="Aula 01 — Introdução"/></div>
+            <div class="fg"><label class="fl">Ícone</label><input id="aulaIco" class="fi" placeholder="🎬" maxlength="4"/></div>
+            <div class="fg"><label class="fl">Tipo de vídeo</label><select id="aulaVT" class="fi"><option value="youtube">YouTube</option><option value="vimeo">Vimeo</option><option value="mp4">MP4 direto</option></select></div>
+            <div class="fg full"><label class="fl">URL do vídeo</label><input id="aulaVU" class="fi" placeholder="https://www.youtube.com/watch?v=..."/></div>
+            <div class="fg"><label class="fl">Duração (min)</label><input id="aulaDur" class="fi" type="number" placeholder="15" min="1"/></div>
+            <div class="fg"><label class="fl">Ordem</label><input id="aulaOrd" class="fi" type="number" placeholder="1" min="1"/></div>
+            <div class="fg full"><label class="fl">Tópicos (um por linha)</label><textarea id="aulaTop" class="fi" rows="3" placeholder="Conceito&#10;Análise"></textarea></div>
+            <input type="hidden" id="aulaEId"/>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:13px">
+            <button id="bSAula" class="btn bp">💾 Salvar Aula</button>
+            <button id="bCAula" class="btn bg2">✖ Limpar</button>
+          </div>
+        </div>
+        <div class="card cp">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Aulas por Módulo</div>
+          <div class="fg" style="margin-bottom:12px"><label class="fl">Filtrar por módulo</label><select id="aulaFiltro" class="fi"><option value="">Todos os módulos</option></select></div>
+          <div class="tw2"><table><thead><tr><th>Ord</th><th>Aula</th><th>Módulo</th><th>Tipo</th><th>Duração</th><th>Ações</th></tr></thead><tbody id="aulasTable"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS QUIZ -->
+      <div id="adm-qstats" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">📊 Analytics do Quiz</div>
+        <div class="card cp" style="margin-bottom:14px">
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Filtrar por módulo</label><select id="qsFiltroMod" class="fi"><option value="">Todos os módulos</option></select></div>
+            <div class="fg" style="align-items:flex-end;display:flex"><button id="bQStats" class="btn bp btn-sm">🔍 Analisar</button></div>
+          </div>
+        </div>
+        <div id="qStatsResume" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px"></div>
+        <div class="card cp">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Desempenho por Questão</div>
+          <div id="qStatsList"></div>
+        </div>
+      </div>
+
+      <!-- PROJETOS ADMIN -->
+      <div id="adm-projetos" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">🎓 Projetos dos Alunos</div>
+        <div class="card cp" style="margin-bottom:14px">
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Filtrar por turma</label><select id="projFiltro" class="fi"><option value="">Todas as turmas</option></select></div>
+            <div class="fg"><label class="fl">Status</label><select id="projStatus" class="fi"><option value="">Todos</option><option value="enviado">Enviados</option><option value="em_revisao">Em revisão</option><option value="aprovado">Aprovados</option><option value="reprovado">Reprovados</option></select></div>
+            <div class="fg" style="align-items:flex-end;display:flex"><button id="bLoadProj" class="btn bp btn-sm">🔍 Filtrar</button></div>
+          </div>
+        </div>
+        <div id="projList"></div>
+      </div>
+
+
+
     </div>
   </div>
 </div>
 
 <div id="mBg" class="mbg hidden"><div id="mCont" class="modal"></div></div>
 
+
 <script>
+/* ═══════════════════════════════════════════════
+   ESC PLATAFORMA — JS COMPLETO
+   Versão: 3.0 | Todas as funcionalidades
+   ═══════════════════════════════════════════════ */
+
 let sb=null;
 try{sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
-let CU=null,CTurma=null,mods=[],actMod=null,wTimer=null,wSec=0,cdTimer=null;
+let CU=null,CTurma=null,mods=[],actMod=null,actAula=null,wTimer=null,wSec=0,cdTimer=null,inactTimer=null;
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const INACT_LIMIT=30*60*1000; // 30 min
+
+/* ── HELPERS ── */
 function ft(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60,p=n=>String(n).padStart(2,'0');return h>0?`${h}:${p(m)}:${p(sec)}`:`${p(m)}:${p(sec)}`;}
 function pct(a,b){return b>0?Math.round((a/b)*100):0;}
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 function fd(d){return d?new Date(d).toLocaleDateString('pt-BR'):'—';}
 function fdt(d){return d?new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';}
 function du(d){return d?Math.ceil((new Date(d)-new Date())/(864e5)):null;}
 function ti(t){return{pdf:'📊',doc:'📋',xlsx:'📈',link:'🔗',other:'📦'}[t]||'📦';}
-function toast(msg,tp='i'){const el=document.createElement('div');el.className=`toast t${tp}`;el.textContent=msg;$('#tc').appendChild(el);setTimeout(()=>{el.style.animation='tIn .3s ease reverse';setTimeout(()=>el.remove(),300);},3000);}
+function toast(msg,tp='i'){const el=document.createElement('div');el.className=`toast t${tp}`;el.textContent=msg;$('#tc').appendChild(el);setTimeout(()=>{el.style.animation='tIn .3s ease reverse';setTimeout(()=>el.remove(),300);},3200);}
 function showModal(html){$('#mCont').innerHTML=html;$('#mBg').classList.remove('hidden');}
 function closeModal(){$('#mBg').classList.add('hidden');}
 $('#mBg').addEventListener('click',e=>{if(e.target===$('#mBg'))closeModal();});
+function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
-/* LOGIN */
+/* ── SESSION PERSISTENCE ── */
+function saveSession(){if(CU)sessionStorage.setItem('esc_user',JSON.stringify(CU));}
+function clearSession(){sessionStorage.removeItem('esc_user');sessionStorage.removeItem('esc_mod');sessionStorage.removeItem('esc_aula');}
+function resetInactTimer(){
+  clearTimeout(inactTimer);
+  inactTimer=setTimeout(()=>{
+    toast('Sessão expirada por inatividade.','w');
+    setTimeout(doLogout,2000);
+  },INACT_LIMIT);
+}
+['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,resetInactTimer,{passive:true}));
+
+/* ── CONCURRENT LOGIN ── */
+let sessionToken=null;
+async function checkConcurrent(){
+  if(!sb||!CU||CU.role==='admin')return true;
+  const{data}=await sb.from('users').select('session_token').eq('id',CU.id).single();
+  if(data&&data.session_token&&data.session_token!==sessionToken){
+    toast('Sua conta foi acessada em outro dispositivo.','e');
+    setTimeout(doLogout,2500);
+    return false;
+  }
+  return true;
+}
+async function setSessionToken(){
+  if(!sb||!CU||CU.role==='admin')return;
+  sessionToken=genId();
+  await sb.from('users').update({session_token:sessionToken,ultimo_acesso:new Date().toISOString()}).eq('id',CU.id);
+  setInterval(async()=>{await checkConcurrent();},60000);
+}
+
+/* ── LOGIN ── */
 $$('.ltab').forEach(t=>t.addEventListener('click',()=>{
   $$('.ltab').forEach(x=>x.classList.remove('act'));t.classList.add('act');
   const tb=t.dataset.lt;
@@ -632,6 +747,7 @@ $$('.ltab').forEach(t=>t.addEventListener('click',()=>{
 }));
 $('#lBtn').addEventListener('click',doLogin);
 $('#lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
 async function doLogin(){
   const lg=$('#lUser').value.trim(),pw=$('#lPass').value.trim(),err=$('#lErr');
   if(!lg||!pw){err.textContent='Preencha login e senha.';return;}
@@ -642,38 +758,67 @@ async function doLogin(){
     else{err.textContent='Demo: admin/admin2024 ou aluno1/123456';}
     return;
   }
-  $('#lBtn').disabled=true;
+  $('#lBtn').disabled=true;$('#lBtn').textContent='Entrando...';
   const hash=await sha(pw);
   const{data,error}=await sb.from('users').select('*').eq('login',lg).eq('senha',hash).single();
-  $('#lBtn').disabled=false;
+  $('#lBtn').disabled=false;$('#lBtn').textContent='Entrar';
   if(error||!data){err.textContent='Login ou senha incorretos.';return;}
-  if(data.status==='pending'){err.textContent='Cadastro aguardando aprovacao.';return;}
-  if(data.status==='blocked'){err.textContent='Acesso bloqueado. Contate o admin.';return;}
-  if(data.status==='expired'||(data.validade_acesso&&new Date(data.validade_acesso)<new Date())){err.textContent='Acesso expirado.';return;}
-  CU=data;data.role==='admin'?showAdmin():showStudent();
+  if(data.status==='pending'){err.textContent='Cadastro aguardando aprovação.';return;}
+  if(data.status==='blocked'){err.textContent='Acesso bloqueado. Contate o administrador.';return;}
+  if(data.status==='expired'||(data.validade_acesso&&new Date(data.validade_acesso)<new Date())){err.textContent='Acesso expirado. Contate o administrador.';return;}
+  CU=data;
+  saveSession();
+  resetInactTimer();
+  if(data.role==='admin')showAdmin();else{await setSessionToken();showStudent();}
 }
+
 $('#rBtn').addEventListener('click',async()=>{
   const n=$('#rNome').value.trim(),e=$('#rEmail').value.trim(),l=$('#rLogin').value.trim(),p=$('#rPass').value.trim(),err=$('#rErr');
   if(!n||!e||!l||!p){err.textContent='Preencha todos os campos.';return;}
-  if(p.length<6){err.textContent='Senha minimo 6 caracteres.';return;}
+  if(p.length<6){err.textContent='Senha mínimo 6 caracteres.';return;}
   if(!sb){toast('Configure o Supabase.','w');return;}
   $('#rBtn').disabled=true;
   const hash=await sha(p);
   const{error}=await sb.from('users').insert({nome:n,email:e,login:l,senha:hash,role:'student',status:'pending'});
   $('#rBtn').disabled=false;
-  if(error){$('#rErr').textContent=error.message.includes('unique')?'Login ou email ja em uso.':'Erro ao enviar.';return;}
-  toast('Solicitacao enviada! Aguarde aprovacao.','s');document.querySelector('[data-lt="login"]').click();
+  if(error){$('#rErr').textContent=error.message.includes('unique')?'Login ou e-mail já em uso.':'Erro ao enviar.';return;}
+  toast('Solicitação enviada! Aguarde aprovação.','s');document.querySelector('[data-lt="login"]').click();
 });
+
 function doLogout(){
-  CU=null;CTurma=null;actMod=null;mods=[];
-  if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);
+  CU=null;CTurma=null;actMod=null;actAula=null;mods=[];
+  if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);clearTimeout(inactTimer);
+  clearSession();
+  if(sb&&sessionToken){sb.from('users').update({session_token:null}).eq('id',CU?.id||'');}
   $('#sa').classList.add('hidden');$('#aa').classList.add('hidden');
   $('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';
 }
 $('#sOut').addEventListener('click',doLogout);
 $('#aOut').addEventListener('click',doLogout);
 
-/* STUDENT */
+/* ── AUTO-RESTORE SESSION ── */
+window.addEventListener('load',async()=>{
+  const saved=sessionStorage.getItem('esc_user');
+  if(!saved)return;
+  try{
+    const u=JSON.parse(saved);
+    if(!sb){CU=u;u.role==='admin'?showAdmin():showStudent();return;}
+    const{data}=await sb.from('users').select('*').eq('id',u.id).single();
+    if(!data||data.status==='blocked'||data.status==='expired')return clearSession();
+    CU=data;resetInactTimer();
+    const savedMod=sessionStorage.getItem('esc_mod');
+    const savedAula=sessionStorage.getItem('esc_aula');
+    if(data.role==='admin')showAdmin();
+    else{
+      await setSessionToken();
+      await showStudent();
+      if(savedMod)openMod(savedMod);
+      if(savedAula)openAula(savedAula);
+    }
+  }catch(e){clearSession();}
+});
+
+/* ── STUDENT ── */
 async function showStudent(){
   $('#ls').style.display='none';$('#sa').classList.remove('hidden');
   const ini=CU.nome.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -682,27 +827,37 @@ async function showStudent(){
   const d=du(CU.validade_acesso);
   if(d!==null&&d<=30&&d>0){$('#ew').classList.remove('hidden');$('#ed').textContent=d;}
   await loadMods();renderDash();renderSML();loadLiveSection();loadCountdown();
+  // Check if student has projeto turma
+  await checkProjetoTurma();
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
     const pg=item.dataset.pg;
     $$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
     $$('#sa .page').forEach(p=>p.classList.remove('act'));
-    document.querySelector(`#pg-${pg}`).classList.add('act');
-    if(pg==='forum')loadFPage();if(pg==='mural')loadMural();
+    document.getElementById(`pg-${pg}`).classList.add('act');
+    if(pg==='forum')loadFPage();if(pg==='mural')loadMural();if(pg==='projeto')loadProjetoAluno();
   }));
   $$('.tb').forEach(b=>b.addEventListener('click',()=>{
     const tab=b.dataset.tab;
     $$('.tb').forEach(x=>x.classList.remove('act'));b.classList.add('act');
     $$('.tp').forEach(p=>p.classList.remove('act'));
-    document.querySelector(`#tab-${tab}`).classList.add('act');
-    if(tab==='note')loadNote();if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();
+    document.getElementById(`tab-${tab}`).classList.add('act');
+    if(tab==='note')loadNote();if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();if(tab==='aulas')loadAulasList();
   }));
+}
+async function checkProjetoTurma(){
+  if(!sb||!CU.turma_id)return;
+  const{data}=await sb.from('turmas').select('tem_projeto').eq('id',CU.turma_id).single();
+  if(data?.tem_projeto){
+    const nav=document.getElementById('navProjeto');
+    if(nav)nav.style.display='';
+  }
 }
 async function loadLiveSection(){
   if(!sb||!CU.turma_id){$('#liveSection').classList.add('hidden');return;}
   const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','live').eq('ativa',true).single();
   if(!data){$('#liveSection').classList.add('hidden');return;}
   $('#liveTitulo').textContent=data.titulo||'Aula Ao Vivo';
-  $('#liveDesc').textContent=data.descricao||'Sua turma esta em aula agora!';
+  $('#liveDesc').textContent=data.descricao||'';
   $('#liveBtn').href=data.link||'#';
   $('#liveSection').classList.remove('hidden');
 }
@@ -710,27 +865,26 @@ async function loadCountdown(){
   if(cdTimer)clearInterval(cdTimer);
   if(!sb||!CU.turma_id){$('#cdSection').classList.add('hidden');return;}
   const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','countdown').eq('ativa',true).single();
-  if(!data||!data.data_hora){$('#cdSection').classList.add('hidden');return;}
+  if(!data?.data_hora){$('#cdSection').classList.add('hidden');return;}
   const target=new Date(data.data_hora);
   if(target<new Date()){$('#cdSection').classList.add('hidden');return;}
-  $('#cdTitulo').textContent=data.titulo||'Proxima Aula';
+  $('#cdTitulo').textContent=data.titulo||'Próxima Aula';
   $('#cdData').textContent=fdt(data.data_hora);
   $('#cdTurmaLabel').textContent=CTurma?.nome||'';
   $('#cdSection').classList.remove('hidden');
   function tick(){
-    const now=new Date(),diff=target-now;
+    const diff=target-new Date();
     if(diff<=0){$('#cdSection').classList.add('hidden');clearInterval(cdTimer);return;}
-    const dd=Math.floor(diff/864e5),hh=Math.floor((diff%864e5)/36e5),mm=Math.floor((diff%36e5)/6e4),ss=Math.floor((diff%6e4)/1e3);
     const p=n=>String(n).padStart(2,'0');
-    $('#cdD').textContent=p(dd);$('#cdH').textContent=p(hh);$('#cdM').textContent=p(mm);$('#cdS').textContent=p(ss);
+    $('#cdD').textContent=p(Math.floor(diff/864e5));
+    $('#cdH').textContent=p(Math.floor((diff%864e5)/36e5));
+    $('#cdM').textContent=p(Math.floor((diff%36e5)/6e4));
+    $('#cdS').textContent=p(Math.floor((diff%6e4)/1e3));
   }
   tick();cdTimer=setInterval(tick,1000);
 }
 async function loadMods(){
-  if(!sb){
-    mods=[{id:'dm1',titulo:'Introducao',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visao geral',ordem:1},{id:'dm2',titulo:'Parametros',icone:'📊',duracao_seg:840,video_type:'youtube',video_url:'',topicos:'Tipos',ordem:2}];
-    CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;
-  }
+  if(!sb){mods=[{id:'dm1',titulo:'Introdução',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visão geral',ordem:1}];CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;}
   if(CU.turma_id){
     const{data:t}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
     CTurma=t;if(t)$('#sTurmaHdr').textContent=t.nome;
@@ -748,18 +902,19 @@ async function renderDash(){
   const pm=await getProg();
   const done=mods.filter(m=>pm[m.id]?.concluido).length,total=mods.length;
   const p=pct(done,total),ts=Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0);
-  const qs=Object.values(pm).filter(x=>x.quiz_score!==null&&x.quiz_score!==undefined);
+  const qs=Object.values(pm).filter(x=>x.quiz_score!=null);
   $('#dPct').textContent=p+'%';$('#dDone').textContent=`${done}/${total}`;
-  $('#dTime').textContent=(ts/3600).toFixed(1)+'h';$('#dQuiz').textContent=qs.length?`${qs[qs.length-1].quiz_score}/${qs[qs.length-1].quiz_total||'?'}`:'—';
-  $('#sPct').textContent=p+'%';$('#sBar').style.width=p+'%';$('#sLbl').textContent=`${done} de ${total} modulos`;
+  $('#dTime').textContent=(ts/3600).toFixed(1)+'h';
+  $('#dQuiz').textContent=qs.length?`${qs[qs.length-1].quiz_score}/${qs[qs.length-1].quiz_total||'?'}`:'—';
+  $('#sPct').textContent=p+'%';$('#sBar').style.width=p+'%';$('#sLbl').textContent=`${done} de ${total} módulos`;
   const tr=$('#trail');tr.innerHTML='';
   mods.forEach(m=>{
     const mp=pm[m.id]||{segundos_vistos:0,concluido:false},pp=pct(mp.segundos_vistos||0,m.duracao_seg||1),isDone=mp.concluido,isCur=actMod===m.id;
     const el=document.createElement('div');el.className='tri';
-    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${m.titulo}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg)}</span>${isDone?'<span class="badge bg3">Concluido</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Nao iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
+    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${m.titulo}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
     tr.appendChild(el);
   });
-  if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum modulo disponivel para sua turma.</div>';
+  if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
 }
 function renderSML(){
   const l=$('#sML');l.innerHTML='';
@@ -770,23 +925,107 @@ function renderSML(){
   });
 }
 window.openMod=function(id){
-  actMod=id;
+  actMod=id;actAula=null;
+  sessionStorage.setItem('esc_mod',id);sessionStorage.removeItem('esc_aula');
   $$('[data-pg]').forEach(x=>x.classList.remove('act'));
   document.querySelector('[data-pg="class"]').classList.add('act');
   $$('#sa .page').forEach(p=>p.classList.remove('act'));
   $('#pg-class').classList.add('act');
   const m=mods.find(x=>x.id===id);if(!m)return;
   $('#pMod').textContent=`${m.icone} ${m.titulo}`;$('#cMT').textContent=m.titulo;
-  $('#cTop').innerHTML=(m.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem topicos.</span>';
-  loadVideo(m);renderCML();loadCMats(id);loadQuiz();
-  $('#nta').oninput=()=>{$('#nch').textContent=$('#nta').value.length;};
-  renderDash();renderSML();
+  $('#cTop').innerHTML=(m.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem tópicos.</span>';
+  // Switch to aulas tab first
+  $$('.tb').forEach(x=>x.classList.remove('act'));
+  $$('.tp').forEach(p=>p.classList.remove('act'));
+  const tabAulas=document.getElementById('tabAulas');
+  if(tabAulas){tabAulas.classList.add('act');document.getElementById('tab-aulas').classList.add('act');loadAulasList();}
+  else{document.querySelector('[data-tab="cont"]').classList.add('act');document.getElementById('tab-cont').classList.add('act');loadVideo(m);}
+  renderCML();loadCMats(id);$('#nta').oninput=()=>{$('#nch').textContent=$('#nta').value.length;};renderDash();renderSML();
 };
+
+/* ── AULAS (STUDENT) ── */
+async function loadAulasList(){
+  const l=$('#aulasList');
+  if(!actMod){l.innerHTML='<div style="color:var(--muted)">Selecione um módulo.</div>';return;}
+  if(!sb){l.innerHTML='<div style="color:var(--muted)">Nenhuma aula cadastrada.</div>';return;}
+  const{data:aulas}=await sb.from('aulas').select('*').eq('modulo_id',actMod).eq('ativo',true).order('ordem');
+  if(!aulas?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">📭 Nenhuma aula neste módulo ainda.</div>';return;}
+  const{data:prog}=await sb.from('progress').select('*').eq('user_id',CU.id).in('aula_id',aulas.map(a=>a.id));
+  const pm={};(prog||[]).forEach(p=>{pm[p.aula_id]=p;});
+  l.innerHTML='';
+  aulas.forEach((aula,i)=>{
+    const ap=pm[aula.id]||{},pp=pct(ap.segundos_vistos||0,aula.duracao_seg||1),isDone=ap.concluido;
+    const el=document.createElement('div');
+    el.style.cssText=`display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);border:1px solid ${actAula===aula.id?'var(--cyan)':'var(--border)'};background:${actAula===aula.id?'rgba(0,200,255,.07)':'rgba(0,0,0,.14)'};margin-bottom:8px;cursor:pointer;transition:all .2s`;
+    el.innerHTML=
+      `<div style="width:36px;height:36px;border-radius:50%;background:${isDone?'rgba(15,186,129,.2)':actAula===aula.id?'rgba(0,200,255,.15)':'rgba(255,255,255,.05)'};display:grid;place-items:center;font-size:1.1rem;flex-shrink:0">${isDone?'✅':aula.icone||'🎬'}</div>`+
+      `<div style="flex:1"><div style="font-weight:700;font-size:.92rem">${i+1}. ${aula.titulo}</div>`+
+      `<div style="display:flex;gap:8px;align-items:center;margin-top:3px"><span style="font-size:.76rem;color:var(--muted)">⏱️ ${ft(aula.duracao_seg||0)}</span>${isDone?'<span class="badge bg3" style="font-size:.67rem">Concluída</span>':pp>0?`<span class="badge bc" style="font-size:.67rem">${pp}%</span>`:''}</div></div>`+
+      `<div class="btn bp btn-sm" style="flex-shrink:0">${isDone?'▶️ Rever':pp>0?'▶️ Continuar':'▶️ Assistir'}</div>`;
+    el.addEventListener('click',()=>openAula(aula.id));
+    l.appendChild(el);
+  });
+}
+window.openAula=async function(id){
+  if(!sb)return;
+  const{data:aula}=await sb.from('aulas').select('*').eq('id',id).single();
+  if(!aula)return;
+  actAula=id;sessionStorage.setItem('esc_aula',id);
+  // Switch to cont tab
+  $$('.tb').forEach(x=>x.classList.remove('act'));$$('.tp').forEach(p=>p.classList.remove('act'));
+  document.querySelector('[data-tab="cont"]').classList.add('act');
+  document.getElementById('tab-cont').classList.add('act');
+  $('#pMod').textContent=`${aula.icone||'🎬'} ${aula.titulo}`;
+  $('#cMT').textContent=aula.titulo;
+  $('#cTop').innerHTML=(aula.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem tópicos.</span>';
+  loadVideoAula(aula);loadAulasList();
+};
+function loadVideoAula(aula){
+  const vc=$('#vc');if(wTimer)clearInterval(wTimer);
+  if(!aula.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Vídeo em breve</div>';startWTAula(aula);return;}
+  if(aula.video_type==='youtube'){const vid=ytId(aula.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
+  else if(aula.video_type==='vimeo'){const vid=vmId(aula.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
+  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${aula.video_url}" type="video/mp4"/></video>`;}
+  startWTAula(aula);
+}
+async function startWTAula(aula){
+  if(sb&&CU){const{data}=await sb.from('progress').select('*').eq('user_id',CU.id).eq('aula_id',aula.id).single();wSec=data?.segundos_vistos||0;}else wSec=0;
+  updVP(aula);
+  wTimer=setInterval(async()=>{
+    wSec=Math.min(wSec+1,aula.duracao_seg||3600);updVP(aula);
+    if(wSec%20===0)await svProgressAula(aula);
+  },1000);
+}
+function updVP(m){$('#vPct').textContent=pct(wSec,(m.duracao_seg||1))+'%';}
+async function svProgressAula(aula,done=null){
+  if(!sb||!CU)return;
+  const pay={user_id:CU.id,aula_id:aula.id,modulo_id:actMod,segundos_vistos:wSec,atualizado_em:new Date().toISOString()};
+  if(done!==null)pay.concluido=done;
+  await sb.from('progress').upsert(pay,{onConflict:'user_id,aula_id'});
+}
+$('#bDone').addEventListener('click',async()=>{
+  if(actAula&&sb){
+    const{data:aula}=await sb.from('aulas').select('*').eq('id',actAula).single();
+    if(aula){
+      const p=pct(wSec,aula.duracao_seg||1);
+      if(p<70&&!confirm(`Assistiu apenas ${p}%. Concluir mesmo assim?`))return;
+      await svProgressAula(aula,true);toast('✅ Aula concluída!','s');
+      loadAulasList();renderDash();return;
+    }
+  }
+  // fallback: module done
+  const m=mods.find(x=>x.id===actMod);if(!m)return;
+  const p2=pct(wSec,m.duracao_seg||1);
+  if(p2<70&&!confirm(`Assistiu apenas ${p2}%. Concluir mesmo assim?`))return;
+  await svP(m,true);toast('✅ Módulo concluído!','s');renderDash();
+});
+
+/* ── MODULE VIDEO (fallback when no aulas) ── */
 function loadVideo(m){
   const vc=$('#vc');if(wTimer)clearInterval(wTimer);
-  if(!m.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Video em breve</div>';startWT(m);return;}
-  if(m.video_type==='youtube'){const vid=ytId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'';}
-  else if(m.video_type==='vimeo'){const vid=vmId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'';}
+  if(!m.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Vídeo em breve</div>';startWT(m);return;}
+  if(m.video_type==='youtube'){const vid=ytId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
+  else if(m.video_type==='vimeo'){const vid=vmId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
   else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${m.video_url}" type="video/mp4"/></video>`;}
   startWT(m);
 }
@@ -794,21 +1033,14 @@ function ytId(u){const m=u.match(/(?:v=|youtu\.be\/|embed\/)([^#&?]{11})/);retur
 function vmId(u){const m=u.match(/vimeo.*\/(\d+)/i);return m?m[1]:null;}
 async function startWT(m){
   if(sb&&CU){const{data}=await sb.from('progress').select('*').eq('user_id',CU.id).eq('modulo_id',m.id).single();wSec=data?.segundos_vistos||0;}else wSec=0;
-  updVP(m);wTimer=setInterval(async()=>{wSec=Math.min(wSec+1,m.duracao_seg);updVP(m);if(wSec%20===0)await svP(m);},1000);
+  updVP(m);wTimer=setInterval(async()=>{wSec=Math.min(wSec+1,m.duracao_seg||3600);updVP(m);if(wSec%20===0)await svP(m);},1000);
 }
-function updVP(m){$('#vPct').textContent=pct(wSec,m.duracao_seg)+'%';}
 async function svP(m,done=null){
   if(!sb||!CU)return;
   const pay={user_id:CU.id,modulo_id:m.id,segundos_vistos:wSec,atualizado_em:new Date().toISOString()};
   if(done!==null)pay.concluido=done;
   await sb.from('progress').upsert(pay,{onConflict:'user_id,modulo_id'});
 }
-$('#bDone').addEventListener('click',async()=>{
-  const m=mods.find(x=>x.id===actMod);if(!m)return;
-  const p=pct(wSec,m.duracao_seg);
-  if(p<80&&!confirm(`Assistiu apenas ${p}%. Concluir mesmo assim?`))return;
-  await svP(m,true);toast('Modulo concluido!','s');renderDash();
-});
 function renderCML(){
   const l=$('#cML');l.innerHTML='';
   mods.forEach(m=>{
@@ -833,77 +1065,71 @@ async function loadNote(){
 $('#bNote').addEventListener('click',async()=>{
   if(!sb||!actMod||!CU)return;
   await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
-  $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('Anotacoes salvas!','s');
+  $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('📝 Anotações salvas!','s');
 });
-setInterval(async()=>{
-  if(sb&&CU&&actMod&&$('#nta').value)
-    await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
-},30000);
+setInterval(async()=>{if(sb&&CU&&actMod&&$('#nta').value)await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});},30000);
+
+/* ── QUIZ (STUDENT) ── */
 async function loadQuiz(){
   const qc=$('#qCont');if(!actMod)return;
   if(sb&&CU){
     const{data:pr}=await sb.from('progress').select('quiz_score,quiz_total').eq('user_id',CU.id).eq('modulo_id',actMod).single();
-    if(pr?.quiz_score!==null&&pr?.quiz_score!==undefined){qc.innerHTML=`<div style="padding:15px;border:1px solid var(--green);border-radius:var(--r);background:rgba(15,186,129,.07)"><div style="font-weight:800;color:var(--green);margin-bottom:5px">Quiz respondido!</div><div>Nota: <strong>${pr.quiz_score}/${pr.quiz_total}</strong></div></div>`;return;}
+    if(pr?.quiz_score!=null){qc.innerHTML=`<div style="padding:15px;border:1px solid var(--green);border-radius:var(--r);background:rgba(15,186,129,.07)"><div style="font-weight:800;color:var(--green);margin-bottom:5px">✅ Quiz respondido!</div><div>Nota: <strong>${pr.quiz_score}/${pr.quiz_total}</strong></div><button class="btn bg2 btn-sm" style="margin-top:10px" onclick="retakeQuiz()">🔄 Refazer quiz</button></div>`;return;}
   }
-  let qs=[];
-  if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
-  if(!qs.length){qc.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao para este modulo.</div>';return;}
+  let qs=[];if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
+  if(!qs.length){qc.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão para este módulo.</div>';return;}
   qc.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
-  qc.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){
-    const qb=this.closest('[data-qid]');
-    qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});
-    this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';
-  }));
+  qc.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){const qb=this.closest('[data-qid]');qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';}));
   document.getElementById('bSQ2').addEventListener('click',async()=>{
-    let sc=0,ok=true;
-    qs.forEach(q=>{const s=qc.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){ok=false;return;}if(parseInt(s.value)===parseInt(q.correct_option))sc++;});
-    if(!ok){toast('Responda todas!','w');return;}
-    if(sb&&CU)await sb.from('progress').upsert({user_id:CU.id,modulo_id:actMod,segundos_vistos:wSec,quiz_score:sc,quiz_total:qs.length,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
+    let sc=0,ok=true,answers=[];
+    qs.forEach(q=>{const s=qc.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){ok=false;return;}const ans=parseInt(s.value);answers.push({qid:q.id,answer:ans,correct:q.correct_option,wrong:ans!==q.correct_option});if(ans===parseInt(q.correct_option))sc++;});
+    if(!ok){toast('Responda todas as questões!','w');return;}
+    if(sb&&CU){
+      await sb.from('progress').upsert({user_id:CU.id,modulo_id:actMod,segundos_vistos:wSec,quiz_score:sc,quiz_total:qs.length,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
+      // Save per-question answers for analytics
+      for(const a of answers){
+        await sb.from('quiz_respostas').upsert({user_id:CU.id,quiz_id:a.qid,modulo_id:actMod,resposta:a.answer,correta:!a.wrong,criado_em:new Date().toISOString()},{onConflict:'user_id,quiz_id'});
+      }
+    }
     toast(`${sc}/${qs.length} corretas!`,sc===qs.length?'s':'i');loadQuiz();renderDash();
   });
 }
+window.retakeQuiz=async function(){
+  if(!sb||!CU)return;
+  await sb.from('progress').update({quiz_score:null,quiz_total:null}).eq('user_id',CU.id).eq('modulo_id',actMod);
+  loadQuiz();
+};
 
-/* MURAL ALUNO */
+/* ── MURAL (STUDENT) ── */
 async function loadMural(){
   const l=$('#muralList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
   let q=sb.from('mural_avisos').select('*').eq('ativo',true).order('fixado',{ascending:false}).order('criado_em',{ascending:false});
   if(CU.turma_id)q=q.or('turma_id.eq.'+CU.turma_id+',turma_id.is.null');else q=q.is('turma_id',null);
   const{data}=await q.limit(30);
-  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum aviso no momento.</div>';return;}
-  l.innerHTML=data.map(av=>
-    '<div class="muralcard'+(av.fixado?' fix':'')+'">'+
+  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">📭 Nenhum aviso no momento.</div>';return;}
+  l.innerHTML=data.map(av=>'<div class="muralcard'+(av.fixado?' fix':'')+'">'+
     (av.fixado?'<div class="muralfix">📌 FIXADO</div>':'')+
-    '<div style="display:flex;align-items:start;gap:11px">'+
-    '<div style="font-size:1.5rem;flex-shrink:0">📢</div>'+
-    '<div style="flex:1">'+
+    '<div style="display:flex;align-items:start;gap:11px"><div style="font-size:1.5rem;flex-shrink:0">📢</div><div style="flex:1">'+
     '<div style="font-weight:800;font-size:1rem;margin-bottom:5px">'+av.titulo+'</div>'+
     '<div style="color:var(--soft);font-size:.9rem;line-height:1.6;margin-bottom:9px">'+av.conteudo+'</div>'+
     '<div style="font-size:.75rem;color:var(--muted)">'+fdt(av.criado_em)+'</div>'+
-    '</div></div></div>'
-  ).join('');
+    '</div></div></div>').join('');
 }
 
-/* FORUM ALUNO */
+/* ── FORUM (STUDENT) ── */
 async function loadFPage(){
-  $('#fMF').innerHTML='<option value="">Todos os modulos</option>'+mods.map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
+  $('#fMF').innerHTML='<option value="">Todos os módulos</option>'+mods.map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
   await renderFL();
   $('#fMF').onchange=renderFL;$('#fSF').onchange=renderFL;
 }
 async function renderFL(){
   const l=$('#fList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
-  if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
+  if(!sb)return;
   const mi=$('#fMF').value,sf=$('#fSF').value;
   let q=sb.from('forum_posts').select('*,users(nome,login)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
-  if(sf==='mine'){q=q.eq('user_id',CU.id);}
-  else{
-    q=q.eq('aprovado',true);
-    if(mi){q=q.eq('modulo_id',mi);}
-    else if(CU.turma_id&&mods.length){
-      const ids=mods.map(m=>m.id);
-      q=q.or('modulo_id.is.null,'+ids.map(id=>'modulo_id.eq.'+id).join(','));
-    }
-  }
+  if(sf==='mine')q=q.eq('user_id',CU.id);
+  else{q=q.eq('aprovado',true);if(mi)q=q.eq('modulo_id',mi);else if(CU.turma_id&&mods.length)q=q.or('modulo_id.is.null,'+mods.map(m=>'modulo_id.eq.'+m.id).join(','));}
   const{data:posts}=await q.limit(50);
   l.innerHTML='';
   if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem encontrada.</div>';return;}
@@ -915,33 +1141,17 @@ async function renderFL(){
     let rpsHtml='';
     for(const r of(rps||[])){
       const rAv=r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase();
-      const rNome=r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?');
-      rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':'')+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div><div style="font-weight:700;font-size:.83rem">'+rNome+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">'+r.conteudo+'</div></div></div>';
+      rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':'')+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div><div style="font-weight:700;font-size:.83rem">'+(r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?'))+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">'+r.conteudo+'</div></div></div>';
     }
-    card.innerHTML=
-      '<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+p.titulo+'</div>'+
-      '<div style="font-size:.78rem;color:var(--muted)">por <strong>'+(p.users?.nome||'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">Pendente</span>':'')+'</div></div></div>'+
-      '<div class="pbody">'+p.conteudo+'</div>'+
-      '<div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 '+(rps||[]).length+'</span>'+
-      '<button class="btn bg2 btn-xs tog-rep">Ver respostas</button>'+(p.user_id===CU.id?'<button class="btn bd btn-xs del-post">🗑️</button>':'')+'</div>'+
-      '<div class="rlist hidden rep-area">'+rpsHtml+
-      (p.aprovado?'<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta... (aguarda aprovacao)"></textarea><button class="btn bp btn-sm rep-send" style="margin-top:7px">Responder</button></div>':'')+
-      '</div>';
+    card.innerHTML='<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+p.titulo+'</div><div style="font-size:.78rem;color:var(--muted)">por <strong>'+(p.users?.nome||'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">Pendente</span>':'')+'</div></div></div><div class="pbody">'+p.conteudo+'</div><div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 '+(rps||[]).length+'</span><button class="btn bg2 btn-xs tog-rep">Ver respostas</button>'+(p.user_id===CU.id?'<button class="btn bd btn-xs del-post">🗑️</button>':'')+'</div><div class="rlist hidden rep-area">'+rpsHtml+(p.aprovado?'<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta... (aguarda aprovação)"></textarea><button class="btn bp btn-sm rep-send" style="margin-top:7px">Responder</button></div>':'')+'</div>';
     card.querySelector('.tog-rep').onclick=()=>card.querySelector('.rep-area').classList.toggle('hidden');
-    const delBtn=card.querySelector('.del-post');
-    if(delBtn)delBtn.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',p.id);toast('Excluido.','i');renderFL();};
-    const sendBtn=card.querySelector('.rep-send');
-    if(sendBtn)sendBtn.onclick=async()=>{
-      const ta=card.querySelector('.rep-ta'),txt=ta.value.trim();
-      if(!txt){toast('Digite sua resposta.','w');return;}
-      await sb.from('forum_replies').insert({post_id:p.id,user_id:CU.id,conteudo:txt,aprovado:false,is_admin:false});
-      ta.value='';toast('Resposta enviada! Aguarda aprovacao.','i');renderFL();
-    };
+    const delBtn=card.querySelector('.del-post');if(delBtn)delBtn.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',p.id);toast('Excluído.','i');renderFL();};
+    const sendBtn=card.querySelector('.rep-send');if(sendBtn)sendBtn.onclick=async()=>{const ta=card.querySelector('.rep-ta'),txt=ta.value.trim();if(!txt){toast('Digite sua resposta.','w');return;}await sb.from('forum_replies').insert({post_id:p.id,user_id:CU.id,conteudo:txt,aprovado:false,is_admin:false});ta.value='';toast('Resposta enviada! Aguarda aprovação.','i');renderFL();};
     l.appendChild(card);
   }
 }
 function openNP(mid){
-  showModal('<div class="mtt">💬 Nova Duvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Titulo</label><input id="npT" class="fi" placeholder="Ex: Duvida sobre parametros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteudo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua duvida..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem sera revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+  showModal('<div class="mtt">💬 Nova Dúvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Título</label><input id="npT" class="fi" placeholder="Ex: Dúvida sobre parâmetros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteúdo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua dúvida..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
   document.getElementById('btnNPS').onclick=()=>subPost(mid||'');
 }
 $('#bNP').addEventListener('click',()=>openNP(actMod||''));
@@ -950,39 +1160,147 @@ async function subPost(mid){
   const t=$('#npT').value.trim(),c2=$('#npC').value.trim();
   if(!t||!c2){toast('Preencha tudo.','w');return;}
   await sb.from('forum_posts').insert({modulo_id:mid||null,user_id:CU.id,titulo:t,conteudo:c2,aprovado:false,fixado:false});
-  toast('Enviado para aprovacao!','s');closeModal();
+  toast('✅ Enviado para aprovação!','s');closeModal();
   if($('#pg-forum').classList.contains('act'))renderFL();
   if($('#tab-fmod').classList.contains('act'))loadFMod();
 }
 async function loadFMod(){
-  const l=$('#fML');
-  if(!actMod){l.innerHTML='<div style="color:var(--muted)">Selecione um modulo.</div>';return;}
-  if(!sb)return;
+  const l=$('#fML');if(!actMod||!sb)return;
   const{data:posts}=await sb.from('forum_posts').select('*,users(nome)').eq('aprovado',true).or('modulo_id.eq.'+actMod+',modulo_id.is.null').order('criado_em',{ascending:false}).limit(15);
-  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem duvidas. Seja o primeiro!</div>';return;}
+  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem dúvidas. Seja o primeiro!</div>';return;}
   l.innerHTML=posts.map(p=>'<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">'+(p.users?.nome||'?').substring(0,2).toUpperCase()+'</div><div><div style="font-weight:800;font-size:.9rem">'+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+fd(p.criado_em)+'</div></div></div><div class="pbody" style="font-size:.87rem">'+p.conteudo+'</div></div>').join('');
 }
 
-/* ADMIN */
+/* ── PROJETO FINAL (STUDENT) ── */
+async function loadProjetoAluno(){
+  const c2=$('#projetoContent');c2.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  if(!sb||!CU.turma_id)return;
+  const{data:turma}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
+  if(!turma?.tem_projeto){c2.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Sua turma não possui módulo de projeto.</div>';return;}
+  // Verificar se todos módulos regulares concluídos
+  const pm=await getProg();
+  const modsReg=mods.filter(m=>!m.is_projeto);
+  const todosConc=modsReg.length>0&&modsReg.every(m=>pm[m.id]?.concluido);
+  // Carregar envio de projeto do aluno
+  const{data:proj}=await sb.from('projetos').select('*').eq('user_id',CU.id).eq('turma_id',CU.turma_id).single();
+  const status=proj?.status||'pendente';
+  const bloqueado=!todosConc;
+  c2.innerHTML='';
+  // Card status
+  const statusCard=document.createElement('div');
+  statusCard.className='card cp';statusCard.style.marginBottom='16px';
+  const statusColors={pendente:'var(--muted)',enviado:'var(--amber)',em_revisao:'var(--cyan)',aprovado:'var(--green)',reprovado:'var(--red)'};
+  const statusLabels={pendente:'Não enviado',enviado:'Aguardando revisão',em_revisao:'Em revisão pelo professor',aprovado:'✅ Aprovado!',reprovado:'❌ Reprovado — veja os comentários'};
+  statusCard.innerHTML=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:${proj?'16px':'0'}"><div style="width:48px;height:48px;border-radius:50%;background:${statusColors[status]||'var(--muted)'};opacity:.2;position:absolute"></div><div style="position:relative;font-size:2rem">${{pendente:'📋',enviado:'📤',em_revisao:'🔍',aprovado:'🏆',reprovado:'📝'}[status]||'📋'}</div><div><div style="font-weight:900;font-size:1.05rem">Projeto Final — ${turma.nome}</div><div style="font-size:.88rem;color:${statusColors[status]||'var(--muted)'};font-weight:700;margin-top:3px">${statusLabels[status]||status}</div></div></div>${proj?.comentario_admin?`<div style="padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,0,0,.2);font-size:.88rem;color:var(--soft);margin-top:12px"><div style="font-weight:800;color:var(--cyan);margin-bottom:5px">💬 Comentário do Professor</div>${proj.comentario_admin}</div>`:''}`;
+  c2.appendChild(statusCard);
+  // Certificado disponível
+  if(status==='aprovado'){
+    const certCard=document.createElement('div');certCard.className='card cp';certCard.style.cssText='margin-bottom:16px;border:1px solid var(--green);background:rgba(15,186,129,.05)';
+    certCard.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:3rem;margin-bottom:8px">🏆</div><div style="font-weight:900;font-size:1.15rem;color:var(--green);margin-bottom:8px">Parabéns! Certificado disponível!</div><div style="font-size:.9rem;color:var(--soft);margin-bottom:18px">Seu projeto foi aprovado. Você pode emitir seu certificado de conclusão.</div><button class="btn bp" onclick="emitirCertificado()">🎓 Emitir Certificado</button></div>';
+    c2.appendChild(certCard);
+  }
+  // Envio bloqueado se não concluiu módulos
+  if(bloqueado&&status==='pendente'){
+    const blCard=document.createElement('div');blCard.className='card cp';
+    blCard.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted)"><div style="font-size:2rem;margin-bottom:8px">🔒</div><div style="font-weight:800;margin-bottom:6px">Conclua todos os módulos primeiro</div><div style="font-size:.88rem">${modsReg.filter(m=>pm[m.id]?.concluido).length} de ${modsReg.length} módulos concluídos.</div></div>`;
+    c2.appendChild(blCard);return;
+  }
+  // Form de envio (se não aprovado)
+  if(status!=='aprovado'){
+    const formCard=document.createElement('div');formCard.className='card cp';
+    const descricaoInstrucoes=turma.projeto_instrucoes||'Envie o link do seu projeto (Google Drive, GitHub, etc.) e uma descrição do trabalho realizado.';
+    formCard.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:12px">${status==='pendente'?'📤 Enviar Projeto':'🔄 Reenviar Projeto'}</div><div style="padding:12px;border:1px solid rgba(0,200,255,.15);border-radius:var(--rs);background:rgba(0,200,255,.04);font-size:.87rem;color:var(--soft);margin-bottom:14px;line-height:1.6">${descricaoInstrucoes}</div><div class="fgrid"><div class="fg full"><label class="fl">Link do projeto</label><input id="projLink" class="fi" placeholder="https://drive.google.com/..." value="${proj?.link||''}"/></div><div class="fg full"><label class="fl">Descrição do projeto</label><textarea id="projDesc" class="fi" rows="5" placeholder="Descreva o que foi desenvolvido...">${proj?.descricao||''}</textarea></div></div><div style="margin-top:13px"><button class="btn bp" onclick="enviarProjeto()">📤 Enviar para revisão</button></div>`;
+    c2.appendChild(formCard);
+  }
+}
+window.enviarProjeto=async function(){
+  const link=$('#projLink').value.trim(),desc=$('#projDesc').value.trim();
+  if(!link||!desc){toast('Preencha o link e a descrição.','w');return;}
+  if(!sb)return;
+  await sb.from('projetos').upsert({user_id:CU.id,turma_id:CU.turma_id,link,descricao:desc,status:'enviado',enviado_em:new Date().toISOString()},{onConflict:'user_id,turma_id'});
+  toast('✅ Projeto enviado para revisão!','s');loadProjetoAluno();
+};
+window.emitirCertificado=async function(){
+  if(!sb||!CU)return;
+  const{data:proj}=await sb.from('projetos').select('*').eq('user_id',CU.id).eq('turma_id',CU.turma_id).single();
+  if(proj?.status!=='aprovado'){toast('Projeto ainda não aprovado.','w');return;}
+  const{data:turma}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
+  const dataAprov=fd(proj.aprovado_em||new Date());
+  const totalHoras=Math.round(mods.reduce((s,m)=>s+(m.duracao_seg||0),0)/3600);
+  gerarCertificadoHTML(CU.nome,turma?.nome||'',dataAprov,totalHoras,proj.aprovado_em);
+};
+function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
+  const w=window.open('','_blank','width=1050,height=750');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Certificado ESC — ${nome}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0a0a14;display:grid;place-items:center;min-height:100vh;font-family:'EB Garamond',serif}
+    .cert{width:960px;min-height:660px;background:linear-gradient(135deg,#0d0d20 0%,#0f0f24 50%,#0b0b1a 100%);border:2px solid rgba(0,200,255,.25);border-radius:4px;padding:58px 72px;position:relative;overflow:hidden}
+    .cert::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(0,200,255,.3),transparent 40%,transparent 60%,rgba(124,92,252,.3));border-radius:4px;z-index:0;pointer-events:none}
+    .cert::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(ellipse,rgba(0,200,255,.04) 0%,transparent 70%);pointer-events:none}
+    .inner{position:relative;z-index:1;text-align:center}
+    .logo-area{margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:12px}
+    .logo-icon{width:48px;height:48px;background:linear-gradient(135deg,#00c8ff,#7c5cfc);border-radius:10px;display:grid;place-items:center;font-size:1.5rem;font-weight:900;color:#fff;font-family:'Cinzel',serif}
+    .logo-txt{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#00c8ff,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .border-line{width:240px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,200,255,.5),transparent);margin:0 auto 32px}
+    .cert-title{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.4em;color:rgba(0,200,255,.7);text-transform:uppercase;margin-bottom:18px}
+    .cert-declares{font-size:1rem;color:rgba(255,255,255,.55);margin-bottom:12px;font-style:italic}
+    .cert-name{font-family:'Cinzel',serif;font-size:2.6rem;font-weight:800;background:linear-gradient(90deg,#00c8ff,#bff6ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;line-height:1.2}
+    .cert-text{font-size:1.05rem;color:rgba(255,255,255,.7);line-height:1.8;max-width:640px;margin:0 auto 20px}
+    .cert-course{font-size:1.3rem;font-weight:600;color:#bff6ff;font-style:italic;margin-bottom:6px}
+    .cert-detail{font-size:.9rem;color:rgba(255,255,255,.45);margin-bottom:36px}
+    .border-line2{width:380px;height:1px;background:linear-gradient(90deg,transparent,rgba(124,92,252,.4),rgba(0,200,255,.4),transparent);margin:0 auto 32px}
+    .cert-footer{display:flex;justify-content:space-between;align-items:flex-end;padding-top:24px;border-top:1px solid rgba(255,255,255,.07)}
+    .sign-block{text-align:center}
+    .sign-line{width:160px;height:1px;background:rgba(255,255,255,.3);margin-bottom:8px}
+    .sign-name{font-family:'Cinzel',serif;font-size:.82rem;color:rgba(255,255,255,.7);letter-spacing:.1em}
+    .sign-role{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:3px}
+    .cert-id{font-size:.7rem;color:rgba(255,255,255,.2);letter-spacing:.05em}
+    .ornament{position:absolute;opacity:.04;font-size:280px;color:#00c8ff;font-family:'Cinzel',serif;top:50%;left:50%;transform:translate(-50%,-52%);pointer-events:none;user-select:none;font-weight:800}
+    @media print{body{background:#fff}.cert{border-color:#ddd}.cert::before,.cert::after,.ornament{display:none}}
+  </style></head><body>
+  <div class="cert">
+    <div class="ornament">ESC</div>
+    <div class="inner">
+      <div class="logo-area"><div class="logo-icon">E</div><div class="logo-txt">ESC Plataforma</div></div>
+      <div class="border-line"></div>
+      <div class="cert-title">Certificado de Conclusão</div>
+      <div class="cert-declares">Este certificado atesta que</div>
+      <div class="cert-name">${nome}</div>
+      <div class="cert-text">concluiu com êxito o curso de formação, apresentou e teve aprovado o projeto final referente à turma</div>
+      <div class="cert-course">${turma}</div>
+      <div class="cert-detail">Carga horária: ${horas}h • Projeto aprovado em ${dataAprov}</div>
+      <div class="border-line2"></div>
+      <div class="cert-footer">
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">ESC Educação</div><div class="sign-role">Coordenação</div></div>
+        <div class="cert-id">Emitido em ${fd(dataEmissao||new Date())}<br/>ID: ${genId().toUpperCase()}</div>
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">${nome}</div><div class="sign-role">Concluinte</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:18px"><button onclick="window.print()" style="background:linear-gradient(135deg,#00c8ff,#7c5cfc);border:none;color:#fff;padding:10px 28px;border-radius:8px;font-size:.95rem;cursor:pointer;font-weight:700">🖨️ Imprimir / Salvar PDF</button></div>
+  </body></html>`);
+  w.document.close();
+}
+
+/* ── ADMIN ── */
 async function showAdmin(){
   $('#ls').style.display='none';$('#aa').classList.remove('hidden');
   $$('.ani').forEach(i=>i.addEventListener('click',()=>{
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
-    const adm=i.dataset.adm;
-    document.querySelector(`#adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,mats:loadAMats,quiz:loadAQuiz,live:loadALive,mural:loadAMural,forum:loadAForum};
+    const adm=i.dataset.adm;document.getElementById(`adm-${adm}`).classList.add('act');
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum};
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();
 }
+
+/* ── ADMIN DASHBOARD ── */
 async function loadADash(){
   if(!sb)return;
-  const[{data:al},{data:pe},{data:mo}]=await Promise.all([
-    sb.from('users').select('*,turmas(nome)').eq('role','student').eq('status','active'),
-    sb.from('users').select('id').eq('status','pending'),
-    sb.from('modules').select('id')
-  ]);
+  const[{data:al},{data:pe},{data:mo}]=await Promise.all([sb.from('users').select('*,turmas(nome)').eq('role','student').eq('status','active'),sb.from('users').select('id').eq('status','pending'),sb.from('modules').select('id')]);
   const alunos=al||[],pc=(pe||[]).length,mc=(mo||[]).length;
   $('#aA').textContent=alunos.length;$('#aP').textContent=pc;$('#aMo').textContent=mc;
   if(pc>0){$('#pBadge').textContent=pc;$('#pBadge').classList.remove('hidden');}else $('#pBadge').classList.add('hidden');
@@ -996,14 +1314,16 @@ async function loadADash(){
     tb.innerHTML+=`<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td><span class="badge bc">${a.turmas?.nome||'—'}</span></td><td><div style="display:flex;align-items:center;gap:7px"><div class="pw" style="width:75px"><div class="pf" style="width:${p2}%"></div></div><span style="font-size:.82rem;font-weight:700">${p2}%</span></div></td><td>${dn}/${mc}</td><td class="${dc}" style="font-size:.85rem">${fd(a.validade_acesso)}</td><td><span class="badge bg3">Ativo</span></td></tr>`;
   }
 }
+
+/* ── ADMIN PENDENTES ── */
 async function loadPend(){
   if(!sb)return;
   const{data}=await sb.from('users').select('*').eq('status','pending').order('criado_em');
   const c2=$('#pendCont');
-  if(!data?.length){c2.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">✅ Nenhuma solicitacao pendente.</div>';return;}
+  if(!data?.length){c2.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">✅ Nenhuma solicitação pendente.</div>';return;}
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const to=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
-  c2.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:13px">🔔 ${data.length} solicitacao(oes)</div>`;
+  c2.innerHTML=`<div style="font-weight:800;color:var(--cyan);margin-bottom:13px">🔔 ${data.length} solicitação(ões)</div>`;
   data.forEach(u=>{
     const d2=document.createElement('div');d2.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:11px;background:rgba(0,0,0,.18)';
     d2.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:11px"><div><div style="font-weight:800">${u.nome}</div><div style="font-size:.82rem;color:var(--muted)">${u.email||''} · ${u.login}</div></div><div style="font-size:.75rem;color:var(--muted)">${fd(u.criado_em)}</div></div><div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center"><select id="ts-${u.id}" class="fi" style="width:auto;min-width:180px"><option value="">Sem turma</option>${to}</select><input type="number" id="ms-${u.id}" class="fi" value="12" min="1" style="width:95px"/><button class="btn bs" onclick="aprovA('${u.id}')">✅ Aprovar</button><button class="btn bd" onclick="rejA('${u.id}')">❌ Rejeitar</button></div>`;
@@ -1017,32 +1337,29 @@ window.aprovA=async function(id){
   toast('✅ Aluno aprovado!','s');loadPend();loadADash();
 };
 window.rejA=async function(id){if(!confirm('Rejeitar?'))return;await sb.from('users').update({status:'blocked'}).eq('id',id);toast('Rejeitado.','i');loadPend();};
+
+/* ── ADMIN ALUNOS ── */
 async function loadAAlunos(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*');
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
   $('#aTurma').innerHTML='<option value="">Sem turma</option>'+opts;
   const{data:al}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
-  $('#aAT').innerHTML=(al||[]).map(a=>{
-    const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';
-    return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td style="font-size:.85rem">${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="font-size:.85rem${d2!==null&&d2<=30?';color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;
-  }).join('');
+  $('#aAT').innerHTML=(al||[]).map(a=>{const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td>${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="${d2!==null&&d2<=30?'color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;}).join('');
 }
 $('#bCA').addEventListener('click',async()=>{
   const n=$('#aNome').value.trim(),e=$('#aEmail').value.trim(),l=$('#aLogin').value.trim(),p=$('#aPass').value.trim(),ti=$('#aTurma').value,ms=parseInt($('#aMes').value)||12;
   if(!n||!e||!l||!p){toast('⚠️ Preencha todos os campos.','w');return;}
-  if(!sb)return;
   const hash=await sha(p),v=new Date();v.setMonth(v.getMonth()+ms);
   const{error}=await sb.from('users').insert({nome:n,email:e,login:l,senha:hash,role:'student',status:'active',turma_id:ti||null,validade_acesso:v.toISOString(),meses_acesso:ms});
   if(error){toast('❌ '+error.message,'e');return;}
   toast('✅ Aluno criado!','s');['aNome','aEmail','aLogin','aPass'].forEach(id=>document.getElementById(id).value='');$('#aMes').value='12';loadAAlunos();
 });
 window.editA=async function(id){
-  if(!sb)return;
   const{data:a}=await sb.from('users').select('*').eq('id',id).single();
   const{data:turmas}=await sb.from('turmas').select('*');
   const opts=(turmas||[]).map(t=>`<option value="${t.id}"${a.turma_id===t.id?' selected':''}>${t.nome}</option>`).join('');
-  showModal('<div class="mtt">✏️ Editar: '+a.nome+'</div><div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>'+opts+'</select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"'+(a.status==='active'?' selected':'')+'>Ativo</option><option value="blocked"'+(a.status==='blocked'?' selected':'')+'>Bloqueado</option></select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Meses de acesso</label><input id="eMes" class="fi" type="number" value="'+(a.meses_acesso||12)+'" min="1"/></div><div class="fg" style="margin-bottom:16px"><label class="fl">Nova senha (vazio = nao altera)</label><input id="ePass" class="fi" type="password" placeholder="Nova senha..."/></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveA(\''+id+'\')">💾 Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+  showModal('<div class="mtt">✏️ Editar: '+a.nome+'</div><div class="fg" style="margin-bottom:12px"><label class="fl">Turma</label><select id="eTurma" class="fi"><option value="">Sem turma</option>'+opts+'</select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Status</label><select id="eStatus" class="fi"><option value="active"'+(a.status==='active'?' selected':'')+'>Ativo</option><option value="blocked"'+(a.status==='blocked'?' selected':'')+'>Bloqueado</option></select></div><div class="fg" style="margin-bottom:12px"><label class="fl">Meses de acesso</label><input id="eMes" class="fi" type="number" value="'+(a.meses_acesso||12)+'" min="1"/></div><div class="fg" style="margin-bottom:16px"><label class="fl">Nova senha (vazio = não altera)</label><input id="ePass" class="fi" type="password"/></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveA(\''+id+'\')">💾 Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
 };
 window.saveA=async function(id){
   const ti=$('#eTurma').value,st=$('#eStatus').value,ms=parseInt($('#eMes').value)||12,np=$('#ePass').value.trim();
@@ -1057,143 +1374,249 @@ window.delA=async function(id){
   await Promise.all([sb.from('progress').delete().eq('user_id',id),sb.from('notes').delete().eq('user_id',id)]);
   await sb.from('users').delete().eq('id',id);toast('🗑️ Removido.','i');loadAAlunos();loadADash();
 };
+
+/* ── ADMIN TURMAS ── */
 async function loadATurmas(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*').order('criado_em');
   const tb=$('#aTT');tb.innerHTML='';
   for(const t of turmas||[]){
     const[{data:al},{data:mo}]=await Promise.all([sb.from('users').select('id').eq('turma_id',t.id).eq('status','active'),sb.from('modules').select('id').eq('turma_id',t.id)]);
-    tb.innerHTML+=`<tr><td><strong>${t.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${t.descricao||''}</span></td><td>${(al||[]).length}</td><td>${(mo||[]).length}</td><td><span class="badge ${t.ativa?'bg3':'bw2'}">${t.ativa?'Ativa':'Inativa'}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="togT('${t.id}',${!t.ativa})">${t.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delT('${t.id}')">🗑️</button></td></tr>`;
+    tb.innerHTML+=`<tr><td><strong>${t.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${t.descricao||''}</span></td><td>${(al||[]).length}</td><td>${(mo||[]).length}</td><td><span class="badge ${t.ativa?'bg3':'bw2'}">${t.ativa?'Ativa':'Inativa'}</span></td><td><span class="badge ${t.tem_projeto?'bpp':'bw2'}">${t.tem_projeto?'Sim':'Não'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="editT('${t.id}')">✏️</button><button class="btn bg2 btn-xs" onclick="togT('${t.id}',${!t.ativa})">${t.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delT('${t.id}')">🗑️</button></td></tr>`;
   }
 }
 $('#bST').addEventListener('click',async()=>{
-  const n=$('#tNome').value.trim(),d=$('#tDesc').value.trim();
-  if(!n){toast('⚠️ Nome obrigatorio.','w');return;}
-  if(!sb)return;
-  await sb.from('turmas').insert({nome:n,descricao:d,ativa:true});
-  toast('✅ Turma criada!','s');$('#tNome').value='';$('#tDesc').value='';loadATurmas();loadTurmaSelects();
+  const n=$('#tNome').value.trim(),d=$('#tDesc').value.trim(),tp=$('#tProjeto')?.checked||false;
+  if(!n){toast('⚠️ Nome obrigatório.','w');return;}
+  await sb.from('turmas').insert({nome:n,descricao:d,ativa:true,tem_projeto:tp});
+  toast('✅ Turma criada!','s');$('#tNome').value='';$('#tDesc').value='';if($('#tProjeto'))$('#tProjeto').checked=false;loadATurmas();loadTurmaSelects();
 });
+window.editT=async function(id){
+  const{data:t}=await sb.from('turmas').select('*').eq('id',id).single();
+  showModal('<div class="mtt">✏️ Editar Turma</div><div class="fg" style="margin-bottom:12px"><label class="fl">Nome</label><input id="etNome" class="fi" value="'+t.nome+'"/></div><div class="fg" style="margin-bottom:12px"><label class="fl">Descrição</label><input id="etDesc" class="fi" value="'+(t.descricao||'')+'"/></div><div class="fg" style="margin-bottom:12px"><label class="fl">Instruções do projeto</label><textarea id="etProjInst" class="fi" rows="4" placeholder="Instruções para os alunos sobre o projeto final...">'+(t.projeto_instrucoes||'')+'</textarea></div><div class="fg" style="margin-bottom:16px;display:flex;align-items:center;gap:10px"><input type="checkbox" id="etProjeto" style="accent-color:var(--cyan);width:18px;height:18px"'+(t.tem_projeto?' checked':'')+'/><label for="etProjeto" class="fl" style="margin:0">Possui módulo de projeto final</label></div><div style="display:flex;gap:9px"><button class="btn bp" onclick="saveT(\''+id+'\')">💾 Salvar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
+};
+window.saveT=async function(id){
+  const n=document.getElementById('etNome').value.trim(),d=document.getElementById('etDesc').value.trim(),pi=document.getElementById('etProjInst').value.trim(),tp=document.getElementById('etProjeto').checked;
+  await sb.from('turmas').update({nome:n,descricao:d,projeto_instrucoes:pi,tem_projeto:tp}).eq('id',id);
+  toast('✅ Turma atualizada!','s');closeModal();loadATurmas();loadTurmaSelects();
+};
 window.togT=async function(id,a){await sb.from('turmas').update({ativa:a}).eq('id',id);loadATurmas();};
-window.delT=async function(id){if(!confirm('Excluir turma?'))return;await sb.from('turmas').delete().eq('id',id);loadATurmas();};
+window.delT=async function(id){if(!confirm('Excluir turma e todos os módulos?'))return;await sb.from('turmas').delete().eq('id',id);toast('🗑️ Excluída.','i');loadATurmas();};
 async function loadTurmaSelects(){
   if(!sb)return;
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
-  ['mTur','aTurma','lvTurma','cdTurma','mrTurma'].forEach(id=>{
+  ['mTur','aTurma','aulaModuloTurma','lvTurma','cdTurma','mrTurma','projFiltro'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    const pre=id==='aTurma'?'<option value="">Sem turma</option>':id==='mrTurma'?'<option value="">Todas as turmas</option>':'<option value="">Selecione...</option>';
+    const pre=id==='aTurma'?'<option value="">Sem turma</option>':id==='mrTurma'||id==='projFiltro'?'<option value="">Todas as turmas</option>':'<option value="">Selecione...</option>';
     el.innerHTML=pre+opts;
   });
 }
+
+/* ── ADMIN MÓDULOS ── */
 async function loadAMods(){
   if(!sb)return;await loadTurmaSelects();
   const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('ordem');
-  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
+  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type||'—'}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
 }
 $('#bSM').addEventListener('click',async()=>{
-  const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'📖',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||10)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
-  if(!tt||!tu){toast('⚠️ Titulo e turma obrigatorios.','w');return;}
-  if(!sb)return;
-  if(eid){await sb.from('modules').update({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('✅ Modulo atualizado!','s');}
-  else{await sb.from('modules').insert({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('✅ Modulo criado!','s');}
-  clearMF();loadAMods();loadAMats();loadAQuiz();
+  const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'📖',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||0)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
+  if(!tt||!tu){toast('⚠️ Título e turma obrigatórios.','w');return;}
+  if(eid){await sb.from('modules').update({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('✅ Módulo atualizado!','s');}
+  else{await sb.from('modules').insert({titulo:tt,icone:ic,turma_id:tu,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('✅ Módulo criado!','s');}
+  clearMF();loadAMods();loadAAulas();
 });
 $('#bCM').addEventListener('click',clearMF);
 function clearMF(){['mTit','mIco','mVU','mDur','mOrd','mTop','mEId'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});$('#mVT').value='youtube';}
 window.editM=async function(id){
   const{data:m}=await sb.from('modules').select('*').eq('id',id).single();
   $('#mTit').value=m.titulo;$('#mIco').value=m.icone||'📖';$('#mTur').value=m.turma_id||'';$('#mVT').value=m.video_type||'youtube';
-  $('#mVU').value=m.video_url||'';$('#mDur').value=Math.round((m.duracao_seg||600)/60);$('#mOrd').value=m.ordem||1;$('#mTop').value=m.topicos||'';$('#mEId').value=m.id;
+  $('#mVU').value=m.video_url||'';$('#mDur').value=Math.round((m.duracao_seg||0)/60);$('#mOrd').value=m.ordem||1;$('#mTop').value=m.topicos||'';$('#mEId').value=m.id;
   toast('📝 Editando: '+m.titulo,'i');
 };
-window.delM=async function(id){if(!confirm('Excluir modulo?'))return;await sb.from('modules').delete().eq('id',id);toast('🗑️ Excluido.','i');loadAMods();};
+window.delM=async function(id){if(!confirm('Excluir módulo e aulas?'))return;await sb.from('aulas').delete().eq('modulo_id',id);await sb.from('modules').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAMods();};
+
+/* ── ADMIN AULAS ── */
+async function loadAAulas(){
+  if(!sb)return;
+  const{data:mds}=await sb.from('modules').select('id,titulo,icone,turmas(nome)').order('ordem');
+  const modOpts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo} (${m.turmas?.nome||'?'})</option>`).join('');
+  $('#aulaModulo').innerHTML='<option value="">Selecione o módulo...</option>'+modOpts;
+  $('#aulaFiltro').innerHTML='<option value="">Todos os módulos</option>'+modOpts;
+  const filtro=$('#aulaFiltro').value;
+  let q=sb.from('aulas').select('*,modules(titulo,turmas(nome))').order('ordem');
+  if(filtro)q=q.eq('modulo_id',filtro);
+  const{data:aulas}=await q;
+  $('#aulasTable').innerHTML=(aulas||[]).map(a=>`<tr><td>${a.ordem}</td><td><strong>${a.icone||'🎬'} ${a.titulo}</strong></td><td><span class="badge bc">${a.modules?.titulo||'—'} <span style="opacity:.6">(${a.modules?.turmas?.nome||'?'})</span></span></td><td><span class="badge bpp">${a.video_type}</span></td><td>${Math.round((a.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editAula('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delAula('${a.id}')">🗑️</button></td></tr>`).join('');
+}
+$('#aulaFiltro').addEventListener('change',loadAAulas);
+$('#bSAula').addEventListener('click',async()=>{
+  const mo=$('#aulaModulo').value,tt=$('#aulaTit').value.trim(),ic=$('#aulaIco').value.trim()||'🎬',vt=$('#aulaVT').value,vu=$('#aulaVU').value.trim(),dur=(parseInt($('#aulaDur').value)||0)*60,ord=parseInt($('#aulaOrd').value)||1,top=$('#aulaTop').value.trim(),eid=$('#aulaEId').value;
+  if(!mo||!tt){toast('⚠️ Módulo e título obrigatórios.','w');return;}
+  if(eid){await sb.from('aulas').update({modulo_id:mo,titulo:tt,icone:ic,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true}).eq('id',eid);toast('✅ Aula atualizada!','s');}
+  else{await sb.from('aulas').insert({modulo_id:mo,titulo:tt,icone:ic,video_type:vt,video_url:vu,duracao_seg:dur,topicos:top,ordem:ord,ativo:true});toast('✅ Aula criada!','s');}
+  clearAulaF();loadAAulas();
+});
+$('#bCAula').addEventListener('click',clearAulaF);
+function clearAulaF(){['aulaTit','aulaIco','aulaVU','aulaDur','aulaOrd','aulaTop','aulaEId'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});$('#aulaVT').value='youtube';$('#aulaModulo').value='';}
+window.editAula=async function(id){
+  const{data:a}=await sb.from('aulas').select('*').eq('id',id).single();
+  $('#aulaModulo').value=a.modulo_id||'';$('#aulaTit').value=a.titulo;$('#aulaIco').value=a.icone||'🎬';
+  $('#aulaVT').value=a.video_type||'youtube';$('#aulaVU').value=a.video_url||'';
+  $('#aulaDur').value=Math.round((a.duracao_seg||0)/60);$('#aulaOrd').value=a.ordem||1;$('#aulaTop').value=a.topicos||'';$('#aulaEId').value=a.id;
+  toast('📝 Editando: '+a.titulo,'i');
+  document.querySelector('[data-adm="aulas"]').click();
+};
+window.delAula=async function(id){if(!confirm('Excluir aula?'))return;await sb.from('aulas').delete().eq('id',id);toast('🗑️ Excluída.','i');loadAAulas();};
+
+/* ── ADMIN MATERIAIS ── */
 async function loadAMats(){
   if(!sb)return;
   const{data:mds}=await sb.from('modules').select('id,titulo,icone');
   const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
-  $('#matM').innerHTML='<option value="">Todos os modulos</option>'+opts;
+  $('#matM').innerHTML='<option value="">Todos os módulos</option>'+opts;
   const{data:mats}=await sb.from('materials').select('*,modules(titulo)').order('criado_em',{ascending:false});
   $('#aMatT').innerHTML=(mats||[]).map(m=>`<tr><td><strong>${ti(m.tipo)} ${m.nome}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${m.descricao||''}</span></td><td><span class="badge bc">${m.tipo}</span></td><td>${m.modules?.titulo||'Todos'}</td><td><a href="${m.url}" target="_blank" style="color:var(--cyan);font-size:.78rem;word-break:break-all">${m.url.substring(0,40)}</a></td><td><button class="btn bd btn-xs" onclick="delMat('${m.id}')">🗑️</button></td></tr>`).join('');
 }
 $('#bSMat').addEventListener('click',async()=>{
   const n=$('#matN').value.trim(),t2=$('#matT').value,u=$('#matU').value.trim(),d=$('#matD').value.trim(),m=$('#matM').value;
-  if(!n||!u){toast('⚠️ Nome e URL obrigatorios.','w');return;}
-  if(!sb)return;
+  if(!n||!u){toast('⚠️ Nome e URL obrigatórios.','w');return;}
   await sb.from('materials').insert({nome:n,tipo:t2,url:u,descricao:d,modulo_id:m||null});
   toast('✅ Material adicionado!','s');['matN','matU','matD'].forEach(id=>document.getElementById(id).value='');$('#matM').value='';loadAMats();
 });
 window.delMat=async function(id){if(!confirm('Remover?'))return;await sb.from('materials').delete().eq('id',id);toast('🗑️ Removido.','i');loadAMats();};
+
+/* ── ADMIN QUIZ ── */
 async function loadAQuiz(){
   if(!sb)return;
   const{data:mds}=await sb.from('modules').select('id,titulo,icone');
   const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
-  $('#qMod').innerHTML='<option value="">Geral</option>'+opts;
+  $('#qMod').innerHTML='<option value="">Geral (todos)</option>'+opts;
   const{data:qs}=await sb.from('quiz').select('*,modules(titulo)').order('criado_em',{ascending:false});
   const l=$('#aQL');
-  if(!qs?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questao.</div>';return;}
-  l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt}${oi===q.correct_option?' ✓':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Modulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
+  if(!qs?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão.</div>';return;}
+  l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt}${oi===q.correct_option?' ✓':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Módulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
 }
 $('#bSQ').addEventListener('click',async()=>{
   const q=$('#qEn').value.trim(),o0=$('#qO0').value.trim(),o1=$('#qO1').value.trim(),o2=$('#qO2').value.trim(),cs=document.querySelector('input[name="qC"]:checked'),m=$('#qMod').value;
-  if(!q||!o0||!o1||!o2){toast('⚠️ Preencha enunciado e 3 opcoes.','w');return;}
-  if(!cs){toast('⚠️ Marque a opcao correta.','w');return;}
-  if(!sb)return;
+  if(!q||!o0||!o1||!o2||!cs){toast('⚠️ Preencha tudo e marque a opção correta.','w');return;}
   await sb.from('quiz').insert({question:q,options:[o0,o1,o2],correct_option:parseInt(cs.value),modulo_id:m||null});
-  toast('✅ Questao adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(id=>document.getElementById(id).value='');document.querySelectorAll('input[name="qC"]').forEach(r=>r.checked=false);loadAQuiz();
+  toast('✅ Questão adicionada!','s');['qEn','qO0','qO1','qO2'].forEach(id=>document.getElementById(id).value='');document.querySelectorAll('input[name="qC"]').forEach(r=>r.checked=false);loadAQuiz();
 });
 window.delQ=async function(id){if(!confirm('Excluir?'))return;await sb.from('quiz').delete().eq('id',id);loadAQuiz();};
 
-/* ADMIN LIVE */
+/* ── ADMIN ANALYTICS QUIZ ── */
+async function loadQStats(){
+  if(!sb)return;
+  const{data:mds}=await sb.from('modules').select('id,titulo,icone');
+  const opts=(mds||[]).map(m=>`<option value="${m.id}">${m.icone} ${m.titulo}</option>`).join('');
+  $('#qsFiltroMod').innerHTML='<option value="">Todos os módulos</option>'+opts;
+  await runQStats();
+}
+$('#bQStats').addEventListener('click',runQStats);
+async function runQStats(){
+  const filtro=$('#qsFiltroMod').value;
+  // Get all quiz questions
+  let qQuery=sb.from('quiz').select('*,modules(titulo)').order('criado_em');
+  if(filtro)qQuery=qQuery.eq('modulo_id',filtro);
+  const{data:qs}=await qQuery;
+  if(!qs?.length){$('#qStatsList').innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão encontrada.</div>';$('#qStatsResume').innerHTML='';return;}
+  // Get all answers
+  let rQuery=sb.from('quiz_respostas').select('*,users(nome)');
+  if(filtro)rQuery=rQuery.eq('modulo_id',filtro);
+  const{data:respostas}=await rQuery;
+  const r=respostas||[];
+  // Summary cards
+  const totalRes=r.length,totalCorretas=r.filter(x=>x.correta).length,totalErros=totalRes-totalCorretas;
+  const alunos=[...new Set(r.map(x=>x.user_id))].length;
+  const taxaAcerto=totalRes>0?pct(totalCorretas,totalRes):0;
+  $('#qStatsResume').innerHTML=[
+    ['👥','Alunos respondentes',alunos,'var(--cyan)'],
+    ['📝','Respostas totais',totalRes,'var(--purple)'],
+    ['✅','Taxa de acerto',taxaAcerto+'%','var(--green)'],
+    ['❌','Total de erros',totalErros,'var(--red)']
+  ].map(([ic,lb,val,cl])=>`<div class="card cp" style="text-align:center"><div style="font-size:1.6rem;margin-bottom:4px">${ic}</div><div style="font-size:1.5rem;font-weight:900;color:${cl}">${val}</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">${lb}</div></div>`).join('');
+  // Per-question breakdown
+  const l=$('#qStatsList');l.innerHTML='';
+  for(const q of qs){
+    const qResps=r.filter(x=>x.quiz_id===q.id);
+    const total=qResps.length,corretas=qResps.filter(x=>x.correta).length,erros=total-corretas;
+    const taxa=total>0?pct(corretas,total):0;
+    const optCounts=(q.options||[]).map((_,i)=>qResps.filter(x=>x.resposta===i).length);
+    const div=document.createElement('div');div.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;background:rgba(0,0,0,.18)';
+    div.innerHTML=`<div style="display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:12px"><div style="font-weight:800;flex:1">${q.question}</div><div style="display:flex;gap:6px;flex-shrink:0"><span class="badge bg3">${taxa}% acertos</span><span class="badge ${erros>0?'br':'bw2'}">${erros} erros</span><span class="badge bw2">${total} resp.</span></div></div><div style="font-size:.8rem;color:var(--muted);margin-bottom:9px">Módulo: ${q.modules?.titulo||'Geral'}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((opt,oi)=>{const cnt=optCounts[oi]||0,pctOpt=total>0?pct(cnt,total):0,isCorrect=oi===q.correct_option;return `<div style="display:flex;align-items:center;gap:9px"><div style="width:200px;font-size:.84rem;color:${isCorrect?'var(--green)':'var(--soft)'}">${String.fromCharCode(65+oi)}) ${opt}</div><div style="flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden"><div style="height:100%;background:${isCorrect?'var(--green)':'var(--red)'};width:${pctOpt}%;border-radius:5px;transition:width .5s"></div></div><div style="font-size:.8rem;width:55px;text-align:right;color:${isCorrect?'var(--green)':'var(--muted)'}">${cnt} (${pctOpt}%)</div>${isCorrect?'<span style="font-size:.75rem;color:var(--green)">✓</span>':''}</div>`;}).join('')}</div>`;
+    l.appendChild(div);
+  }
+}
+
+/* ── ADMIN PROJETOS ── */
+async function loadAProjetos(){
+  if(!sb)return;await loadTurmaSelects();
+  const filtroT=$('#projFiltro').value,filtroS=$('#projStatus').value;
+  let q=sb.from('projetos').select('*,users(nome,login),turmas(nome)').order('enviado_em',{ascending:false});
+  if(filtroT)q=q.eq('turma_id',filtroT);if(filtroS)q=q.eq('status',filtroS);
+  const{data:projs}=await q;
+  const l=$('#projList');l.innerHTML='';
+  if(!projs?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum projeto encontrado.</div>';return;}
+  for(const p of projs){
+    const statusColors={enviado:'var(--amber)',em_revisao:'var(--cyan)',aprovado:'var(--green)',reprovado:'var(--red)'};
+    const card=document.createElement('div');card.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;background:rgba(0,0,0,.18)';
+    card.innerHTML=`<div style="display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:12px"><div><div style="font-weight:800">${p.users?.nome||'?'} <span style="font-size:.78rem;color:var(--muted);font-weight:400">@${p.users?.login||'?'}</span></div><div style="font-size:.82rem;color:var(--muted);margin-top:2px">Turma: ${p.turmas?.nome||'?'} · Enviado: ${fdt(p.enviado_em)}</div></div><span class="badge" style="background:${statusColors[p.status]||'rgba(255,255,255,.1)'};color:#fff;flex-shrink:0">${p.status}</span></div><div style="padding:11px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,0,0,.2);margin-bottom:10px"><div style="font-size:.78rem;font-weight:700;color:var(--cyan);margin-bottom:5px">🔗 Link do projeto</div><a href="${p.link||'#'}" target="_blank" style="color:var(--cyan);font-size:.85rem;word-break:break-all">${p.link||'—'}</a></div><div style="font-size:.87rem;color:var(--soft);margin-bottom:12px;line-height:1.6">${p.descricao||''}</div><div class="proj-comment-area" data-pid="${p.id}"><textarea class="fi" rows="3" placeholder="Comentário / feedback para o aluno..." style="margin-bottom:8px">${p.comentario_admin||''}</textarea><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn bs btn-sm" onclick="avaliarProj('${p.id}','em_revisao')">🔍 Em Revisão</button><button class="btn bp btn-sm" onclick="avaliarProj('${p.id}','aprovado')">✅ Aprovar</button><button class="btn bd btn-sm" onclick="avaliarProj('${p.id}','reprovado')">❌ Reprovar</button></div></div>`;
+    l.appendChild(card);
+  }
+}
+$('#bLoadProj').addEventListener('click',loadAProjetos);
+window.avaliarProj=async function(id,status){
+  const card=document.querySelector(`[data-pid="${id}"]`);
+  const comment=card?.querySelector('textarea')?.value?.trim()||'';
+  const pay={status,comentario_admin:comment,avaliado_em:new Date().toISOString()};
+  if(status==='aprovado')pay.aprovado_em=new Date().toISOString();
+  await sb.from('projetos').update(pay).eq('id',id);
+  toast(status==='aprovado'?'✅ Projeto aprovado!':status==='reprovado'?'❌ Projeto reprovado.':'🔍 Em revisão.','s');
+  loadAProjetos();
+};
+
+/* ── ADMIN LIVE ── */
 async function loadALive(){
   if(!sb)return;await loadTurmaSelects();
   const{data:rows}=await sb.from('aulas_ao_vivo').select('*,turmas(nome)').order('criado_em',{ascending:false});
   const tb=$('#lvTable');
-  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuracao ainda.</div>';return;}
-  tb.innerHTML='<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Titulo</th><th>Status</th><th></th></tr></thead><tbody>'+rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'Ao vivo':'Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'Pausar':'Ativar'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')+'</tbody></table></div>';
+  if(!rows?.length){tb.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma configuração ainda.</div>';return;}
+  tb.innerHTML='<div class="tw2"><table><thead><tr><th>Turma</th><th>Tipo</th><th>Título</th><th>Status</th><th></th></tr></thead><tbody>'+rows.map(r=>`<tr><td><span class="badge bc">${r.turmas?.nome||'—'}</span></td><td><span class="badge ${r.tipo==='live'?'br':'bpp'}">${r.tipo==='live'?'Ao vivo':'Contador'}</span></td><td style="font-size:.85rem">${r.titulo||'—'}</td><td><span class="badge ${r.ativa?'bg3':'bw2'}">${r.ativa?'Ativo':'Inativo'}</span></td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togLV('${r.id}',${!r.ativa})">${r.ativa?'⏸️':'▶️'}</button><button class="btn bd btn-xs" onclick="delLV('${r.id}')">🗑️</button></td></tr>`).join('')+'</tbody></table></div>';
 }
 $('#bSLV').addEventListener('click',async()=>{
   const tu=$('#lvTurma').value,tt=$('#lvTit').value.trim(),lk=$('#lvLink').value.trim(),ds=$('#lvDesc').value.trim(),at=parseInt($('#lvStatus').value);
-  if(!tu||!tt||!lk){toast('⚠️ Turma, titulo e link obrigatorios.','w');return;}
-  if(!sb)return;
+  if(!tu||!tt||!lk){toast('⚠️ Turma, título e link obrigatórios.','w');return;}
   await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'live',titulo:tt,link:lk,descricao:ds,ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
-  toast('✅ Configuracao salva!','s');loadALive();
+  toast('✅ Salvo!','s');loadALive();
 });
 $('#bSCD').addEventListener('click',async()=>{
   const tu=$('#cdTurma').value,tt=$('#cdTit').value.trim(),dh=$('#cdDH').value,at=parseInt($('#cdAtivo').value);
-  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, titulo e data/hora.','w');return;}
-  if(!sb)return;
+  if(!tu||!tt||!dh){toast('⚠️ Preencha turma, título e data/hora.','w');return;}
   await sb.from('aulas_ao_vivo').upsert({turma_id:tu,tipo:'countdown',titulo:tt,data_hora:new Date(dh).toISOString(),ativa:at===1,atualizado_em:new Date().toISOString()},{onConflict:'turma_id,tipo'});
   toast('✅ Contador salvo!','s');loadALive();
 });
 window.togLV=async function(id,a){await sb.from('aulas_ao_vivo').update({ativa:a}).eq('id',id);loadALive();};
 window.delLV=async function(id){if(!confirm('Excluir?'))return;await sb.from('aulas_ao_vivo').delete().eq('id',id);loadALive();};
 
-/* ADMIN MURAL */
+/* ── ADMIN MURAL ── */
 async function loadAMural(){
   if(!sb)return;await loadTurmaSelects();
   const{data}=await sb.from('mural_avisos').select('*,turmas(nome)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
   const l=$('#aMuralList');
   if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum aviso publicado.</div>';return;}
-  l.innerHTML=data.map(av=>
-    '<div style="border:1px solid '+(av.fixado?'rgba(245,158,11,.4)':'var(--border)')+';border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)">'+
-    '<div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px">'+
-    '<div><div style="font-weight:800">'+(av.fixado?'📌 ':'')+av.titulo+'</div>'+
-    '<div style="font-size:.78rem;color:var(--muted);margin-top:2px">'+(av.turmas?.nome||'Todas as turmas')+' · '+fdt(av.criado_em)+'</div></div>'+
-    '<div style="display:flex;gap:5px;flex-shrink:0"><button class="btn bg2 btn-xs" onclick="togMR(\''+av.id+'\','+!av.fixado+')">'+(av.fixado?'Desafixar':'Fixar')+'</button><button class="btn bd btn-xs" onclick="delMR(\''+av.id+'\')">🗑️</button></div></div>'+
-    '<div style="font-size:.88rem;color:var(--soft);line-height:1.5">'+av.conteudo+'</div></div>'
-  ).join('');
+  l.innerHTML=data.map(av=>'<div style="border:1px solid '+(av.fixado?'rgba(245,158,11,.4)':'var(--border)')+';border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(0,0,0,.18)"><div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:7px"><div><div style="font-weight:800">'+(av.fixado?'📌 ':'')+av.titulo+'</div><div style="font-size:.78rem;color:var(--muted);margin-top:2px">'+(av.turmas?.nome||'Todas')+' · '+fdt(av.criado_em)+'</div></div><div style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="togMR(\''+av.id+'\','+!av.fixado+')">'+(av.fixado?'Desafixar':'Fixar')+'</button><button class="btn bd btn-xs" onclick="delMR(\''+av.id+'\')">🗑️</button></div></div><div style="font-size:.88rem;color:var(--soft);line-height:1.5">'+av.conteudo+'</div></div>').join('');
 }
 $('#bSMR').addEventListener('click',async()=>{
   const tu=$('#mrTurma').value,ti2=$('#mrTit').value.trim(),co=$('#mrCont').value.trim(),fi=parseInt($('#mrFix').value);
-  if(!ti2||!co){toast('⚠️ Titulo e conteudo obrigatorios.','w');return;}
-  if(!sb)return;
+  if(!ti2||!co){toast('⚠️ Título e conteúdo obrigatórios.','w');return;}
   await sb.from('mural_avisos').insert({turma_id:tu||null,titulo:ti2,conteudo:co,fixado:fi===1,ativo:true});
   toast('✅ Aviso publicado!','s');['mrTit','mrCont'].forEach(id=>document.getElementById(id).value='');$('#mrFix').value='0';loadAMural();
 });
 window.togMR=async function(id,f){await sb.from('mural_avisos').update({fixado:f}).eq('id',id);loadAMural();};
 window.delMR=async function(id){if(!confirm('Excluir aviso?'))return;await sb.from('mural_avisos').delete().eq('id',id);loadAMural();};
 
-/* ADMIN FORUM */
+/* ── ADMIN FORUM ── */
 async function loadAForum(){
   if(!sb)return;
   const f=$('#aFF').value;
@@ -1209,54 +1632,24 @@ async function loadAForum(){
     let rpsHtml='';
     for(const r of(rps||[])){
       const rAv=r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase();
-      const rNome=r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?');
-      rpsHtml+=
-        '<div class="ri'+(r.is_admin?' adm-reply':!r.aprovado?' pending-reply':'')+'" data-rid="'+r.id+'">'+
-        '<div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div>'+
-        '<div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'+
-        '<div style="font-weight:700;font-size:.82rem">'+rNome+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span>'+
-        (!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem;margin-left:4px">Pendente</span>':'')+
-        '</div><div style="display:flex;gap:4px">'+
-        (!r.aprovado&&!r.is_admin?'<button class="btn bs btn-xs aprv-rep">✅ Aprovar</button>':'')+
-        '<button class="btn bd btn-xs del-rep">🗑️</button></div></div>'+
-        '<div style="font-size:.87rem;color:var(--soft);margin-top:3px">'+r.conteudo+'</div></div></div>';
+      rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':!r.aprovado?' pending-reply':'')+'" data-rid="'+r.id+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:.82rem">'+(r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?'))+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span>'+(!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem;margin-left:4px">Pendente</span>':'')+'</div><div style="display:flex;gap:4px">'+(!r.aprovado&&!r.is_admin?'<button class="btn bs btn-xs aprv-rep">✅</button>':'')+'<button class="btn bd btn-xs del-rep">🗑️</button></div></div><div style="font-size:.87rem;color:var(--soft);margin-top:3px">'+r.conteudo+'</div></div></div>';
     }
     const card=document.createElement('div');card.className='pc'+(p.fixado?' pin':'');
-    card.innerHTML=
-      '<div class="phead"><div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div>'+
-      '<div style="flex:1"><div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+p.titulo+'</div>'+
-      '<div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+(p.modules?.titulo||'Geral')+' · '+fd(p.criado_em)+
-      (!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">Post pendente</span>':'')+
-      (pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">'+pendReps+' resp. pendente(s)</span>':'')+
-      '</div></div>'+
-      '<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
-      (!p.aprovado?'<button class="btn bs btn-xs aprv-post">✅ Aprovar</button>':'')+
-      '<button class="btn bg2 btn-xs pin-post">'+(p.fixado?'Desafixar':'📌 Fixar')+'</button>'+
-      '<button class="btn bd btn-xs del-post">🗑️</button></div></div>'+
-      '<div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+p.conteudo+'</div>'+
-      '<div style="padding:11px 15px">'+
-      '<div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+((rps||[]).length)+')</div>'+
-      '<div class="rep-con">'+rpsHtml+'</div>'+
-      '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'+
-      '<div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨 Responder como Admin</div>'+
-      '<textarea class="fi adm-ta" rows="2" placeholder="Digite sua resposta (publicada imediatamente)..."></textarea>'+
-      '<button class="btn bp btn-sm adm-rep" style="margin-top:7px">📤 Enviar resposta</button></div></div>';
+    card.innerHTML='<div class="phead"><div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+(p.modules?.titulo||'Geral')+' · '+fd(p.criado_em)+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">Post pendente</span>':'')+(pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">'+pendReps+' pend.</span>':'')+'</div></div><div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">'+(!p.aprovado?'<button class="btn bs btn-xs aprv-post">✅ Aprovar</button>':'')+'<button class="btn bg2 btn-xs pin-post">'+(p.fixado?'📌':'Fixar')+'</button><button class="btn bd btn-xs del-post">🗑️</button></div></div><div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+p.conteudo+'</div><div style="padding:11px 15px"><div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+((rps||[]).length)+')</div><div class="rep-con">'+rpsHtml+'</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨 Responder como Admin</div><textarea class="fi adm-ta" rows="2" placeholder="Resposta publicada imediatamente..."></textarea><button class="btn bp btn-sm adm-rep" style="margin-top:7px">📤 Enviar</button></div></div>';
     (function(post,cardEl,replies){
-      const ap=cardEl.querySelector('.aprv-post');
-      if(ap)ap.onclick=async()=>{await sb.from('forum_posts').update({aprovado:true}).eq('id',post.id);toast('✅ Post aprovado!','s');loadAForum();};
+      const ap=cardEl.querySelector('.aprv-post');if(ap)ap.onclick=async()=>{await sb.from('forum_posts').update({aprovado:true}).eq('id',post.id);toast('✅ Post aprovado!','s');loadAForum();};
       cardEl.querySelector('.pin-post').onclick=async()=>{await sb.from('forum_posts').update({fixado:!post.fixado}).eq('id',post.id);loadAForum();};
-      cardEl.querySelector('.del-post').onclick=async()=>{if(!confirm('Excluir post e respostas?'))return;await sb.from('forum_replies').delete().eq('post_id',post.id);await sb.from('forum_posts').delete().eq('id',post.id);toast('🗑️ Excluido.','i');loadAForum();};
+      cardEl.querySelector('.del-post').onclick=async()=>{if(!confirm('Excluir post?'))return;await sb.from('forum_replies').delete().eq('post_id',post.id);await sb.from('forum_posts').delete().eq('id',post.id);toast('🗑️','i');loadAForum();};
       replies.forEach(r=>{
         const rd=cardEl.querySelector('[data-rid="'+r.id+'"]');if(!rd)return;
-        const ab=rd.querySelector('.aprv-rep');if(ab)ab.onclick=async()=>{await sb.from('forum_replies').update({aprovado:true}).eq('id',r.id);toast('✅ Aprovado!','s');loadAForum();};
+        const ab=rd.querySelector('.aprv-rep');if(ab)ab.onclick=async()=>{await sb.from('forum_replies').update({aprovado:true}).eq('id',r.id);toast('✅','s');loadAForum();};
         const db=rd.querySelector('.del-rep');if(db)db.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_replies').delete().eq('id',r.id);loadAForum();};
       });
       cardEl.querySelector('.adm-rep').onclick=async()=>{
         const ta=cardEl.querySelector('.adm-ta'),txt=ta.value.trim();
         if(!txt){toast('⚠️ Digite uma resposta.','w');return;}
-        const res=await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:true,is_admin:true});
-        if(res.error){toast('❌ Erro: '+res.error.message,'e');return;}
-        ta.value='';toast('✅ Resposta publicada!','s');loadAForum();
+        await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:true,is_admin:true});
+        ta.value='';toast('✅ Publicado!','s');loadAForum();
       };
     })(p,card,rps||[]);
     l.appendChild(card);
