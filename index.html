@@ -182,7 +182,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 <div id="tc"></div>
 
 <!-- LOGIN -->
-<div id="ls">
+<div id="ls" style="display:none">
   <div class="lwrap">
     <div style="text-align:center;margin-bottom:28px">
       <div class="llogobox">ESC</div>
@@ -199,7 +199,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div class="fg" style="margin-bottom:13px"><label class="fl">Senha</label><input id="lPass" class="fi" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
         <div id="lErr" class="ferr" style="min-height:18px;margin-bottom:8px"></div>
         <button id="lBtn" class="lbtn">ENTRAR</button>
-        <div style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:11px">Problemas de acesso? Contate o administrador.</div>
+        <div style="text-align:center;margin-top:12px">
+          <button id="bForgot" style="background:none;border:none;color:rgba(0,200,255,.6);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">Esqueci minha senha</button>
+        </div>
       </div>
       <div id="lf-reg" class="hidden">
         <div style="padding:10px;border:1px solid rgba(0,200,255,.18);border-radius:var(--rs);background:rgba(0,200,255,.04);margin-bottom:14px;font-size:.84rem;color:var(--soft)">
@@ -221,7 +223,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 <!-- STUDENT APP -->
 <div id="sa" class="hidden">
   <header class="hdr">
-    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Método dos Dados a Decisão</div></div></div>
+    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Telemetria B30</div></div></div>
     <div class="hright">
       <div id="ew" class="expw hidden">⚠️ Expira em <span id="ed"></span>d</div>
       <div class="uchip"><div id="sAv" class="uav">?</div><span id="sNm" class="uname"></span></div>
@@ -359,7 +361,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
             <div class="card cp">
               <div style="font-weight:800;color:var(--cyan);margin-bottom:11px">ℹ️ Detalhes</div>
               <div style="display:flex;flex-direction:column;gap:7px">
-                <div style="display:flex;justify-content:space-between"><span style="font-size:.85rem;color:var(--soft)">Professor</span><span style="font-size:.85rem;font-weight:700">Elcio Cardoso</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="font-size:.85rem;color:var(--soft)">Professor</span><span style="font-size:.85rem;font-weight:700">Equipe ESC</span></div>
                 <div style="display:flex;justify-content:space-between"><span style="font-size:.85rem;color:var(--soft)">Acesso até</span><span style="font-size:.85rem;font-weight:700" id="cAU">—</span></div>
                 <div style="display:flex;justify-content:space-between"><span style="font-size:.85rem;color:var(--soft)">Turma</span><span id="cTn" class="badge bc">—</span></div>
               </div>
@@ -465,9 +467,28 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
           </div>
           <button id="bCA" class="btn bp" style="margin-top:13px">➕ Criar Aluno</button>
         </div>
-        <div class="card cp">
-          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Todos os alunos</div>
-          <div class="tw2"><table><thead><tr><th>Nome</th><th>Login</th><th>Turma</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="aAT"></tbody></table></div>
+        <div class="card cp" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+            <div style="font-weight:800;color:var(--cyan)">📋 Todos os alunos</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn bg2 btn-sm alunoTab act" data-at="lista">👥 Lista</button>
+              <button class="btn bg2 btn-sm alunoTab" data-at="certs">🏆 Certificados</button>
+              <button class="btn bg2 btn-sm alunoTab" data-at="historico">📚 Histórico</button>
+              <button class="btn bg2 btn-sm alunoTab" data-at="upsell">💡 Interesse</button>
+            </div>
+          </div>
+          <div id="at-lista">
+            <div class="tw2"><table><thead><tr><th>Nome</th><th>Login</th><th>Turma</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="aAT"></tbody></table></div>
+          </div>
+          <div id="at-certs" style="display:none">
+            <div id="certList"></div>
+          </div>
+          <div id="at-historico" style="display:none">
+            <div id="histList"></div>
+          </div>
+          <div id="at-upsell" style="display:none">
+            <div id="upsellList"></div>
+          </div>
         </div>
       </div>
 
@@ -479,6 +500,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
           <div class="fgrid">
             <div class="fg"><label class="fl">Nome</label><input id="tNome" class="fi" placeholder="B30 — Jan/2025"/></div>
             <div class="fg"><label class="fl">Descrição</label><input id="tDesc" class="fi" placeholder="Opcional"/></div>
+            <div class="fg full" style="display:flex;align-items:center;gap:10px;padding-top:4px">
+              <input type="checkbox" id="tProjeto" style="accent-color:var(--cyan);width:18px;height:18px"/>
+              <label for="tProjeto" class="fl" style="margin:0">Possui módulo de projeto final (habilita certificado)</label>
+            </div>
           </div>
           <button id="bST" class="btn bp" style="margin-top:13px">💾 Salvar</button>
         </div>
@@ -689,7 +714,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 
 let sb=null;
 try{sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
-let CU=null,CTurma=null,mods=[],actMod=null,actAula=null,wTimer=null,wSec=0,cdTimer=null,inactTimer=null;
+let CU=null,CTurma=null,mods=[],actMod=null,actAula=null,wTimer=null,wSec=0,cdTimer=null,inactTimer=null,userIdleSec=0;
+// Track user idle time for progress (pauses if truly idle >2min)
+setInterval(()=>{userIdleSec++;},1000);
+['click','keydown','mousemove','scroll','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{userIdleSec=0;},{passive:true}));
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const INACT_LIMIT=30*60*1000; // 30 min
 
@@ -710,6 +738,7 @@ function genId(){return Date.now().toString(36)+Math.random().toString(36).subst
 /* ── SESSION PERSISTENCE ── */
 function saveSession(){if(CU)sessionStorage.setItem('esc_user',JSON.stringify(CU));}
 function clearSession(){sessionStorage.removeItem('esc_user');sessionStorage.removeItem('esc_mod');sessionStorage.removeItem('esc_aula');}
+// Inactivity logout (30 min no interaction)
 function resetInactTimer(){
   clearTimeout(inactTimer);
   inactTimer=setTimeout(()=>{
@@ -747,6 +776,32 @@ $$('.ltab').forEach(t=>t.addEventListener('click',()=>{
 }));
 $('#lBtn').addEventListener('click',doLogin);
 $('#lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+/* Forgot password */
+document.getElementById('bForgot').addEventListener('click',()=>{
+  showModal(
+    '<div class="mtt">🔑 Redefinir Senha</div>'+
+    '<p style="font-size:.88rem;color:var(--soft);margin-bottom:14px;line-height:1.6">Digite seu login ou e-mail. Se o cadastro existir, um link de redefinição será enviado por e-mail ou o administrador será notificado.</p>'+
+    '<div class="fg" style="margin-bottom:14px"><label class="fl">Login ou e-mail</label><input id="forgotInput" class="fi" placeholder="seu.login ou email@empresa.com"/></div>'+
+    '<div id="forgotMsg" style="min-height:18px;margin-bottom:10px;font-size:.84rem"></div>'+
+    '<div style="display:flex;gap:9px"><button id="forgotBtn" class="btn bp">Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>'
+  );
+  document.getElementById('forgotBtn').addEventListener('click',async()=>{
+    const val=document.getElementById('forgotInput').value.trim();
+    const msg=document.getElementById('forgotMsg');
+    if(!val){msg.style.color='var(--amber)';msg.textContent='Digite seu login ou e-mail.';return;}
+    document.getElementById('forgotBtn').disabled=true;
+    if(!sb){msg.style.color='var(--green)';msg.textContent='✅ Solicitação registrada. O administrador irá redefinir sua senha.';return;}
+    // Try to find user by login or email
+    const{data:byLogin}=await sb.from('users').select('id,email,nome').eq('login',val).single();
+    const{data:byEmail}=byLogin?{data:null}:await sb.from('users').select('id,email,nome').eq('email',val).single();
+    const user=byLogin||byEmail;
+    if(!user){msg.style.color='var(--amber)';msg.textContent='Nenhuma conta encontrada com esses dados.';document.getElementById('forgotBtn').disabled=false;return;}
+    // Insert reset request (admin will see it)
+    await sb.from('reset_requests').insert({user_id:user.id,email:user.email,nome:user.nome,solicitado_em:new Date().toISOString(),resolvido:false});
+    msg.style.color='var(--green)';msg.textContent='✅ Solicitação enviada! O administrador irá redefinir sua senha em breve.';
+  });
+});
 
 async function doLogin(){
   const lg=$('#lUser').value.trim(),pw=$('#lPass').value.trim(),err=$('#lErr');
@@ -791,7 +846,7 @@ function doLogout(){
   clearSession();
   if(sb&&sessionToken){sb.from('users').update({session_token:null}).eq('id',CU?.id||'');}
   $('#sa').classList.add('hidden');$('#aa').classList.add('hidden');
-  $('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';
+  $('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';$('#lErr').textContent='';
 }
 $('#sOut').addEventListener('click',doLogout);
 $('#aOut').addEventListener('click',doLogout);
@@ -799,12 +854,25 @@ $('#aOut').addEventListener('click',doLogout);
 /* ── AUTO-RESTORE SESSION ── */
 window.addEventListener('load',async()=>{
   const saved=sessionStorage.getItem('esc_user');
-  if(!saved)return;
+  if(!saved){
+    // No session: show login screen
+    $('#ls').style.display='flex';
+    return;
+  }
+  // Session found: keep login hidden, try to restore
   try{
     const u=JSON.parse(saved);
-    if(!sb){CU=u;u.role==='admin'?showAdmin():showStudent();return;}
+    if(!sb){
+      CU=u;
+      if(u.role==='admin')showAdmin();else showStudent();
+      return;
+    }
     const{data}=await sb.from('users').select('*').eq('id',u.id).single();
-    if(!data||data.status==='blocked'||data.status==='expired')return clearSession();
+    if(!data||data.status==='blocked'||data.status==='expired'){
+      clearSession();
+      $('#ls').style.display='flex';
+      return;
+    }
     CU=data;resetInactTimer();
     const savedMod=sessionStorage.getItem('esc_mod');
     const savedAula=sessionStorage.getItem('esc_aula');
@@ -812,10 +880,12 @@ window.addEventListener('load',async()=>{
     else{
       await setSessionToken();
       await showStudent();
-      if(savedMod)openMod(savedMod);
-      if(savedAula)openAula(savedAula);
+      if(savedMod)setTimeout(()=>openMod(savedMod),300);
     }
-  }catch(e){clearSession();}
+  }catch(e){
+    clearSession();
+    $('#ls').style.display='flex';
+  }
 });
 
 /* ── STUDENT ── */
@@ -991,8 +1061,12 @@ function loadVideoAula(aula){
 async function startWTAula(aula){
   if(sb&&CU){const{data}=await sb.from('progress').select('*').eq('user_id',CU.id).eq('aula_id',aula.id).single();wSec=data?.segundos_vistos||0;}else wSec=0;
   updVP(aula);
+  if(wTimer)clearInterval(wTimer);
   wTimer=setInterval(async()=>{
-    wSec=Math.min(wSec+1,aula.duracao_seg||3600);updVP(aula);
+    if(document.hidden)return;
+    if(userIdleSec>120)return;
+    wSec=Math.min(wSec+1,aula.duracao_seg||36000);
+    updVP(aula);
     if(wSec%20===0)await svProgressAula(aula);
   },1000);
 }
@@ -1033,7 +1107,16 @@ function ytId(u){const m=u.match(/(?:v=|youtu\.be\/|embed\/)([^#&?]{11})/);retur
 function vmId(u){const m=u.match(/vimeo.*\/(\d+)/i);return m?m[1]:null;}
 async function startWT(m){
   if(sb&&CU){const{data}=await sb.from('progress').select('*').eq('user_id',CU.id).eq('modulo_id',m.id).single();wSec=data?.segundos_vistos||0;}else wSec=0;
-  updVP(m);wTimer=setInterval(async()=>{wSec=Math.min(wSec+1,m.duracao_seg||3600);updVP(m);if(wSec%20===0)await svP(m);},1000);
+  updVP(m);
+  if(wTimer)clearInterval(wTimer);
+  wTimer=setInterval(async()=>{
+    // Only count when tab is visible and user is not idle
+    if(document.hidden)return;
+    if(userIdleSec>120)return; // pausa se inativo >2 min
+    wSec=Math.min(wSec+1,m.duracao_seg||36000);
+    updVP(m);
+    if(wSec%20===0)await svP(m);
+  },1000);
 }
 async function svP(m,done=null){
   if(!sb||!CU)return;
@@ -1227,9 +1310,61 @@ window.emitirCertificado=async function(){
   const{data:turma}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
   const dataAprov=fd(proj.aprovado_em||new Date());
   const totalHoras=Math.round(mods.reduce((s,m)=>s+(m.duracao_seg||0),0)/3600);
-  gerarCertificadoHTML(CU.nome,turma?.nome||'',dataAprov,totalHoras,proj.aprovado_em);
+  const certId=genId().toUpperCase();
+  // Save certificate record
+  await sb.from('certificados').upsert({
+    user_id:CU.id,turma_id:CU.turma_id,
+    cert_id:certId,nome_aluno:CU.nome,nome_turma:turma?.nome||'',
+    carga_horaria:totalHoras,emitido_em:new Date().toISOString(),aprovado_em:proj.aprovado_em
+  },{onConflict:'user_id,turma_id'});
+  // Open certificate
+  gerarCertificadoHTML(CU.nome,turma?.nome||'',dataAprov,totalHoras,proj.aprovado_em,certId);
+  // Check if Excel course → show upsell
+  const nomeT=(turma?.nome||'').toLowerCase();
+  const isExcel=nomeT.includes('excel');
+  if(isExcel){
+    setTimeout(()=>mostrarUpsell(turma?.nome||''),1200);
+  }
 };
-function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
+function mostrarUpsell(turmaOrigem){
+  showModal(
+    '<div style="text-align:center;padding:8px 0 16px">' +
+    '<div style="font-size:2.5rem;margin-bottom:8px">🎉</div>' +
+    '<div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);font-weight:800;margin-bottom:6px">Parabéns pelo certificado!</div>' +
+    '<div style="font-size:.9rem;color:var(--soft);margin-bottom:22px;line-height:1.7">Você concluiu o Excel. Que tal dar o próximo passo?</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">' +
+    '<div style="border:1px solid rgba(0,200,255,.25);border-radius:var(--r);padding:14px;background:rgba(0,200,255,.05);cursor:pointer" onclick="registrarInteresse(\'powerbi\',\''+turmaOrigem+'\')">' +
+    '<div style="font-weight:800;color:var(--cyan);margin-bottom:4px">📊 Power BI — Dashboards Profissionais</div>' +
+    '<div style="font-size:.84rem;color:var(--soft)">Aprenda a criar dashboards interativos com Power BI e transforme seus dados em decisões.</div>' +
+    '<div style="font-size:.8rem;color:var(--cyan);margin-top:8px;font-weight:700">👆 Tenho interesse</div>' +
+    '</div>' +
+    '<div style="border:1px solid rgba(124,92,252,.25);border-radius:var(--r);padding:14px;background:rgba(124,92,252,.05);cursor:pointer" onclick="registrarInteresse(\'mentoria\',\''+turmaOrigem+'\')">' +
+    '<div style="font-weight:800;color:var(--purple);margin-bottom:4px">🚀 Mentoria em Projetos de Análise de Dados</div>' +
+    '<div style="font-size:.84rem;color:var(--soft)">Acompanhamento personalizado para criar projetos reais de análise e montar seu portfólio.</div>' +
+    '<div style="font-size:.8rem;color:var(--purple);margin-top:8px;font-weight:700">👆 Tenho interesse</div>' +
+    '</div>' +
+    '</div>' +
+    '<button class="btn bg2" style="width:100%" onclick="closeModal()">Agora não, obrigado</button>'
+  );
+}
+window.registrarInteresse=async function(curso,turmaOrigem){
+  if(sb&&CU){
+    await sb.from('upsell_interesse').insert({user_id:CU.id,nome_aluno:CU.nome,turma_origem:turmaOrigem,curso_interesse:curso,registrado_em:new Date().toISOString()});
+  }
+  closeModal();
+  const nomes={powerbi:'Power BI',mentoria:'Mentoria em Projetos'};
+  showModal(
+    '<div style="text-align:center;padding:16px 0">' +
+    '<div style="font-size:2.5rem;margin-bottom:10px">✅</div>' +
+    '<div style="font-family:var(--fd);font-size:1.1rem;color:var(--green);font-weight:800;margin-bottom:8px">Interesse registrado!</div>' +
+    '<div style="font-size:.9rem;color:var(--soft);line-height:1.7">Registramos seu interesse em <strong style="color:var(--cyan)">' + (nomes[curso]||curso) + '</strong>.<br/>Em breve entraremos em contato com mais detalhes.</div>' +
+    '<button class="btn bp" style="margin-top:18px;width:100%" onclick="closeModal()">Perfeito!</button>' +
+    '</div>'
+  );
+};
+function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao,certId){
+  certId=certId||genId().toUpperCase();
   const w=window.open('','_blank','width=1050,height=750');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Certificado ESC — ${nome}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -1263,7 +1398,7 @@ function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
   <div class="cert">
     <div class="ornament">ESC</div>
     <div class="inner">
-      <div class="logo-area"><div class="logo-icon">E</div><div class="logo-txt">ESC Data & Analytics</div></div>
+      <div class="logo-area"><div class="logo-icon">E</div><div class="logo-txt">ESC Plataforma</div></div>
       <div class="border-line"></div>
       <div class="cert-title">Certificado de Conclusão</div>
       <div class="cert-declares">Este certificado atesta que</div>
@@ -1273,9 +1408,9 @@ function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
       <div class="cert-detail">Carga horária: ${horas}h • Projeto aprovado em ${dataAprov}</div>
       <div class="border-line2"></div>
       <div class="cert-footer">
-        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">ESC Data & Analytics</div><div class="sign-role">Coordenação</div></div>
-        <div class="cert-id">Emitido em ${fd(dataEmissao||new Date())}<br/>ID: ${genId().toUpperCase()}</div>
-        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">${nome}</div><div class="sign-role">Aluno</div></div>
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">ESC Educação</div><div class="sign-role">Coordenação</div></div>
+        <div class="cert-id">Emitido em ${fd(dataEmissao||new Date())}<br/>ID: ${certId}</div>
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">${nome}</div><div class="sign-role">Concluinte</div></div>
       </div>
     </div>
   </div>
@@ -1294,7 +1429,7 @@ async function showAdmin(){
     const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum};
     if(fns[adm])fns[adm]();
   }));
-  await loadADash();await loadPend();
+  await loadADash();await loadPend();await checkResetRequests();
 }
 
 /* ── ADMIN DASHBOARD ── */
@@ -1338,6 +1473,40 @@ window.aprovA=async function(id){
 };
 window.rejA=async function(id){if(!confirm('Rejeitar?'))return;await sb.from('users').update({status:'blocked'}).eq('id',id);toast('Rejeitado.','i');loadPend();};
 
+/* ── ADMIN RESET DE SENHA ── */
+async function checkResetRequests(){
+  if(!sb)return;
+  const{data}=await sb.from('reset_requests').select('*,users(nome,login,email)').eq('resolvido',false).order('solicitado_em',{ascending:false});
+  if(!data?.length)return;
+  // Show badge on Pendentes or a toast
+  toast(`🔑 ${data.length} solicitação(ões) de redefinição de senha pendente(s). Verifique em Pendentes.`,'w');
+  // Append to pendCont if it's visible
+  const c2=$('#pendCont');
+  if(!c2)return;
+  const secTitle=document.createElement('div');
+  secTitle.style.cssText='font-weight:800;color:var(--amber);margin:18px 0 10px;display:flex;align-items:center;gap:8px';
+  secTitle.innerHTML='🔑 Redefinições de Senha Solicitadas';
+  c2.appendChild(secTitle);
+  data.forEach(req=>{
+    const d2=document.createElement('div');
+    d2.style.cssText='border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:14px;margin-bottom:10px;background:rgba(245,158,11,.04)';
+    d2.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px"><div><div style="font-weight:800">${req.users?.nome||req.nome||'?'}</div><div style="font-size:.82rem;color:var(--muted)">@${req.users?.login||'?'} · ${req.users?.email||req.email||'?'}</div><div style="font-size:.75rem;color:var(--muted);margin-top:2px">Solicitado: ${fdt(req.solicitado_em)}</div></div></div><div style="display:flex;gap:9px;align-items:center"><input type="password" id="rs-${req.id}" class="fi" placeholder="Nova senha (mín. 6 chars)" style="max-width:220px"/><button class="btn bp btn-sm" onclick="resolverReset('${req.id}','${req.user_id}')">✅ Redefinir</button><button class="btn bg2 btn-sm" onclick="dispensarReset('${req.id}')">✖</button></div>`;
+    c2.appendChild(d2);
+  });
+}
+window.resolverReset=async function(reqId,userId){
+  const pw=document.getElementById('rs-'+reqId)?.value?.trim();
+  if(!pw||pw.length<6){toast('⚠️ Senha mínimo 6 caracteres.','w');return;}
+  const hash=await sha(pw);
+  await sb.from('users').update({senha:hash,session_token:null}).eq('id',userId);
+  await sb.from('reset_requests').update({resolvido:true,resolvido_em:new Date().toISOString()}).eq('id',reqId);
+  toast('✅ Senha redefinida com sucesso!','s');loadPend();checkResetRequests();
+};
+window.dispensarReset=async function(reqId){
+  await sb.from('reset_requests').update({resolvido:true}).eq('id',reqId);
+  toast('Solicitação dispensada.','i');loadPend();
+};
+
 /* ── ADMIN ALUNOS ── */
 async function loadAAlunos(){
   if(!sb)return;
@@ -1346,6 +1515,66 @@ async function loadAAlunos(){
   $('#aTurma').innerHTML='<option value="">Sem turma</option>'+opts;
   const{data:al}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
   $('#aAT').innerHTML=(al||[]).map(a=>{const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td>${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="${d2!==null&&d2<=30?'color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;}).join('');
+  // Setup tab switching
+  $$('.alunoTab').forEach(btn=>btn.addEventListener('click',function(){
+    $$('.alunoTab').forEach(x=>x.classList.remove('act'));this.classList.add('act');
+    ['lista','certs','historico','upsell'].forEach(id=>document.getElementById('at-'+id).style.display='none');
+    const tab=this.dataset.at;document.getElementById('at-'+tab).style.display='';
+    if(tab==='certs')loadCertificadosAdmin();
+    if(tab==='historico')loadHistoricoAdmin();
+    if(tab==='upsell')loadUpsellAdmin();
+  }));
+}
+async function loadCertificadosAdmin(){
+  const l=$('#certList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const{data:certs}=await sb.from('certificados').select('*,users(nome,login),turmas(nome)').order('emitido_em',{ascending:false});
+  if(!certs?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">🏆 Nenhum certificado emitido ainda.</div>';return;}
+  l.innerHTML='<div class="tw2"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Carga H.</th><th>Emitido em</th><th>ID Cert.</th><th></th></tr></thead><tbody>'+
+    certs.map(c=>`<tr><td><strong>${c.users?.nome||'?'}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${c.users?.login||'?'}</span></td><td><span class="badge bc">${c.turmas?.nome||'?'}</span></td><td>${c.carga_horaria||0}h</td><td>${fdt(c.emitido_em)}</td><td style="font-family:monospace;font-size:.78rem;color:var(--cyan)">${c.cert_id||'—'}</td><td><button class="btn bg2 btn-xs" onclick="verCertAdmin('${c.id}')">🏆 Ver</button></td></tr>`).join('')+
+    '</tbody></table></div>';
+}
+window.verCertAdmin=async function(id){
+  const{data:cert}=await sb.from('certificados').select('*,users(nome),turmas(nome)').eq('id',id).single();
+  if(!cert)return;
+  gerarCertificadoHTML(cert.users?.nome||cert.nome_aluno,cert.turmas?.nome||cert.nome_turma,fd(cert.aprovado_em),cert.carga_horaria||0,cert.emitido_em,cert.cert_id);
+};
+async function loadHistoricoAdmin(){
+  const l=$('#histList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  // Get all students with their turmas history (from projetos aprovados)
+  const{data:al}=await sb.from('users').select('id,nome,login').eq('role','student').order('nome');
+  if(!al?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Nenhum aluno.</div>';return;}
+  const{data:certs}=await sb.from('certificados').select('*,turmas(nome)');
+  const certsByUser={};(certs||[]).forEach(c=>{if(!certsByUser[c.user_id])certsByUser[c.user_id]=[];certsByUser[c.user_id].push(c);});
+  const{data:projs}=await sb.from('projetos').select('*,turmas(nome)').eq('status','aprovado');
+  const projsByUser={};(projs||[]).forEach(p=>{if(!projsByUser[p.user_id])projsByUser[p.user_id]=[];projsByUser[p.user_id].push(p);});
+  l.innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
+    al.map(a=>{
+      const userCerts=certsByUser[a.id]||[];
+      const userProjs=projsByUser[a.id]||[];
+      const allTurmas=[...new Set([...userCerts.map(c=>c.turmas?.nome||c.nome_turma),...userProjs.map(p=>p.turmas?.nome||'?')])].filter(Boolean);
+      return `<div style="border:1px solid var(--border);border-radius:var(--r);padding:13px;background:rgba(0,0,0,.18)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div><div style="font-weight:800">${a.nome} <span style="font-size:.78rem;color:var(--muted);font-weight:400">@${a.login}</span></div>
+          <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:5px">${allTurmas.length?allTurmas.map(t=>`<span class="badge bc">${t}</span>`).join(''):'<span style="font-size:.8rem;color:var(--muted)">Sem cursos concluídos</span>'}</div></div>
+          <div style="text-align:right;flex-shrink:0"><div style="font-size:1.3rem;font-weight:900;color:var(--cyan)">${userCerts.length}</div><div style="font-size:.72rem;color:var(--muted)">certificado(s)</div></div>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+}
+async function loadUpsellAdmin(){
+  const l=$('#upsellList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const{data:interesse}=await sb.from('upsell_interesse').select('*,users(nome,login)').order('registrado_em',{ascending:false});
+  if(!interesse?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">💡 Nenhum interesse registrado ainda.</div>';return;}
+  const powerbi=interesse.filter(x=>x.curso_interesse==='powerbi');
+  const mentoria=interesse.filter(x=>x.curso_interesse==='mentoria');
+  l.innerHTML=
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="card cp" style="text-align:center"><div style="font-size:1.8rem;font-weight:900;color:var(--cyan)">${powerbi.length}</div><div style="font-size:.8rem;color:var(--muted);margin-top:3px">Interesse Power BI</div></div>
+      <div class="card cp" style="text-align:center"><div style="font-size:1.8rem;font-weight:900;color:var(--purple)">${mentoria.length}</div><div style="font-size:.8rem;color:var(--muted);margin-top:3px">Interesse Mentoria</div></div>
+    </div>`+
+    '<div class="tw2"><table><thead><tr><th>Aluno</th><th>Turma Origem</th><th>Curso Interesse</th><th>Data</th></tr></thead><tbody>'+
+    interesse.map(i=>`<tr><td><strong>${i.users?.nome||i.nome_aluno||'?'}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${i.users?.login||'?'}</span></td><td>${i.turma_origem||'—'}</td><td><span class="badge ${i.curso_interesse==='powerbi'?'bc':'bpp'}">${i.curso_interesse==='powerbi'?'📊 Power BI':'🚀 Mentoria'}</span></td><td style="font-size:.82rem;color:var(--muted)">${fdt(i.registrado_em)}</td></tr>`).join('')+
+    '</tbody></table></div>';
 }
 $('#bCA').addEventListener('click',async()=>{
   const n=$('#aNome').value.trim(),e=$('#aEmail').value.trim(),l=$('#aLogin').value.trim(),p=$('#aPass').value.trim(),ti=$('#aTurma').value,ms=parseInt($('#aMes').value)||12;
