@@ -221,7 +221,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 <!-- STUDENT APP -->
 <div id="sa" class="hidden">
   <header class="hdr">
-    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Telemetria B30</div></div></div>
+    <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Método dos Dados a Decisão</div></div></div>
     <div class="hright">
       <div id="ew" class="expw hidden">⚠️ Expira em <span id="ed"></span>d</div>
       <div class="uchip"><div id="sAv" class="uav">?</div><span id="sNm" class="uname"></span></div>
@@ -1263,7 +1263,7 @@ function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
   <div class="cert">
     <div class="ornament">ESC</div>
     <div class="inner">
-      <div class="logo-area"><div class="logo-icon">E</div><div class="logo-txt">ESC Plataforma</div></div>
+      <div class="logo-area"><div class="logo-icon">E</div><div class="logo-txt">ESC Data & Analytics</div></div>
       <div class="border-line"></div>
       <div class="cert-title">Certificado de Conclusão</div>
       <div class="cert-declares">Este certificado atesta que</div>
@@ -1273,9 +1273,9 @@ function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao){
       <div class="cert-detail">Carga horária: ${horas}h • Projeto aprovado em ${dataAprov}</div>
       <div class="border-line2"></div>
       <div class="cert-footer">
-        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">ESC Educação</div><div class="sign-role">Coordenação</div></div>
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">ESC Data & Analytics</div><div class="sign-role">Coordenação</div></div>
         <div class="cert-id">Emitido em ${fd(dataEmissao||new Date())}<br/>ID: ${genId().toUpperCase()}</div>
-        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">${nome}</div><div class="sign-role">Concluinte</div></div>
+        <div class="sign-block"><div class="sign-line"></div><div class="sign-name">${nome}</div><div class="sign-role">Aluno</div></div>
       </div>
     </div>
   </div>
