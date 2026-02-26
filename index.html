@@ -53,7 +53,10 @@ body{font-family:var(--fb);color:var(--text);background:var(--black);min-height:
 .fi{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;color:var(--text);font-family:var(--fb);font-size:.95rem;outline:none;transition:border .22s;width:100%}
 .fi:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,255,.1)}
 .fi::placeholder{color:var(--muted)}
-select.fi{cursor:pointer}textarea.fi{resize:vertical}
+select.fi{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c8ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+textarea.fi{resize:vertical}
+select.fi option{background:#0f1318;color:#ddeeff;padding:8px}
+select.fi option:hover,select.fi option:checked{background:#1a2535;color:#00c8ff}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fgrid .full{grid-column:1/-1}
 .ferr{font-size:.82rem;color:var(--red);font-weight:700}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:999px;font-size:.74rem;font-weight:700}
@@ -238,6 +241,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ni" data-pg="mural"><span class="nic">📋</span>Mural</div>
       <div class="ni" data-pg="forum"><span class="nic">💬</span>Fórum</div>
       <div class="ni" id="navProjeto" data-pg="projeto" style="display:none"><span class="nic">🎓</span>Projeto Final</div>
+      <div class="ni" id="navAval" data-pg="aval" style="display:none"><span class="nic">⭐</span>Avaliar Curso</div>
       <div class="nsect">Módulos</div>
       <div id="sML"></div>
       <div class="nsect" style="margin-top:18px">Progresso</div>
@@ -376,6 +380,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         <div id="projetoContent"></div>
       </div>
 
+      <!-- AVALIAÇÃO -->
+      <div id="pg-aval" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">⭐ Avaliação do Curso</div>
+        <div style="font-size:.88rem;color:var(--muted);margin-bottom:22px">Sua opinião é muito importante para continuarmos melhorando!</div>
+        <div id="avalContent"></div>
+      </div>
+
       <!-- MURAL -->
       <div id="pg-mural" class="page">
         <div style="margin-bottom:20px">
@@ -428,6 +439,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="live">🔴 Aulas Ao Vivo</div>
       <div class="ani" data-adm="mural">📋 Mural</div>
       <div class="ani" data-adm="forum">💬 Fórum</div>
+      <div class="ani" data-adm="aval">⭐ Avaliações</div>
     </nav>
     <div class="mcont">
 
@@ -699,6 +711,33 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 
 
 
+
+      <!-- AVALIAÇÕES ADM -->
+      <div id="adm-aval" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">⭐ Avaliações do Curso</div>
+        <div id="avalResume" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px"></div>
+        <div class="card cp" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <select id="avalFiltroTurma" class="fi" style="width:auto;min-width:180px"><option value="">Todas as turmas</option></select>
+            <select id="avalFiltroNota" class="fi" style="width:auto;min-width:140px">
+              <option value="">Todas as notas</option>
+              <option value="5">⭐⭐⭐⭐⭐ 5 estrelas</option>
+              <option value="4">⭐⭐⭐⭐ 4 estrelas</option>
+              <option value="3">⭐⭐⭐ 3 estrelas</option>
+              <option value="2">⭐⭐ 2 estrelas</option>
+              <option value="1">⭐ 1 estrela</option>
+            </select>
+            <button id="bLoadAval" class="btn bp btn-sm">🔍 Filtrar</button>
+            <button id="bExportAval" class="btn bg2 btn-sm">📥 Exportar CSV</button>
+          </div>
+        </div>
+        <div id="avalGrafico" style="margin-bottom:18px"></div>
+        <div class="card cp">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Todas as avaliações</div>
+          <div id="avalList"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -899,12 +938,13 @@ async function showStudent(){
   await loadMods();renderDash();renderSML();loadLiveSection();loadCountdown();
   // Check if student has projeto turma
   await checkProjetoTurma();
+  await checkAvalNav();
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
     const pg=item.dataset.pg;
     $$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
     $$('#sa .page').forEach(p=>p.classList.remove('act'));
     document.getElementById(`pg-${pg}`).classList.add('act');
-    if(pg==='forum')loadFPage();if(pg==='mural')loadMural();if(pg==='projeto')loadProjetoAluno();
+    if(pg==='forum')loadFPage();if(pg==='mural')loadMural();if(pg==='projeto')loadProjetoAluno();if(pg==='aval')loadAvalAluno();
   }));
   $$('.tb').forEach(b=>b.addEventListener('click',()=>{
     const tab=b.dataset.tab;
@@ -1426,7 +1466,7 @@ async function showAdmin(){
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
     const adm=i.dataset.adm;document.getElementById(`adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum};
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin};
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();await checkResetRequests();
@@ -1804,6 +1844,297 @@ window.avaliarProj=async function(id,status){
   toast(status==='aprovado'?'✅ Projeto aprovado!':status==='reprovado'?'❌ Projeto reprovado.':'🔍 Em revisão.','s');
   loadAProjetos();
 };
+
+/* ── AVALIAÇÃO DO CURSO (STUDENT) ── */
+async function loadAvalAluno(){
+  const c2=$('#avalContent');
+  if(!sb||!CU){c2.innerHTML='<div style="color:var(--muted)">Indisponível.</div>';return;}
+  if(!CU.turma_id){c2.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Você não está vinculado a uma turma.</div>';return;}
+
+  // Verificar se já avaliou
+  const{data:jaAvalS}=await sb.from('avaliacoes').select('*').eq('user_id',CU.id).eq('turma_id',CU.turma_id).single();
+  if(jaAvalS){
+    c2.innerHTML=`<div class="card cp" style="text-align:center;padding:32px">
+      <div style="font-size:2.5rem;margin-bottom:10px">✅</div>
+      <div style="font-weight:800;color:var(--green);font-size:1.1rem;margin-bottom:8px">Avaliação já enviada!</div>
+      <div style="font-size:.9rem;color:var(--soft);margin-bottom:18px">Obrigado pelo seu feedback.</div>
+      <div style="display:flex;justify-content:center;gap:4px;font-size:1.8rem;margin-bottom:12px">${'⭐'.repeat(jaAvalS.nota_geral)}${'☆'.repeat(5-jaAvalS.nota_geral)}</div>
+      <div style="font-size:.88rem;color:var(--muted)">${fdt(jaAvalS.criado_em)}</div>
+      <button class="btn bg2 btn-sm" style="margin-top:16px" onclick="editarAvaliacao()">✏️ Editar avaliação</button>
+    </div>`;
+    return;
+  }
+
+  // Verificar conclusão do curso
+  const pm=await getProg();
+  const totalMods=mods.length,concluded=mods.filter(m=>pm[m.id]?.concluido).length;
+  const pctConc=pct(concluded,totalMods);
+
+  c2.innerHTML='';
+
+  if(pctConc<100){
+    const alertEl=document.createElement('div');
+    alertEl.style.cssText='padding:12px 14px;border:1px solid rgba(245,158,11,.2);border-radius:var(--r);background:rgba(245,158,11,.05);font-size:.87rem;color:var(--amber);margin-bottom:18px;display:flex;align-items:center;gap:9px';
+    alertEl.innerHTML=`<span style="font-size:1.3rem">⚠️</span><span>Você concluiu ${concluded} de ${totalMods} módulos (${pctConc}%). Recomendamos avaliar após concluir o curso, mas pode fazê-lo agora se quiser.</span>`;
+    c2.appendChild(alertEl);
+  }
+
+  const formEl=document.createElement('div');
+  formEl.innerHTML=`
+  <div class="card cp" style="margin-bottom:14px">
+    <div style="font-weight:800;color:var(--cyan);margin-bottom:18px;font-size:1.05rem">📋 Pesquisa de Satisfação</div>
+
+    <!-- NOTAS POR CATEGORIA -->
+    <div style="display:flex;flex-direction:column;gap:18px;margin-bottom:22px">
+      ${[
+        ['nota_geral','⭐ Avaliação Geral do Curso','Qual sua nota geral para o curso?'],
+        ['nota_conteudo','📚 Qualidade do Conteúdo','O conteúdo foi relevante e bem estruturado?'],
+        ['nota_didatica','🎤 Didática','A didática do professor foi clara e objetiva?'],
+        ['nota_aulas','🎬 Qualidade das Aulas','Como você avalia a qualidade técnica das aulas?'],
+        ['nota_plataforma','💻 Plataforma','A plataforma é fácil de usar e navegar?'],
+      ].map(([id,label,desc])=>`
+        <div>
+          <div style="font-weight:700;margin-bottom:3px">${label}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">${desc}</div>
+          <div class="star-group" data-field="${id}" style="display:flex;gap:6px">
+            ${[1,2,3,4,5].map(n=>`<span class="star" data-val="${n}" style="font-size:2rem;cursor:pointer;transition:transform .1s;user-select:none;opacity:.35">⭐</span>`).join('')}
+          </div>
+          <input type="hidden" id="${id}" value="0"/>
+        </div>`).join('')}
+    </div>
+
+    <!-- NPS -->
+    <div style="margin-bottom:22px">
+      <div style="font-weight:700;margin-bottom:4px">🔁 Você recomendaria este curso para um amigo ou colega?</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px">0 = Não recomendaria · 10 = Recomendaria com certeza</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<button type="button" class="nps-btn" data-nps="${n}" style="width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.25);color:var(--text);cursor:pointer;font-weight:700;font-size:.9rem;transition:all .15s">${n}</button>`).join('')}
+      </div>
+      <input type="hidden" id="nps_score" value="-1"/>
+    </div>
+
+    <!-- CAMPOS TEXTO -->
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:22px">
+      <div>
+        <label class="fl">💬 O que você mais gostou no curso?</label>
+        <textarea id="av_positivo" class="fi" rows="3" placeholder="Pontos fortes, o que te surpreendeu positivamente..."></textarea>
+      </div>
+      <div>
+        <label class="fl">🔧 O que poderia ser melhorado?</label>
+        <textarea id="av_melhoria" class="fi" rows="3" placeholder="Sugestões, pontos de atenção, o que faltou..."></textarea>
+      </div>
+      <div>
+        <label class="fl">📝 Comentário livre (opcional)</label>
+        <textarea id="av_comentario" class="fi" rows="3" placeholder="Conte mais sobre sua experiência..."></textarea>
+      </div>
+      <div>
+        <label class="fl" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="av_anonimo" style="accent-color:var(--cyan);width:16px;height:16px"/>
+          Enviar de forma anônima
+        </label>
+      </div>
+    </div>
+
+    <div id="avalErr" style="min-height:18px;font-size:.85rem;color:var(--amber);margin-bottom:10px"></div>
+    <button id="bEnviarAval" class="btn bp">⭐ Enviar Avaliação</button>
+  </div>`;
+  c2.appendChild(formEl);
+
+  // Star interaction
+  c2.querySelectorAll('.star-group').forEach(group=>{
+    const field=group.dataset.field;
+    const stars=group.querySelectorAll('.star');
+    stars.forEach(star=>{
+      star.addEventListener('mouseenter',()=>{
+        const val=parseInt(star.dataset.val);
+        stars.forEach(s=>s.style.opacity=parseInt(s.dataset.val)<=val?'1':'.25');
+      });
+      star.addEventListener('mouseleave',()=>{
+        const cur=parseInt(document.getElementById(field).value)||0;
+        stars.forEach(s=>s.style.opacity=parseInt(s.dataset.val)<=cur?'1':'.35');
+      });
+      star.addEventListener('click',()=>{
+        const val=parseInt(star.dataset.val);
+        document.getElementById(field).value=val;
+        stars.forEach(s=>{s.style.opacity=parseInt(s.dataset.val)<=val?'1':'.35';s.style.transform=parseInt(s.dataset.val)<=val?'scale(1.1)':'scale(1)';});
+      });
+    });
+  });
+
+  // NPS interaction
+  c2.querySelectorAll('.nps-btn').forEach(btn=>{
+    const npsColors={0:'#ef4444',1:'#ef4444',2:'#ef4444',3:'#ef4444',4:'#ef4444',5:'#ef4444',6:'#f59e0b',7:'#f59e0b',8:'#0fba81',9:'#0fba81',10:'#0fba81'};
+    btn.addEventListener('click',()=>{
+      document.getElementById('nps_score').value=btn.dataset.nps;
+      c2.querySelectorAll('.nps-btn').forEach(b=>{
+        const n=parseInt(b.dataset.nps),sel=b===btn;
+        b.style.background=sel?npsColors[n]:'rgba(0,0,0,.25)';
+        b.style.borderColor=sel?npsColors[n]:'var(--border)';
+        b.style.color=sel?'#fff':'var(--text)';
+        b.style.transform=sel?'scale(1.12)':'scale(1)';
+      });
+    });
+  });
+
+  // Submit
+  c2.querySelector('#bEnviarAval').addEventListener('click',async()=>{
+    const err=c2.querySelector('#avalErr');
+    const campos=['nota_geral','nota_conteudo','nota_didatica','nota_aulas','nota_plataforma'];
+    const notas={};let allFilled=true;
+    campos.forEach(f=>{
+      const v=parseInt(document.getElementById(f).value)||0;
+      notas[f]=v;if(v===0)allFilled=false;
+    });
+    const nps=parseInt(document.getElementById('nps_score').value);
+    if(!allFilled){err.textContent='⚠️ Por favor, avalie todas as categorias.';return;}
+    if(nps===-1){err.textContent='⚠️ Por favor, informe sua nota de recomendação (NPS).';return;}
+    err.textContent='';
+    const anonimo=document.getElementById('av_anonimo').checked;
+    await sb.from('avaliacoes').upsert({
+      user_id:CU.id,turma_id:CU.turma_id,
+      nome_aluno:anonimo?'Anônimo':CU.nome,
+      ...notas,nps_score:nps,
+      positivo:document.getElementById('av_positivo').value.trim(),
+      melhoria:document.getElementById('av_melhoria').value.trim(),
+      comentario:document.getElementById('av_comentario').value.trim(),
+      anonimo,criado_em:new Date().toISOString()
+    },{onConflict:'user_id,turma_id'});
+    toast('⭐ Avaliação enviada! Obrigado!','s');
+    loadAvalAluno();
+  });
+}
+window.editarAvaliacao=async function(){
+  if(sb&&CU){await sb.from('avaliacoes').delete().eq('user_id',CU.id).eq('turma_id',CU.turma_id);}
+  loadAvalAluno();
+};
+
+/* ── AVALIAÇÕES (ADMIN) ── */
+async function loadAvalAdmin(){
+  if(!sb)return;
+  const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
+  const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  $('#avalFiltroTurma').innerHTML='<option value="">Todas as turmas</option>'+opts;
+  await runAvalAdmin();
+}
+$('#bLoadAval').addEventListener('click',runAvalAdmin);
+async function runAvalAdmin(){
+  const filtroT=$('#avalFiltroTurma').value,filtroN=$('#avalFiltroNota').value;
+  let q=sb.from('avaliacoes').select('*,turmas(nome)').order('criado_em',{ascending:false});
+  if(filtroT)q=q.eq('turma_id',filtroT);
+  if(filtroN)q=q.eq('nota_geral',parseInt(filtroN));
+  const{data:avals}=await q;
+  const all=avals||[];
+
+  // ── RESUMO ──
+  const avg=field=>all.length?+(all.reduce((s,a)=>s+(a[field]||0),0)/all.length).toFixed(1):0;
+  const npsScores=all.filter(a=>a.nps_score!=null);
+  const promoters=npsScores.filter(a=>a.nps_score>=9).length;
+  const detractors=npsScores.filter(a=>a.nps_score<=6).length;
+  const nps=npsScores.length?Math.round(((promoters-detractors)/npsScores.length)*100):null;
+  const stars=n=>'⭐'.repeat(n)+'☆'.repeat(5-n);
+
+  const resumeData=[
+    ['⭐','Nota Geral',avg('nota_geral'),'/5','var(--amber)'],
+    ['📚','Conteúdo',avg('nota_conteudo'),'/5','var(--cyan)'],
+    ['🎤','Didática',avg('nota_didatica'),'/5','var(--purple)'],
+    ['🎬','Aulas',avg('nota_aulas'),'/5','var(--green)'],
+    ['💻','Plataforma',avg('nota_plataforma'),'/5','rgba(255,255,255,.6)'],
+    ['🔁','NPS',nps!==null?nps+'%':'—','',nps>=50?'var(--green)':nps>=0?'var(--amber)':'var(--muted)'],
+    ['👥','Respostas',all.length,'','var(--cyan)'],
+  ];
+  $('#avalResume').innerHTML=resumeData.map(([ic,lb,val,suf,cl])=>
+    `<div class="card cp" style="text-align:center;padding:14px 10px">
+      <div style="font-size:1.1rem;margin-bottom:3px">${ic}</div>
+      <div style="font-size:1.6rem;font-weight:900;color:${cl}">${val}${suf}</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:2px">${lb}</div>
+    </div>`
+  ).join('');
+
+  // ── GRÁFICO DE DISTRIBUIÇÃO ──
+  const dist=[1,2,3,4,5].map(n=>({n,cnt:all.filter(a=>a.nota_geral===n).length}));
+  const maxCnt=Math.max(...dist.map(d=>d.cnt),1);
+  $('#avalGrafico').innerHTML=`<div class="card cp">
+    <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">📊 Distribuição de Notas</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${dist.reverse().map(d=>`<div style="display:flex;align-items:center;gap:10px">
+        <div style="width:60px;font-size:.85rem;font-weight:700;flex-shrink:0">${'⭐'.repeat(d.n)}</div>
+        <div style="flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden">
+          <div style="height:100%;background:${d.n>=4?'var(--green)':d.n===3?'var(--amber)':'var(--red)'};width:${pct(d.cnt,maxCnt)}%;border-radius:4px;transition:width .6s;min-width:${d.cnt>0?'4px':'0'}"></div>
+        </div>
+        <div style="width:40px;text-align:right;font-size:.84rem;font-weight:700">${d.cnt}</div>
+      </div>`).join('')}
+    </div>
+    ${npsScores.length?`<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-weight:800;color:var(--cyan);margin-bottom:10px">🔁 NPS — Distribuição</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="padding:10px 14px;border-radius:var(--rs);background:rgba(15,186,129,.1);border:1px solid rgba(15,186,129,.2);text-align:center;flex:1;min-width:100px"><div style="font-size:1.3rem;font-weight:900;color:var(--green)">${promoters}</div><div style="font-size:.75rem;color:var(--muted)">Promotores (9-10)</div></div>
+        <div style="padding:10px 14px;border-radius:var(--rs);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);text-align:center;flex:1;min-width:100px"><div style="font-size:1.3rem;font-weight:900;color:var(--amber)">${npsScores.filter(a=>a.nps_score>=7&&a.nps_score<=8).length}</div><div style="font-size:.75rem;color:var(--muted)">Neutros (7-8)</div></div>
+        <div style="padding:10px 14px;border-radius:var(--rs);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);text-align:center;flex:1;min-width:100px"><div style="font-size:1.3rem;font-weight:900;color:var(--red)">${detractors}</div><div style="font-size:.75rem;color:var(--muted)">Detratores (0-6)</div></div>
+        <div style="padding:10px 14px;border-radius:var(--rs);background:${nps>=50?'rgba(15,186,129,.1)':nps>=0?'rgba(245,158,11,.1)':'rgba(239,68,68,.1)'};border:1px solid ${nps>=50?'rgba(15,186,129,.2)':nps>=0?'rgba(245,158,11,.2)':'rgba(239,68,68,.2)'};text-align:center;flex:1;min-width:100px"><div style="font-size:1.3rem;font-weight:900;color:${nps>=50?'var(--green)':nps>=0?'var(--amber)':'var(--red)'}">${nps}%</div><div style="font-size:.75rem;color:var(--muted)">NPS Score</div></div>
+      </div>
+    </div>`:'' }
+  </div>`;
+
+  // ── LISTA ──
+  const l=$('#avalList');
+  if(!all.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Nenhuma avaliação ainda.</div>';return;}
+  l.innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
+    all.map(a=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18)">
+      <div style="display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:12px">
+        <div>
+          <div style="font-weight:800">${a.anonimo?'👤 Anônimo':a.nome_aluno||'?'}</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${a.turmas?.nome||'?'} · ${fdt(a.criado_em)}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <span class="badge ${a.nota_geral>=4?'bg3':a.nota_geral>=3?'ba':'br'}">${'⭐'.repeat(a.nota_geral)} ${a.nota_geral}/5</span>
+          ${a.nps_score!=null?`<span class="badge ${a.nps_score>=9?'bg3':a.nps_score>=7?'ba':'br'}">NPS ${a.nps_score}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        ${[['📚',a.nota_conteudo,'Conteúdo'],['🎤',a.nota_didatica,'Didática'],['🎬',a.nota_aulas,'Aulas'],['💻',a.nota_plataforma,'Plataforma']].map(([ic,n,lb])=>
+          `<div style="padding:5px 10px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.78rem">${ic} <strong>${n}</strong> <span style="color:var(--muted)">${lb}</span></div>`
+        ).join('')}
+      </div>
+      ${a.positivo?`<div style="padding:9px 12px;border-left:3px solid var(--green);background:rgba(15,186,129,.05);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:7px;font-size:.86rem"><div style="font-size:.72rem;font-weight:700;color:var(--green);margin-bottom:3px">✅ PONTOS POSITIVOS</div>${a.positivo}</div>`:''}
+      ${a.melhoria?`<div style="padding:9px 12px;border-left:3px solid var(--amber);background:rgba(245,158,11,.05);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:7px;font-size:.86rem"><div style="font-size:.72rem;font-weight:700;color:var(--amber);margin-bottom:3px">🔧 PONTOS DE MELHORIA</div>${a.melhoria}</div>`:''}
+      ${a.comentario?`<div style="padding:9px 12px;border-left:3px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);border-radius:0 var(--rs) var(--rs) 0;font-size:.86rem"><div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:3px">💬 COMENTÁRIO</div>${a.comentario}</div>`:''}
+    </div>`
+  ).join('')+'</div>';
+}
+$('#bExportAval').addEventListener('click',()=>{
+  const rows=document.querySelectorAll('#avalList [style]');
+  // Simple CSV export from data
+  if(!sb)return;
+  sb.from('avaliacoes').select('*,turmas(nome)').order('criado_em',{ascending:false}).then(({data})=>{
+    if(!data?.length){toast('Sem dados para exportar.','w');return;}
+    const headers=['Nome','Turma','Nota Geral','Conteudo','Didatica','Aulas','Plataforma','NPS','Positivo','Melhoria','Comentario','Data'];
+    const rows=[headers,...data.map(a=>[
+      a.anonimo?'Anonimo':a.nome_aluno||'',
+      a.turmas?.nome||'',a.nota_geral,a.nota_conteudo,a.nota_didatica,a.nota_aulas,a.nota_plataforma,
+      a.nps_score??'',
+      (a.positivo||'').replace(/,/g,';'),
+      (a.melhoria||'').replace(/,/g,';'),
+      (a.comentario||'').replace(/,/g,';'),
+      fdt(a.criado_em)
+    ])];
+    const csv=rows.map(r=>r.join(',')).join('\n');
+    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a2=document.createElement('a');a2.href=url;a2.download=`avaliacoes_${new Date().toISOString().substring(0,10)}.csv`;a2.click();
+    toast('📥 CSV exportado!','s');
+  });
+});
+
+/* Show avaliação nav when course nearing completion */
+async function checkAvalNav(){
+  if(!CU||!mods.length)return;
+  const pm=await getProg();
+  const pctConc=pct(mods.filter(m=>pm[m.id]?.concluido).length,mods.length);
+  if(pctConc>=50){
+    const nav=document.getElementById('navAval');
+    if(nav)nav.style.display='';
+  }
+}
 
 /* ── ADMIN LIVE ── */
 async function loadALive(){
