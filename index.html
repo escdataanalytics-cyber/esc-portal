@@ -97,6 +97,30 @@ select.fi option:hover,select.fi option:checked{background:#1a2535;color:#00c8ff
 .ni:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .ni.act{color:var(--cyan);background:rgba(0,200,255,.07);border-color:rgba(0,200,255,.18)}
 .nic{font-size:.95rem;width:19px;text-align:center;flex-shrink:0}
+/* ── NOTIFICATION BELL ── */
+.nbell{position:relative;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(0,0,0,.25);cursor:pointer;transition:all .2s;flex-shrink:0}
+.nbell:hover{border-color:var(--cyan);background:rgba(0,200,255,.08)}
+.nbell svg{width:17px;height:17px;stroke:var(--soft);transition:stroke .2s}
+.nbell:hover svg{stroke:var(--cyan)}
+.nbell-dot{position:absolute;top:4px;right:4px;background:var(--red);border-radius:50%;width:8px;height:8px;border:2px solid var(--black);display:none}
+.nbell-dot.show{display:block;animation:pulse 1.8s ease infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.nbell-count{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:999px;font-size:.58rem;font-weight:900;padding:1px 5px;min-width:16px;text-align:center;border:1.5px solid var(--black);display:none}
+.nbell-count.show{display:block}
+/* Notification dropdown */
+.ndrop{position:absolute;top:calc(100% + 10px);right:-10px;width:340px;background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1000;display:none;max-height:420px;overflow-y:auto}
+.ndrop.open{display:block;animation:fadeDown .18s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.ndrop-hdr{padding:12px 14px;border-bottom:1px solid var(--border);font-weight:800;font-size:.88rem;color:var(--cyan);display:flex;align-items:center;justify-content:space-between}
+.ndrop-item{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;display:flex;gap:10px;align-items:flex-start}
+.ndrop-item:hover{background:rgba(255,255,255,.04)}
+.ndrop-item.unread{background:rgba(0,200,255,.04)}
+.ndrop-ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:1rem;flex-shrink:0}
+.ndrop-body{flex:1;min-width:0}
+.ndrop-title{font-size:.83rem;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ndrop-sub{font-size:.75rem;color:var(--muted);line-height:1.4}
+.ndrop-empty{padding:28px 14px;text-align:center;color:var(--muted);font-size:.85rem}
+.nbell-wrap{position:relative}
 .nbadge{background:var(--red);color:#fff;border-radius:999px;font-size:.66rem;font-weight:900;padding:2px 5px;margin-left:auto}
 .mcont{overflow-y:auto;max-height:calc(100vh - 58px);padding:22px}
 .ladm{display:grid;grid-template-columns:215px 1fr;min-height:calc(100vh - 58px)}
@@ -229,6 +253,16 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
     <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Telemetria B30</div></div></div>
     <div class="hright">
       <div id="ew" class="expw hidden">⚠️ Expira em <span id="ed"></span>d</div>
+      <div class="nbell-wrap">
+        <div class="nbell" id="sBell" title="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nbell-count" id="sBellCount">0</span>
+        </div>
+        <div class="ndrop" id="sBellDrop">
+          <div class="ndrop-hdr"><span>🔔 Notificações</span><span id="sBellMarkAll" style="font-size:.75rem;font-weight:400;color:var(--cyan);cursor:pointer">Marcar tudo lido</span></div>
+          <div id="sBellList"><div class="ndrop-empty">Sem notificações</div></div>
+        </div>
+      </div>
       <div class="uchip"><div id="sAv" class="uav">?</div><span id="sNm" class="uname"></span></div>
       <button id="sOut" class="btn bg2 btn-sm">Sair</button>
     </div>
@@ -419,6 +453,16 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
     <div class="brand"><div class="blog">ESC</div><div><div class="bname">Painel Admin</div><div class="bsub">Gerenciamento</div></div></div>
     <div class="hright">
       <span class="badge br" style="padding:5px 11px;font-size:.8rem">🔧 ADMIN</span>
+      <div class="nbell-wrap">
+        <div class="nbell" id="aBell" title="Notificações de alunos">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nbell-count" id="aBellCount">0</span>
+        </div>
+        <div class="ndrop" id="aBellDrop">
+          <div class="ndrop-hdr"><span>🔔 Atividades dos Alunos</span><span id="aBellMarkAll" style="font-size:.75rem;font-weight:400;color:var(--cyan);cursor:pointer">Limpar tudo</span></div>
+          <div id="aBellList"><div class="ndrop-empty">Sem atividades recentes</div></div>
+        </div>
+      </div>
       <div class="uchip"><div class="uav" style="background:linear-gradient(135deg,var(--red),var(--purple))">A</div><span class="uname">Administrador</span></div>
       <button id="aOut" class="btn bg2 btn-sm">Sair</button>
     </div>
@@ -890,6 +934,124 @@ function doLogout(){
 $('#sOut').addEventListener('click',doLogout);
 $('#aOut').addEventListener('click',doLogout);
 
+/* ═══════════════════════════════
+   SISTEMA DE NOTIFICAÇÕES
+   ═══════════════════════════════ */
+
+// ── Toggle bells on click ──
+document.addEventListener('click',e=>{
+  const sbell=document.getElementById('sBell');
+  const sbell_drop=document.getElementById('sBellDrop');
+  const abell=document.getElementById('aBell');
+  const abell_drop=document.getElementById('aBellDrop');
+  if(sbell&&sbell.contains(e.target)){sbell_drop.classList.toggle('open');}
+  else if(sbell_drop&&!sbell_drop.contains(e.target)){sbell_drop?.classList.remove('open');}
+  if(abell&&abell.contains(e.target)){abell_drop.classList.toggle('open');if(abell_drop.classList.contains('open'))pollAdminNotifs();}
+  else if(abell_drop&&!abell_drop.contains(e.target)){abell_drop?.classList.remove('open');}
+});
+
+// ── STUDENT: Mural notifications ──
+async function pollStudentNotifs(){
+  if(!sb||!CU||CU.role==='admin')return;
+  const lastSeen=localStorage.getItem('mural_seen_'+CU.id)||'1970-01-01';
+  let q=sb.from('mural_avisos').select('id,titulo,criado_em,fixado').eq('ativo',true).gt('criado_em',lastSeen).order('criado_em',{ascending:false}).limit(20);
+  if(CU.turma_id)q=q.or('turma_id.eq.'+CU.turma_id+',turma_id.is.null');else q=q.is('turma_id',null);
+  const{data:novos}=await q;
+  const count=(novos||[]).length;
+  const countEl=document.getElementById('sBellCount');
+  if(countEl){countEl.textContent=count>9?'9+':count;countEl.classList.toggle('show',count>0);}
+  const list=document.getElementById('sBellList');
+  if(!list)return;
+  if(!count){list.innerHTML='<div class="ndrop-empty">Sem comunicados novos 🎉</div>';return;}
+  list.innerHTML=novos.map(av=>`<div class="ndrop-item unread" onclick="irParaMural('${av.id}')">
+    <div class="ndrop-ic" style="background:rgba(0,200,255,.1)">📢</div>
+    <div class="ndrop-body">
+      <div class="ndrop-title">${av.fixado?'📌 ':''}${av.titulo}</div>
+      <div class="ndrop-sub">${fdt(av.criado_em)}</div>
+    </div>
+  </div>`).join('');
+  // Mark all button
+  const markAll=document.getElementById('sBellMarkAll');
+  if(markAll)markAll.onclick=()=>{
+    localStorage.setItem('mural_seen_'+CU.id,new Date().toISOString());
+    pollStudentNotifs();
+    document.getElementById('sBellDrop')?.classList.remove('open');
+    toast('✅ Notificações marcadas como lidas.','s');
+  };
+}
+window.irParaMural=function(id){
+  document.getElementById('sBellDrop')?.classList.remove('open');
+  $$('[data-pg]').forEach(x=>x.classList.remove('act'));
+  const muralNav=document.querySelector('[data-pg="mural"]');
+  if(muralNav){muralNav.classList.add('act');}
+  $$('#sa .page').forEach(p=>p.classList.remove('act'));
+  document.getElementById('pg-mural')?.classList.add('act');
+  loadMural();
+  // Mark as seen
+  localStorage.setItem('mural_seen_'+CU.id,new Date().toISOString());
+  const countEl=document.getElementById('sBellCount');
+  if(countEl){countEl.textContent='0';countEl.classList.remove('show');}
+};
+
+// ── ADMIN: Activity notifications ──
+let adminNotifsSeen=localStorage.getItem('admin_notifs_seen')||'1970-01-01';
+async function pollAdminNotifs(){
+  if(!sb||!CU||CU.role!=='admin')return;
+  const items=[];
+  // New forum posts (pending)
+  const{data:fposts}=await sb.from('forum_posts').select('id,titulo,criado_em,users(nome)').eq('aprovado',false).gt('criado_em',adminNotifsSeen).order('criado_em',{ascending:false}).limit(10);
+  (fposts||[]).forEach(p=>items.push({ic:'💬',color:'rgba(0,200,255,.15)',title:`Nova dúvida pendente`,sub:`${p.users?.nome||'?'}: "${p.titulo.substring(0,45)}${p.titulo.length>45?'...':''}"`,ts:p.criado_em,action:"goAdm('forum')"}));
+  // New projects submitted
+  const{data:projs}=await sb.from('projetos').select('id,enviado_em,users(nome),turmas(nome)').eq('status','enviado').gt('enviado_em',adminNotifsSeen).order('enviado_em',{ascending:false}).limit(10);
+  (projs||[]).forEach(p=>items.push({ic:'🎓',color:'rgba(124,92,252,.15)',title:`Projeto enviado para revisão`,sub:`${p.users?.nome||'?'} — ${p.turmas?.nome||'?'}`,ts:p.enviado_em,action:"goAdm('projetos')"}));
+  // New avaliacoes
+  const{data:avals}=await sb.from('avaliacoes').select('id,criado_em,nome_aluno,nota_geral').gt('criado_em',adminNotifsSeen).order('criado_em',{ascending:false}).limit(10);
+  (avals||[]).forEach(a=>items.push({ic:'⭐',color:'rgba(245,158,11,.15)',title:`Nova avaliação recebida`,sub:`${a.anonimo?'Anônimo':a.nome_aluno||'?'} — ${'⭐'.repeat(a.nota_geral||0)} ${a.nota_geral}/5`,ts:a.criado_em,action:"goAdm('aval')"}));
+  // New pending students
+  const{data:pends}=await sb.from('users').select('id,nome,criado_em').eq('status','pending').gt('criado_em',adminNotifsSeen).order('criado_em',{ascending:false}).limit(5);
+  (pends||[]).forEach(u=>items.push({ic:'👤',color:'rgba(15,186,129,.15)',title:`Novo aluno aguardando aprovação`,sub:u.nome,ts:u.criado_em,action:"goAdm('pend')"}));
+  // New reset requests
+  const{data:resets}=await sb.from('reset_requests').select('id,nome,solicitado_em').eq('resolvido',false).gt('solicitado_em',adminNotifsSeen).order('solicitado_em',{ascending:false}).limit(5);
+  (resets||[]).forEach(r=>items.push({ic:'🔑',color:'rgba(239,68,68,.15)',title:`Solicitação de redefinição de senha`,sub:r.nome||'?',ts:r.solicitado_em,action:"goAdm('pend')"}));
+  // Sort by most recent
+  items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  const count=items.length;
+  const countEl=document.getElementById('aBellCount');
+  if(countEl){countEl.textContent=count>9?'9+':count;countEl.classList.toggle('show',count>0);}
+  const list=document.getElementById('aBellList');
+  if(!list)return;
+  if(!count){list.innerHTML='<div class="ndrop-empty">Sem atividades novas 🎉</div>';return;}
+  list.innerHTML=items.map(n=>`<div class="ndrop-item unread" onclick="${n.action}">
+    <div class="ndrop-ic" style="background:${n.color}">${n.ic}</div>
+    <div class="ndrop-body">
+      <div class="ndrop-title">${n.title}</div>
+      <div class="ndrop-sub">${n.sub}<br/><span style="color:var(--muted);font-size:.7rem">${fdt(n.ts)}</span></div>
+    </div>
+  </div>`).join('');
+  const markAll=document.getElementById('aBellMarkAll');
+  if(markAll)markAll.onclick=()=>{
+    adminNotifsSeen=new Date().toISOString();
+    localStorage.setItem('admin_notifs_seen',adminNotifsSeen);
+    pollAdminNotifs();
+    document.getElementById('aBellDrop')?.classList.remove('open');
+    toast('✅ Notificações limpas.','s');
+  };
+}
+window.goAdm=function(panel){
+  document.getElementById('aBellDrop')?.classList.remove('open');
+  const navItem=document.querySelector(`.ani[data-adm="${panel}"]`);
+  if(navItem)navItem.click();
+};
+// Notify admin when forum reply is sent
+async function criarNotifAdmin(tipo,titulo,desc,extra){
+  // This just triggers a poll — the data is already in the DB
+  // Poll will pick it up via timestamp comparison
+  pollAdminNotifs();
+}
+// ── Auto-poll intervals ──
+setInterval(()=>{if(CU?.role!=='admin')pollStudentNotifs();},60000);
+setInterval(()=>{if(CU?.role==='admin')pollAdminNotifs();},90000);
+
 /* ── AUTO-RESTORE SESSION ── */
 window.addEventListener('load',async()=>{
   const saved=sessionStorage.getItem('esc_user');
@@ -939,6 +1101,8 @@ async function showStudent(){
   // Check if student has projeto turma
   await checkProjetoTurma();
   await checkAvalNav();
+  // Start notification polling
+  setTimeout(pollStudentNotifs,1500);
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
     const pg=item.dataset.pg;
     $$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
@@ -1273,16 +1437,54 @@ async function renderFL(){
     l.appendChild(card);
   }
 }
-function openNP(mid){
-  showModal('<div class="mtt">💬 Nova Dúvida</div><div class="fg" style="margin-bottom:12px"><label class="fl">Título</label><input id="npT" class="fi" placeholder="Ex: Dúvida sobre parâmetros"/></div><div class="fg" style="margin-bottom:14px"><label class="fl">Conteúdo</label><textarea id="npC" class="fi" rows="5" placeholder="Descreva sua dúvida..."></textarea></div><div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div><div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>');
-  document.getElementById('btnNPS').onclick=()=>subPost(mid||'');
+function openNP(mid,aulaid){
+  const modOpts=mods.map(m=>`<option value="${m.id}"${m.id===mid?' selected':''}>${m.icone} ${m.titulo}</option>`).join('');
+  showModal(
+    '<div class="mtt">💬 Nova Dúvida no Fórum</div>'+
+    '<div class="fgrid" style="margin-bottom:4px">'+
+      '<div class="fg"><label class="fl">Módulo <span style="color:var(--red)">*</span></label>'+
+        '<select id="npMod" class="fi"><option value="">— Selecione o módulo —</option>'+modOpts+'</select></div>'+
+      '<div class="fg"><label class="fl">Aula <span style="color:var(--muted);font-size:.75rem">(opcional)</span></label>'+
+        '<select id="npAula" class="fi" disabled><option value="">Selecione o módulo primeiro</option></select></div>'+
+    '</div>'+
+    '<div class="fg" style="margin-bottom:12px"><label class="fl">Título da dúvida <span style="color:var(--red)">*</span></label>'+
+      '<input id="npT" class="fi" placeholder="Ex: Como funciona o PROCV com múltiplos critérios?"/></div>'+
+    '<div class="fg" style="margin-bottom:14px"><label class="fl">Descreva sua dúvida <span style="color:var(--red)">*</span></label>'+
+      '<textarea id="npC" class="fi" rows="5" placeholder="Descreva com detalhes..."></textarea></div>'+
+    '<div style="padding:10px;border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);background:rgba(245,158,11,.05);margin-bottom:14px;font-size:.83rem;color:var(--amber)">⏳ Sua postagem será revisada antes de ser publicada.</div>'+
+    '<div style="display:flex;gap:9px"><button id="btnNPS" class="btn bp">📤 Enviar Dúvida</button><button class="btn bg2" onclick="closeModal()">Cancelar</button></div>'
+  );
+  const modEl=document.getElementById('npMod');
+  const aulaEl=document.getElementById('npAula');
+  modEl.addEventListener('change',async function(){
+    const modId=this.value;
+    if(!modId){aulaEl.innerHTML='<option value="">Selecione o módulo primeiro</option>';aulaEl.disabled=true;return;}
+    aulaEl.innerHTML='<option value="">Carregando aulas...</option>';aulaEl.disabled=true;
+    if(sb){
+      const{data:aulas}=await sb.from('aulas').select('id,titulo,icone,ordem').eq('modulo_id',modId).eq('ativo',true).order('ordem');
+      if(aulas?.length){
+        aulaEl.innerHTML='<option value="">Dúvida geral do módulo</option>'+aulas.map(a=>`<option value="${a.id}"${a.id===aulaid?' selected':''}>${a.icone||'🎬'} ${a.titulo}</option>`).join('');
+        aulaEl.disabled=false;
+      }else{aulaEl.innerHTML='<option value="">Sem aulas neste módulo</option>';aulaEl.disabled=true;}
+    }
+  });
+  if(mid)modEl.dispatchEvent(new Event('change'));
+  document.getElementById('btnNPS').onclick=async()=>{
+    const modId=modEl.value,aulaId=aulaEl.value;
+    if(!modId){toast('⚠️ Selecione um módulo.','w');return;}
+    subPost(modId,aulaId);
+  };
 }
 $('#bNP').addEventListener('click',()=>openNP(actMod||''));
 $('#bNPM').addEventListener('click',()=>openNP(actMod||''));
-async function subPost(mid){
+async function subPost(mid,aulaId){
   const t=$('#npT').value.trim(),c2=$('#npC').value.trim();
   if(!t||!c2){toast('Preencha tudo.','w');return;}
-  await sb.from('forum_posts').insert({modulo_id:mid||null,user_id:CU.id,titulo:t,conteudo:c2,aprovado:false,fixado:false});
+  if(!mid){toast('⚠️ Selecione um módulo.','w');return;}
+  const modName=mods.find(m=>m.id===mid)?.titulo||'';
+  await sb.from('forum_posts').insert({modulo_id:mid||null,aula_id:aulaId||null,user_id:CU.id,titulo:t,conteudo:c2,aprovado:false,fixado:false});
+  // Create notification for admin
+  await criarNotifAdmin('forum',`📩 Nova dúvida no fórum`,`${CU.nome} perguntou sobre "${modName}": ${t.substring(0,60)}${t.length>60?'...':''}`,{tipo:'forum',user:CU.nome});
   toast('✅ Enviado para aprovação!','s');closeModal();
   if($('#pg-forum').classList.contains('act'))renderFL();
   if($('#tab-fmod').classList.contains('act'))loadFMod();
@@ -1341,6 +1543,7 @@ window.enviarProjeto=async function(){
   if(!link||!desc){toast('Preencha o link e a descrição.','w');return;}
   if(!sb)return;
   await sb.from('projetos').upsert({user_id:CU.id,turma_id:CU.turma_id,link,descricao:desc,status:'enviado',enviado_em:new Date().toISOString()},{onConflict:'user_id,turma_id'});
+  await criarNotifAdmin('projeto','🎓 Projeto enviado',`${CU.nome} enviou o projeto final para revisão.`,{});
   toast('✅ Projeto enviado para revisão!','s');loadProjetoAluno();
 };
 window.emitirCertificado=async function(){
@@ -1470,6 +1673,8 @@ async function showAdmin(){
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();await checkResetRequests();
+  // Start admin notification polling
+  setTimeout(pollAdminNotifs,1500);
 }
 
 /* ── ADMIN DASHBOARD ── */
