@@ -2413,8 +2413,22 @@ async function loadAForum(){
       cardEl.querySelector('.adm-rep').onclick=async()=>{
         const ta=cardEl.querySelector('.adm-ta'),txt=ta.value.trim();
         if(!txt){toast('⚠️ Digite uma resposta.','w');return;}
-        await sb.from('forum_replies').insert({post_id:post.id,user_id:CU.id,conteudo:txt,aprovado:true,is_admin:true});
-        ta.value='';toast('✅ Publicado!','s');loadAForum();
+        const btn=cardEl.querySelector('.adm-rep');
+        btn.disabled=true;btn.textContent='Enviando...';
+        const{error}=await sb.from('forum_replies').insert({
+          post_id:post.id,
+          user_id:CU.id,
+          conteudo:txt,
+          aprovado:true,
+          is_admin:true
+        });
+        btn.disabled=false;btn.textContent='📤 Enviar';
+        if(error){
+          console.error('Erro ao salvar resposta do fórum:',error);
+          toast('❌ Erro ao salvar: '+error.message,'e');
+          return;
+        }
+        ta.value='';toast('✅ Resposta publicada!','s');loadAForum();
       };
     })(p,card,rps||[]);
     l.appendChild(card);
