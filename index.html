@@ -490,6 +490,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="forum">💬 Fórum</div>
       <div class="ani" data-adm="aval">⭐ Avaliações</div>
       <div class="ani" data-adm="proposta">📄 Gerar Proposta</div>
+      <div class="ani" data-adm="crm">🗂️ CRM</div>
     </nav>
     <div class="mcont">
 
@@ -830,6 +831,125 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 </div>
   </div>
 </div>
+
+
+      <!-- CRM -->
+      <div id="adm-crm" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">🗂️ CRM — Clientes & Contratos</div>
+        <div style="font-size:.88rem;color:var(--muted);margin-bottom:18px">Histórico completo: proposta → contrato → curso → certificado.</div>
+        <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+          <button class="btn bp btn-sm crmTab act" data-ct="historico">📋 Histórico</button>
+          <button class="btn bg2 btn-sm crmTab" data-ct="pipeline">🔄 Pipeline</button>
+          <button class="btn bg2 btn-sm crmTab" data-ct="contratos">📄 Contratos</button>
+          <button class="btn bg2 btn-sm crmTab" data-ct="pagamentos">💰 Pagamentos</button>
+          <button class="btn bg2 btn-sm crmTab" data-ct="novo">➕ Nova Proposta</button>
+        </div>
+        <!-- HISTÓRICO -->
+        <div id="crm-historico">
+          <div class="card cp" style="margin-bottom:14px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input id="crmSearch" class="fi" placeholder="🔍 Buscar cliente ou empresa..." style="max-width:260px"/>
+              <select id="crmFiltroStatus" class="fi" style="width:auto;min-width:160px">
+                <option value="">Todos os status</option>
+                <option value="enviada">📤 Enviada</option>
+                <option value="negociando">🔄 Negociando</option>
+                <option value="fechada">✅ Fechada</option>
+                <option value="perdida">❌ Perdida</option>
+              </select>
+              <button id="bCRMSearch" class="btn bp btn-sm">Filtrar</button>
+            </div>
+          </div>
+          <div id="crmHistList"></div>
+        </div>
+        <!-- PIPELINE -->
+        <div id="crm-pipeline" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div><div style="font-weight:800;color:var(--cyan);margin-bottom:10px;padding:8px 12px;background:rgba(0,200,255,.08);border-radius:var(--rs)">📤 Enviada <span id="cnt-enviada" class="badge bc" style="margin-left:4px">0</span></div><div id="col-enviada"></div></div>
+            <div><div style="font-weight:800;color:var(--amber);margin-bottom:10px;padding:8px 12px;background:rgba(245,158,11,.08);border-radius:var(--rs)">🔄 Negociando <span id="cnt-negociando" class="badge ba" style="margin-left:4px">0</span></div><div id="col-negociando"></div></div>
+            <div><div style="font-weight:800;color:var(--green);margin-bottom:10px;padding:8px 12px;background:rgba(15,186,129,.08);border-radius:var(--rs)">✅ Fechada <span id="cnt-fechada" class="badge bg3" style="margin-left:4px">0</span></div><div id="col-fechada"></div></div>
+            <div><div style="font-weight:800;color:var(--red);margin-bottom:10px;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:var(--rs)">❌ Perdida <span id="cnt-perdida" class="badge br" style="margin-left:4px">0</span></div><div id="col-perdida"></div></div>
+          </div>
+        </div>
+        <!-- CONTRATOS -->
+        <div id="crm-contratos" style="display:none">
+          <div class="card cp" style="margin-bottom:14px">
+            <div style="font-weight:800;color:var(--cyan);margin-bottom:12px">➕ Vincular Contrato</div>
+            <div class="fgrid">
+              <div class="fg"><label class="fl">Aluno</label><select id="ctAluno" class="fi"><option value="">Selecione...</option></select></div>
+              <div class="fg"><label class="fl">Proposta vinculada</label><select id="ctProposta" class="fi"><option value="">Nenhuma</option></select></div>
+              <div class="fg"><label class="fl">Link do contrato (Drive/PDF)</label><input id="ctLink" class="fi" placeholder="https://drive.google.com/..."/></div>
+              <div class="fg"><label class="fl">Valor contratado (R$)</label><input id="ctValor" class="fi" type="number" placeholder="497"/></div>
+              <div class="fg"><label class="fl">Data de assinatura</label><input id="ctData" class="fi" type="date"/></div>
+              <div class="fg"><label class="fl">Observações</label><input id="ctObs" class="fi" placeholder="Condições especiais..."/></div>
+            </div>
+            <button id="bSalvarContrato" class="btn bp" style="margin-top:12px">💾 Salvar Contrato</button>
+          </div>
+          <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:12px">📋 Contratos</div><div id="contratoList"></div></div>
+        </div>
+        <!-- PAGAMENTOS -->
+        <div id="crm-pagamentos" style="display:none">
+          <div class="card cp" style="margin-bottom:14px"><div id="pgResumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px"></div></div>
+          <div class="card cp" style="margin-bottom:14px">
+            <div style="font-weight:800;color:var(--cyan);margin-bottom:12px">➕ Registrar Pagamento</div>
+            <div class="fgrid">
+              <div class="fg"><label class="fl">Aluno</label><select id="pgAluno" class="fi"><option value="">Selecione...</option></select></div>
+              <div class="fg"><label class="fl">Valor (R$)</label><input id="pgValor" class="fi" type="number" placeholder="497"/></div>
+              <div class="fg"><label class="fl">Status</label>
+                <select id="pgStatus" class="fi">
+                  <option value="pago">✅ Pago integralmente</option>
+                  <option value="parcial">⚡ Pago parcialmente</option>
+                  <option value="pendente">⏳ Pendente</option>
+                  <option value="isento">🎁 Isento</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl">Forma de pagamento</label>
+                <select id="pgForma" class="fi">
+                  <option value="pix">PIX</option>
+                  <option value="cartao">Cartão de Crédito</option>
+                  <option value="boleto">Boleto</option>
+                  <option value="transferencia">Transferência</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl">Data do pagamento</label><input id="pgData" class="fi" type="date"/></div>
+              <div class="fg"><label class="fl">Observação</label><input id="pgObs" class="fi" placeholder="Parcela 1/3, desconto..."/></div>
+            </div>
+            <button id="bSalvarPagamento" class="btn bp" style="margin-top:12px">💾 Salvar</button>
+          </div>
+          <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:12px">💰 Histórico de Pagamentos</div><div id="pgList"></div></div>
+        </div>
+        <!-- NOVA PROPOSTA CRM -->
+        <div id="crm-novo" style="display:none">
+          <div class="card cp">
+            <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">➕ Registrar Nova Proposta</div>
+            <div class="fgrid">
+              <div class="fg"><label class="fl">Nome do cliente</label><input id="npNome" class="fi" placeholder="João da Silva"/></div>
+              <div class="fg"><label class="fl">Empresa</label><input id="npEmpresa" class="fi" placeholder="Empresa S.A."/></div>
+              <div class="fg"><label class="fl">E-mail</label><input id="npEmail" class="fi" type="email" placeholder="joao@empresa.com"/></div>
+              <div class="fg"><label class="fl">Telefone / WhatsApp</label><input id="npTel" class="fi" placeholder="(11) 9 9999-9999"/></div>
+              <div class="fg"><label class="fl">Curso de interesse</label>
+                <select id="npCurso" class="fi">
+                  <option value="excel">Mentoria em Excel</option>
+                  <option value="powerbi">Mentoria em Power BI</option>
+                  <option value="projetos">Mentoria em Projetos</option>
+                  <option value="combo">Combo Excel + Power BI</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl">Valor proposto (R$)</label><input id="npValor" class="fi" type="number" placeholder="497"/></div>
+              <div class="fg"><label class="fl">Status</label>
+                <select id="npStatus" class="fi">
+                  <option value="enviada">📤 Enviada</option>
+                  <option value="negociando">🔄 Negociando</option>
+                  <option value="fechada">✅ Fechada</option>
+                  <option value="perdida">❌ Perdida</option>
+                </select>
+              </div>
+              <div class="fg"><label class="fl">Link da proposta (Drive)</label><input id="npLink" class="fi" placeholder="https://drive.google.com/..."/></div>
+              <div class="fg full"><label class="fl">Observações</label><textarea id="npObs" class="fi" rows="2" placeholder="Contexto, próximos passos..."></textarea></div>
+            </div>
+            <button id="bSalvarProposta" class="btn bp" style="margin-top:12px">💾 Salvar Proposta</button>
+          </div>
+        </div>
+      </div>
 
 <div id="mBg" class="mbg hidden"><div id="mCont" class="modal"></div></div>
 
@@ -1714,7 +1834,7 @@ async function showAdmin(){
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
     const adm=i.dataset.adm;document.getElementById(`adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin,proposta:initProposta};
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();await checkResetRequests();
@@ -2224,6 +2344,296 @@ window.avaliarProj=async function(id,status){
   loadAProjetos();
 };
 
+/* ══════════════════════════════════════════
+   CRM — Clientes, Contratos & Pagamentos
+   ══════════════════════════════════════════ */
+let _crmInited=false;
+async function loadCRM(){
+  if(!_crmInited){
+    _crmInited=true;
+    // Tab switching
+    $$('.crmTab').forEach(btn=>btn.addEventListener('click',function(){
+      $$('.crmTab').forEach(x=>{x.classList.remove('act');x.classList.add('bg2');x.classList.remove('bp');});
+      this.classList.add('act','bp');this.classList.remove('bg2');
+      ['historico','pipeline','contratos','pagamentos','novo'].forEach(t=>document.getElementById('crm-'+t).style.display='none');
+      const tab=this.dataset.ct;
+      document.getElementById('crm-'+tab).style.display='';
+      if(tab==='historico')loadCRMHist();
+      if(tab==='pipeline')loadCRMPipeline();
+      if(tab==='contratos')loadCRMContratos();
+      if(tab==='pagamentos')loadCRMPagamentos();
+    }));
+    $('#bCRMSearch').addEventListener('click',loadCRMHist);
+    $('#crmSearch').addEventListener('keydown',e=>{if(e.key==='Enter')loadCRMHist();});
+    $('#bSalvarContrato').addEventListener('click',salvarContrato);
+    $('#bSalvarPagamento').addEventListener('click',salvarPagamento);
+    $('#bSalvarProposta').addEventListener('click',salvarPropostaCRM);
+  }
+  loadCRMHist();
+  loadSelectAlunos();
+}
+
+async function loadSelectAlunos(){
+  if(!sb)return;
+  const{data:al}=await sb.from('users').select('id,nome').eq('role','student').order('nome');
+  const opts='<option value="">Selecione...</option>'+(al||[]).map(a=>`<option value="${a.id}">${a.nome}</option>`).join('');
+  ['ctAluno','pgAluno'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  // proposta options for contrato
+  const{data:props}=await sb.from('crm_propostas').select('id,nome_cliente,curso').order('criado_em',{ascending:false});
+  const pOpts='<option value="">Nenhuma</option>'+(props||[]).map(p=>`<option value="${p.id}">${p.nome_cliente} — ${p.curso||''}</option>`).join('');
+  const ctP=document.getElementById('ctProposta');if(ctP)ctP.innerHTML=pOpts;
+}
+
+/* ── HISTÓRICO ── */
+async function loadCRMHist(){
+  const l=$('#crmHistList');if(!l)return;
+  l.innerHTML='<div style="color:var(--muted);padding:20px">Carregando...</div>';
+  const search=$('#crmSearch').value.trim().toLowerCase();
+  const statusF=$('#crmFiltroStatus').value;
+
+  const[{data:props},{data:contratos},{data:pags},{data:alunos}]=await Promise.all([
+    sb.from('crm_propostas').select('*').order('criado_em',{ascending:false}),
+    sb.from('crm_contratos').select('*,users(nome,email,turmas(nome))'),
+    sb.from('crm_pagamentos').select('*'),
+    sb.from('users').select('id,nome,email,turmas(nome),criado_em').eq('role','student').order('nome'),
+  ]);
+
+  // Build unified client list
+  const clientMap={};
+  (props||[]).forEach(p=>{
+    if(!clientMap[p.email||p.nome_cliente])clientMap[p.email||p.nome_cliente]={nome:p.nome_cliente,empresa:p.empresa||'',email:p.email||'',propostas:[],contratos:[],pagamentos:[],aluno:null};
+    clientMap[p.email||p.nome_cliente].propostas.push(p);
+  });
+  (contratos||[]).forEach(ct=>{
+    const key=ct.users?.email||ct.user_id;
+    if(!clientMap[key])clientMap[key]={nome:ct.users?.nome||'?',empresa:'',email:ct.users?.email||'',propostas:[],contratos:[],pagamentos:[],aluno:ct.users};
+    clientMap[key].contratos.push(ct);
+    clientMap[key].aluno=ct.users;
+  });
+  (pags||[]).forEach(pg=>{
+    const key=pg.user_id;
+    if(!clientMap[key])clientMap[key]={nome:'?',empresa:'',email:'',propostas:[],contratos:[],pagamentos:[],aluno:null};
+    clientMap[key].pagamentos.push(pg);
+  });
+  // Add students without proposals yet
+  (alunos||[]).forEach(a=>{
+    if(!clientMap[a.email||a.id]){
+      clientMap[a.email||a.id]={nome:a.nome,empresa:'',email:a.email||'',propostas:[],contratos:[],pagamentos:[],aluno:a};
+    }
+  });
+
+  let clients=Object.values(clientMap);
+  if(search)clients=clients.filter(cl=>cl.nome.toLowerCase().includes(search)||cl.empresa.toLowerCase().includes(search)||cl.email.toLowerCase().includes(search));
+  if(statusF)clients=clients.filter(cl=>cl.propostas.some(p=>p.status===statusF));
+
+  if(!clients.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum cliente encontrado.</div>';return;}
+
+  l.innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
+    clients.map(cl=>{
+      const lastProp=cl.propostas[0];
+      const hasCont=cl.contratos.length>0;
+      const pagTotal=cl.pagamentos.reduce((s,p)=>s+(p.valor||0),0);
+      const hasPago=cl.pagamentos.some(p=>p.status==='pago');
+      const turma=cl.aluno?.turmas?.nome||'';
+      const statusBadge=lastProp?{
+        enviada:`<span class="badge bc">📤 Enviada</span>`,
+        negociando:`<span class="badge ba">🔄 Negociando</span>`,
+        fechada:`<span class="badge bg3">✅ Fechada</span>`,
+        perdida:`<span class="badge br">❌ Perdida</span>`,
+      }[lastProp.status]||'':'';
+
+      // Timeline
+      const steps=[
+        {done:cl.propostas.length>0,label:'Proposta',icon:'📤'},
+        {done:hasCont,label:'Contrato',icon:'📄'},
+        {done:cl.aluno!=null,label:'Aluno',icon:'👤'},
+        {done:hasPago,label:'Pago',icon:'💰'},
+        {done:turma!='',label:'Turma',icon:'🏫'},
+      ];
+
+      return `<div style="border:1px solid var(--border);border-radius:var(--r);padding:16px;background:rgba(0,0,0,.18)">
+        <div style="display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <div>
+            <div style="font-weight:800;font-size:1rem">${cl.nome} ${cl.empresa?`<span style="font-size:.8rem;color:var(--muted);font-weight:400">· ${cl.empresa}</span>`:''}
+            </div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:2px">${cl.email||''}${turma?` &nbsp;·&nbsp; <span class="badge bc">${turma}</span>`:''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0">
+            ${statusBadge}
+            ${hasCont?'<span class="badge bg3">📄 Contrato</span>':''}
+            ${pagTotal>0?`<span class="badge ${hasPago?'bg3':'ba'}">💰 R$ ${pagTotal.toLocaleString('pt-BR')}</span>`:''}
+          </div>
+        </div>
+        <!-- Timeline -->
+        <div style="display:flex;gap:0;margin-bottom:12px">
+          ${steps.map((s,i)=>`
+            <div style="flex:1;text-align:center">
+              <div style="width:28px;height:28px;border-radius:50%;margin:0 auto 4px;display:grid;place-items:center;font-size:.9rem;
+                background:${s.done?'rgba(15,186,129,.2)':'rgba(255,255,255,.05)'};
+                border:2px solid ${s.done?'var(--green)':'rgba(255,255,255,.12)'}">${s.done?'✓':s.icon}</div>
+              <div style="font-size:.68rem;color:${s.done?'var(--green)':'var(--muted)'}">${s.label}</div>
+            </div>
+            ${i<steps.length-1?`<div style="flex:0 0 20px;height:2px;margin-top:13px;background:${steps[i+1].done?'var(--green)':'rgba(255,255,255,.1)'}"></div>`:''}
+          `).join('')}
+        </div>
+        <!-- Actions row -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${cl.propostas.length>0?`<button class="btn bg2 btn-xs" onclick="crmVerProp('${cl.propostas[0].id}')">📤 Ver proposta</button>`:''}
+          ${hasCont?`<button class="btn bg2 btn-xs" onclick="window.open('${cl.contratos[0].link_contrato}','_blank')">📄 Abrir contrato</button>`:''}
+          ${lastProp&&lastProp.status==='enviada'||lastProp?.status==='negociando'?`
+            <button class="btn bg3 btn-xs" onclick="crmUpdateStatus('${lastProp?.id}','fechada')">✅ Marcar fechada</button>
+            <button class="btn br btn-xs" onclick="crmUpdateStatus('${lastProp?.id}','perdida')">❌ Perdida</button>
+          `:''}
+          ${lastProp&&lastProp.status==='enviada'?`<button class="btn ba btn-xs" onclick="crmUpdateStatus('${lastProp?.id}','negociando')">🔄 Em negociação</button>`:''}
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+}
+
+/* ── PIPELINE ── */
+async function loadCRMPipeline(){
+  if(!sb)return;
+  const{data:props}=await sb.from('crm_propostas').select('*').order('criado_em',{ascending:false});
+  const cols={enviada:[],negociando:[],fechada:[],perdida:[]};
+  (props||[]).forEach(p=>{if(cols[p.status])cols[p.status].push(p);});
+  Object.entries(cols).forEach(([status,items])=>{
+    const el=document.getElementById('col-'+status);
+    const cnt=document.getElementById('cnt-'+status);
+    if(cnt)cnt.textContent=items.length;
+    if(!el)return;
+    el.innerHTML=items.length?items.map(p=>`
+      <div style="border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px;background:rgba(0,0,0,.2);cursor:pointer" onclick="crmVerProp('${p.id}')">
+        <div style="font-weight:700;font-size:.88rem;margin-bottom:3px">${p.nome_cliente}</div>
+        <div style="font-size:.78rem;color:var(--muted)">${p.empresa||''}</div>
+        <div style="font-size:.8rem;color:var(--cyan);margin-top:6px;font-weight:700">R$ ${(p.valor||0).toLocaleString('pt-BR')}</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:3px">${fdt(p.criado_em)}</div>
+        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+          ${status==='enviada'?`<button class="btn ba btn-xs" onclick="event.stopPropagation();crmUpdateStatus('${p.id}','negociando')">🔄</button><button class="btn bg3 btn-xs" onclick="event.stopPropagation();crmUpdateStatus('${p.id}','fechada')">✅</button><button class="btn br btn-xs" onclick="event.stopPropagation();crmUpdateStatus('${p.id}','perdida')">❌</button>`:''}
+          ${status==='negociando'?`<button class="btn bg3 btn-xs" onclick="event.stopPropagation();crmUpdateStatus('${p.id}','fechada')">✅ Fechar</button><button class="btn br btn-xs" onclick="event.stopPropagation();crmUpdateStatus('${p.id}','perdida')">❌</button>`:''}
+        </div>
+      </div>`).join(''):'<div style="font-size:.8rem;color:var(--muted);padding:10px;text-align:center">Nenhuma</div>';
+  });
+}
+
+window.crmVerProp=async function(id){
+  const{data:p}=await sb.from('crm_propostas').select('*').eq('id',id).single();
+  if(!p)return;
+  const statusColors={enviada:'var(--cyan)',negociando:'var(--amber)',fechada:'var(--green)',perdida:'var(--red)'};
+  showModal(`<div class="mtt">📤 Proposta — ${p.nome_cliente}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Empresa</span><strong>${p.empresa||'—'}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">E-mail</span><span>${p.email||'—'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Curso</span><strong>${p.curso||'—'}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Valor</span><strong style="color:var(--cyan)">R$ ${(p.valor||0).toLocaleString('pt-BR')}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Status</span><strong style="color:${statusColors[p.status]||'var(--text)'}">${p.status}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Data</span><span>${fdt(p.criado_em)}</span></div>
+      ${p.obs?`<div style="padding:10px;background:rgba(0,0,0,.2);border-radius:var(--rs);font-size:.85rem">${p.obs}</div>`:''}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${p.link_proposta?`<button class="btn bg2" onclick="window.open('${p.link_proposta}','_blank')">📎 Abrir arquivo</button>`:''}
+      <button class="btn bg3" onclick="crmUpdateStatus('${p.id}','fechada');closeModal()">✅ Marcar fechada</button>
+      <button class="btn ba" onclick="crmUpdateStatus('${p.id}','negociando');closeModal()">🔄 Negociando</button>
+      <button class="btn br" onclick="crmUpdateStatus('${p.id}','perdida');closeModal()">❌ Perdida</button>
+      <button class="btn bg2" onclick="closeModal()">Fechar</button>
+    </div>`);
+};
+window.crmUpdateStatus=async function(id,status){
+  await sb.from('crm_propostas').update({status,atualizado_em:new Date().toISOString()}).eq('id',id);
+  toast(`Status atualizado: ${status}`,'s');
+  loadCRMHist();loadCRMPipeline();
+};
+
+/* ── CONTRATOS ── */
+async function loadCRMContratos(){
+  loadSelectAlunos();
+  const l=$('#contratoList');if(!l)return;
+  const{data:cts}=await sb.from('crm_contratos').select('*,users(nome,turmas(nome))').order('data_assinatura',{ascending:false});
+  if(!cts?.length){l.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Nenhum contrato cadastrado.</div>';return;}
+  l.innerHTML='<div class="tw2"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Valor</th><th>Assinatura</th><th>Observação</th><th></th></tr></thead><tbody>'+
+    cts.map(ct=>`<tr>
+      <td><strong>${ct.users?.nome||'?'}</strong></td>
+      <td>${ct.users?.turmas?.nome||'—'}</td>
+      <td style="color:var(--cyan);font-weight:700">R$ ${(ct.valor||0).toLocaleString('pt-BR')}</td>
+      <td style="font-size:.82rem">${fd(ct.data_assinatura)||'—'}</td>
+      <td style="font-size:.82rem;color:var(--muted)">${ct.observacoes||'—'}</td>
+      <td>${ct.link_contrato?`<button class="btn bg2 btn-xs" onclick="window.open('${ct.link_contrato}','_blank')">📄 Abrir</button>`:'—'}</td>
+    </tr>`).join('')+'</tbody></table></div>';
+}
+async function salvarContrato(){
+  const uid=$('#ctAluno').value,link=$('#ctLink').value.trim(),val=parseFloat($('#ctValor').value)||0;
+  const pid=$('#ctProposta').value,data=$('#ctData').value,obs=$('#ctObs').value.trim();
+  if(!uid){toast('⚠️ Selecione um aluno.','w');return;}
+  const{error}=await sb.from('crm_contratos').insert({user_id:uid,proposta_id:pid||null,link_contrato:link,valor:val,data_assinatura:data||null,observacoes:obs,criado_em:new Date().toISOString()});
+  if(error){toast('❌ '+error.message,'e');return;}
+  toast('✅ Contrato salvo!','s');
+  ['ctAluno','ctLink','ctValor','ctData','ctObs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  $('#ctProposta').value='';
+  loadCRMContratos();
+}
+
+/* ── PAGAMENTOS ── */
+async function loadCRMPagamentos(){
+  loadSelectAlunos();
+  const{data:pags}=await sb.from('crm_pagamentos').select('*,users(nome)').order('data_pagamento',{ascending:false});
+  const all=pags||[];
+  const totalPago=all.filter(p=>p.status==='pago').reduce((s,p)=>s+(p.valor||0),0);
+  const totalPend=all.filter(p=>p.status==='pendente').reduce((s,p)=>s+(p.valor||0),0);
+  const totalParcial=all.filter(p=>p.status==='parcial').reduce((s,p)=>s+(p.valor||0),0);
+  $('#pgResumo').innerHTML=[
+    ['💰','Pago',`R$ ${totalPago.toLocaleString('pt-BR')}`,`${all.filter(p=>p.status==='pago').length} alunos`,'var(--green)'],
+    ['⚡','Parcial',`R$ ${totalParcial.toLocaleString('pt-BR')}`,`${all.filter(p=>p.status==='parcial').length} alunos`,'var(--amber)'],
+    ['⏳','Pendente',`R$ ${totalPend.toLocaleString('pt-BR')}`,`${all.filter(p=>p.status==='pendente').length} alunos`,'var(--red)'],
+    ['📊','Total arrecadado',`R$ ${(totalPago+totalParcial).toLocaleString('pt-BR')}`,`${all.length} registros`,'var(--cyan)'],
+  ].map(([ic,lb,val,sub,cl])=>`<div class="card cp" style="text-align:center;padding:12px">
+    <div style="font-size:.9rem">${ic}</div>
+    <div style="font-size:1.2rem;font-weight:900;color:${cl};margin:3px 0">${val}</div>
+    <div style="font-size:.72rem;color:var(--muted)">${lb}</div>
+    <div style="font-size:.7rem;color:var(--muted);margin-top:2px">${sub}</div>
+  </div>`).join('');
+  const l=$('#pgList');if(!l)return;
+  if(!all.length){l.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Nenhum pagamento registrado.</div>';return;}
+  const statusInfo={pago:['var(--green)','✅'],parcial:['var(--amber)','⚡'],pendente:['var(--red)','⏳'],isento:['var(--muted)','🎁']};
+  l.innerHTML='<div class="tw2"><table><thead><tr><th>Aluno</th><th>Valor</th><th>Status</th><th>Forma</th><th>Data</th><th>Obs.</th><th></th></tr></thead><tbody>'+
+    all.map(pg=>{const[cl,ic]=statusInfo[pg.status]||['var(--muted)','?'];return`<tr>
+      <td><strong>${pg.users?.nome||'?'}</strong></td>
+      <td style="font-weight:700;color:var(--cyan)">R$ ${(pg.valor||0).toLocaleString('pt-BR')}</td>
+      <td><span style="color:${cl}">${ic} ${pg.status}</span></td>
+      <td style="font-size:.82rem;color:var(--muted)">${pg.forma||'—'}</td>
+      <td style="font-size:.82rem">${fd(pg.data_pagamento)||'—'}</td>
+      <td style="font-size:.82rem;color:var(--muted);max-width:120px">${pg.observacao||'—'}</td>
+      <td><button class="btn br btn-xs" onclick="delPag('${pg.id}')">🗑️</button></td>
+    </tr>`;}).join('')+'</tbody></table></div>';
+}
+async function salvarPagamento(){
+  const uid=$('#pgAluno').value,val=parseFloat($('#pgValor').value)||0,st=$('#pgStatus').value;
+  const forma=$('#pgForma').value,data=$('#pgData').value,obs=$('#pgObs').value.trim();
+  if(!uid){toast('⚠️ Selecione um aluno.','w');return;}
+  const{error}=await sb.from('crm_pagamentos').insert({user_id:uid,valor:val,status:st,forma,data_pagamento:data||null,observacao:obs,criado_em:new Date().toISOString()});
+  if(error){toast('❌ '+error.message,'e');return;}
+  toast('✅ Pagamento salvo!','s');
+  ['pgValor','pgData','pgObs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  loadCRMPagamentos();
+}
+window.delPag=async function(id){if(!confirm('Remover?'))return;await sb.from('crm_pagamentos').delete().eq('id',id);toast('Removido.','i');loadCRMPagamentos();};
+
+/* ── NOVA PROPOSTA CRM ── */
+async function salvarPropostaCRM(){
+  const nome=$('#npNome').value.trim(),email=$('#npEmail').value.trim(),tel=$('#npTel').value.trim();
+  const empresa=$('#npEmpresa').value.trim(),curso=$('#npCurso').value,val=parseFloat($('#npValor').value)||0;
+  const status=$('#npStatus').value,link=$('#npLink').value.trim(),obs=$('#npObs').value.trim();
+  if(!nome){toast('⚠️ Informe o nome do cliente.','w');return;}
+  const{error}=await sb.from('crm_propostas').insert({nome_cliente:nome,email,tel,empresa,curso,valor:val,status,link_proposta:link,obs,criado_em:new Date().toISOString(),atualizado_em:new Date().toISOString()});
+  if(error){toast('❌ '+error.message,'e');return;}
+  toast('✅ Proposta salva!','s');
+  ['npNome','npEmpresa','npEmail','npTel','npValor','npLink','npObs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // Switch to historico tab
+  $$('.crmTab').forEach(x=>{x.classList.remove('act','bp');x.classList.add('bg2');});
+  document.querySelector('[data-ct="historico"]').classList.add('act','bp');
+  ['pipeline','contratos','pagamentos','novo'].forEach(t=>document.getElementById('crm-'+t).style.display='none');
+  document.getElementById('crm-historico').style.display='';
+  loadCRMHist();
+}
+
 /* ── GERADOR DE PROPOSTA (ADMIN) ── */
 let _propostaInited=false;
 function initProposta(){
@@ -2341,7 +2751,30 @@ ${cursos.map(c=>`
   </div>
 </div>`).join('')}
 
-<div class="section">02. RESUMO — INVESTIMENTO</div>
+<div class="section">02. METODOLOGIA</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px">
+  <div style="padding:18px 20px;border-radius:10px;border:1px solid #00c8ff;background:rgba(0,200,255,.06)">
+    <div style="font-size:1.6rem;font-weight:900;color:#00c8ff;margin-bottom:4px">10</div>
+    <div style="font-weight:700;font-size:.95rem;color:#1a2535;margin-bottom:6px">Aulas ao Vivo</div>
+    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">Encontros síncronos em turmas de até 5 alunos. Cada aula combina teoria aplicada e resolução de desafios práticos em tempo real com o mentor.</div>
+  </div>
+  <div style="padding:18px 20px;border-radius:10px;border:1px solid #7c5cfc;background:rgba(124,92,252,.06)">
+    <div style="font-size:1.6rem;font-weight:900;color:#7c5cfc;margin-bottom:4px">1</div>
+    <div style="font-weight:700;font-size:.95rem;color:#1a2535;margin-bottom:6px">Projeto Prático Final</div>
+    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">Ao final do curso, o aluno desenvolve e entrega um projeto real aplicado ao seu contexto profissional. A aprovação gera o certificado de conclusão automaticamente.</div>
+  </div>
+</div>
+<div style="padding:14px 18px;border-radius:8px;border:1px solid #0fba81;background:rgba(15,186,129,.06);margin-bottom:8px;display:flex;align-items:center;gap:14px">
+  <div style="font-size:2rem;flex-shrink:0">🏆</div>
+  <div><div style="font-weight:700;color:#0a1628;margin-bottom:3px">Certificado de Conclusão</div><div style="font-size:.87rem;color:#2c3e50;line-height:1.5">Emitido automaticamente após aprovação do projeto final. Comprova domínio técnico aplicado — não apenas participação.</div></div>
+</div>
+<div style="padding:12px 16px;border-radius:8px;background:#f0f8ff;border:1px solid #cce8ff;margin-bottom:8px">
+  <div style="font-size:.82rem;color:#2c3e50;line-height:1.7">
+    📅 <strong>Cronograma:</strong> 10 aulas semanais &nbsp;·&nbsp; ⏱️ <strong>Duração média por aula:</strong> 1h30 a 2h &nbsp;·&nbsp; 👥 <strong>Turmas:</strong> máx. 5 alunos &nbsp;·&nbsp; 🛠️ <strong>80% prático</strong>
+  </div>
+</div>
+
+<div class="section">03. RESUMO — INVESTIMENTO</div>
 <table class="price-table">
   <thead><tr><th>Programa</th><th>Investimento por Aluno</th></tr></thead>
   <tbody>
@@ -2349,7 +2782,7 @@ ${cursos.map(c=>`
   </tbody>
 </table>
 
-<div class="section">03. CONDIÇÕES DE PAGAMENTO</div>
+<div class="section">04. CONDIÇÕES DE PAGAMENTO</div>
 <div class="payment-grid">
   <div class="pay-card" style="border-left:3px solid #0fba81">
     <div class="pay-title">💚 PIX / À Vista</div>
@@ -2361,7 +2794,7 @@ ${cursos.map(c=>`
   </div>
 </div>
 
-<div class="section">04. NOSSOS DIFERENCIAIS</div>
+<div class="section">05. NOSSOS DIFERENCIAIS</div>
 <div class="diferencial-grid">
   <div class="dif"><div class="dif-title">🛠️ Aprenda Fazendo</div><div class="dif-text">80% do curso é hands-on com projetos reais do mercado. Zero teoria sem prática.</div></div>
   <div class="dif" style="border-left-color:#7c5cfc"><div class="dif-title">👥 Turmas Reduzidas</div><div class="dif-text">Máximo de 5 pessoas por turma — acompanhamento próximo e personalizado.</div></div>
@@ -2371,7 +2804,7 @@ ${cursos.map(c=>`
 
 ${obs?`<div class="obs-box"><strong>⚠️ Observações:</strong> ${obs}</div>`:''}
 
-<div class="section">05. PRÓXIMOS PASSOS</div>
+<div class="section">06. PRÓXIMOS PASSOS</div>
 <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Análise da proposta</strong> — Leia com atenção e nos envie suas dúvidas por e-mail ou WhatsApp.</div></div>
 <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Confirmação e contrato</strong> — Após alinhamento, enviamos o contrato de serviços para assinatura.</div></div>
 <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Pagamento</strong> — Realize o pagamento via PIX ou cartão e receba a confirmação em até 24h.</div></div>
