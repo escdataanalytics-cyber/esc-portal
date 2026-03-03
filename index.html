@@ -15,6 +15,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 :root{
+  color-scheme:dark;
   --black:#080b10;--dark:#0f1318;--surface:#161c24;--surface2:#1e2630;
   --border:rgba(0,200,255,.14);--border-hi:rgba(0,200,255,.38);
   --cyan:#00c8ff;--purple:#7c5cfc;--green:#0fba81;--amber:#f59e0b;--red:#ef4444;
@@ -22,6 +23,7 @@ html,body{height:100%}
   --fd:'Orbitron',monospace;--fb:'Rajdhani',system-ui;--fm:'JetBrains Mono',monospace;
   --r:12px;--rs:8px;
 }
+:root{color-scheme:dark}
 body{font-family:var(--fb);color:var(--text);background:var(--black);min-height:100vh;
   background-image:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(0,200,255,.06),transparent 60%),
   radial-gradient(ellipse 60% 40% at 90% 10%,rgba(124,92,252,.06),transparent 50%);}
@@ -53,10 +55,13 @@ body{font-family:var(--fb);color:var(--text);background:var(--black);min-height:
 .fi{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 13px;color:var(--text);font-family:var(--fb);font-size:.95rem;outline:none;transition:border .22s;width:100%}
 .fi:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,255,.1)}
 .fi::placeholder{color:var(--muted)}
-select.fi{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c8ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+select.fi{cursor:pointer;appearance:none;-webkit-appearance:none;background:#0d1117 !important;background-color:#0d1117 !important;color:#ddeeff !important;border-color:var(--border);color-scheme:dark;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c8ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+select.fi:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,255,.1)}
 textarea.fi{resize:vertical}
-select.fi option{background:#0f1318;color:#ddeeff;padding:8px}
-select.fi option:hover,select.fi option:checked{background:#1a2535;color:#00c8ff}
+select.fi option,select.fi optgroup{background-color:#0d1117 !important;color:#ddeeff !important;padding:8px 12px}
+select.fi optgroup{color:#00c8ff !important;font-weight:700;font-size:.85rem}
+select.fi option:hover{background-color:#1a2535 !important;color:#00c8ff !important}
+select.fi option:checked{background-color:#162030 !important;color:#00c8ff !important}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fgrid .full{grid-column:1/-1}
 .ferr{font-size:.82rem;color:var(--red);font-weight:700}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:999px;font-size:.74rem;font-weight:700}
@@ -484,6 +489,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="mural">📋 Mural</div>
       <div class="ani" data-adm="forum">💬 Fórum</div>
       <div class="ani" data-adm="aval">⭐ Avaliações</div>
+      <div class="ani" data-adm="proposta">📄 Gerar Proposta</div>
     </nav>
     <div class="mcont">
 
@@ -782,7 +788,46 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
 
-    </div>
+      <!-- GERADOR DE PROPOSTA -->
+      <div id="adm-proposta" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📄 Gerador de Proposta Comercial</div>
+        <div style="font-size:.88rem;color:var(--muted);margin-bottom:22px">Preencha os dados do cliente e selecione os cursos para gerar uma proposta personalizada em HTML pronta para imprimir como PDF.</div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">👤 Dados do Cliente</div>
+          <div class="fgrid">
+            <div class="fg"><label class="fl">Nome do Cliente</label><input id="prNome" class="fi" placeholder="João da Silva"/></div>
+            <div class="fg"><label class="fl">Empresa</label><input id="prEmpresa" class="fi" placeholder="Empresa S.A."/></div>
+            <div class="fg"><label class="fl">Cargo</label><input id="prCargo" class="fi" placeholder="Analista de Produção"/></div>
+            <div class="fg"><label class="fl">E-mail</label><input id="prEmail" class="fi" type="email" placeholder="joao@empresa.com"/></div>
+            <div class="fg"><label class="fl">Telefone / WhatsApp</label><input id="prTel" class="fi" placeholder="(11) 9 9999-9999"/></div>
+            <div class="fg"><label class="fl">Cidade / Data</label><input id="prCidade" class="fi" placeholder="São Paulo, março de 2026"/></div>
+          </div>
+        </div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">📚 Cursos da Proposta</div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="prCursos">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,200,255,.04)">
+              <input type="checkbox" name="prCurso" value="excel" data-price="497" style="accent-color:var(--cyan);width:18px;height:18px" checked/>
+              <div><div style="font-weight:700">Mentoria em Excel — Método dos Dados ao Dashboard</div><div style="font-size:.8rem;color:var(--muted)">R$ 497,00 por aluno</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(124,92,252,.04)">
+              <input type="checkbox" name="prCurso" value="powerbi" data-price="597" style="accent-color:var(--purple);width:18px;height:18px"/>
+              <div><div style="font-weight:700">Mentoria em Power BI — Método dos Dados ao Dashboard</div><div style="font-size:.8rem;color:var(--muted)">R$ 597,00 por aluno</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(15,186,129,.04)">
+              <input type="checkbox" name="prCurso" value="projetos" data-price="597" style="accent-color:var(--green);width:18px;height:18px"/>
+              <div><div style="font-weight:700">Mentoria em Projetos de Análise de Dados</div><div style="font-size:.8rem;color:var(--muted)">A partir de R$ 597,00 — valor conforme escopo</div></div>
+            </label>
+          </div>
+        </div>
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">💬 Observações (opcional)</div>
+          <textarea id="prObs" class="fi" rows="3" placeholder="Condições especiais, contexto do cliente, desconto negociado..."></textarea>
+        </div>
+        <button id="bGerarProposta" class="btn bp" style="width:100%;padding:14px;font-size:1rem">📄 Gerar Proposta Personalizada</button>
+      </div>
+
+</div>
   </div>
 </div>
 
@@ -1669,7 +1714,7 @@ async function showAdmin(){
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
     const adm=i.dataset.adm;document.getElementById(`adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin};
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin,proposta:initProposta};
     if(fns[adm])fns[adm]();
   }));
   await loadADash();await loadPend();await checkResetRequests();
@@ -1890,8 +1935,16 @@ async function loadTurmaSelects(){
 /* ── ADMIN MÓDULOS ── */
 async function loadAMods(){
   if(!sb)return;await loadTurmaSelects();
-  const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('ordem');
-  $('#aMT2').innerHTML=(mds||[]).map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type||'—'}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
+  const{data:mds}=await sb.from('modules').select('*,turmas(nome)').order('turma_id').order('ordem');
+  // Group by turma for clarity
+  const byTurma={};
+  (mds||[]).forEach(m=>{const tn=m.turmas?.nome||'Sem turma';if(!byTurma[tn])byTurma[tn]=[];byTurma[tn].push(m);});
+  let rows='';
+  Object.entries(byTurma).forEach(([tnome,modList])=>{
+    rows+=`<tr><td colspan="6" style="background:rgba(0,200,255,.06);padding:6px 10px;font-size:.75rem;font-weight:800;color:var(--cyan);letter-spacing:.06em">${tnome.toUpperCase()}</td></tr>`;
+    rows+=modList.map(m=>`<tr><td>${m.ordem}</td><td><strong>${m.icone} ${m.titulo}</strong></td><td><span class="badge bc">${m.turmas?.nome||'—'}</span></td><td><span class="badge bpp">${m.video_type||'—'}</span></td><td>${Math.round((m.duracao_seg||0)/60)}min</td><td style="display:flex;gap:5px"><button class="btn bg2 btn-xs" onclick="editM('${m.id}')">✏️</button><button class="btn bp btn-xs" onclick="clonarModulo('${m.id}')" title="Clonar para outra turma">📋</button><button class="btn bd btn-xs" onclick="delM('${m.id}')">🗑️</button></td></tr>`).join('');
+  });
+  $('#aMT2').innerHTML=rows;
 }
 $('#bSM').addEventListener('click',async()=>{
   const tt=$('#mTit').value.trim(),ic=$('#mIco').value.trim()||'📖',tu=$('#mTur').value,vt=$('#mVT').value,vu=$('#mVU').value.trim(),dur=(parseInt($('#mDur').value)||0)*60,ord=parseInt($('#mOrd').value)||1,top=$('#mTop').value.trim(),eid=$('#mEId').value;
@@ -1909,6 +1962,127 @@ window.editM=async function(id){
   toast('📝 Editando: '+m.titulo,'i');
 };
 window.delM=async function(id){if(!confirm('Excluir módulo e aulas?'))return;await sb.from('aulas').delete().eq('modulo_id',id);await sb.from('modules').delete().eq('id',id);toast('🗑️ Excluído.','i');loadAMods();};
+
+/* ── CLONAR MÓDULO ── */
+window.clonarModulo=async function(modId){
+  // Load module + its aulas + materials
+  const[{data:mod},{data:aulas},{data:mats},{data:turmas}]=await Promise.all([
+    sb.from('modules').select('*,turmas(nome)').eq('id',modId).single(),
+    sb.from('aulas').select('*').eq('modulo_id',modId).order('ordem'),
+    sb.from('materials').select('*').eq('modulo_id',modId),
+    sb.from('turmas').select('*').eq('ativa',true).order('nome')
+  ]);
+  if(!mod){toast('Módulo não encontrado.','e');return;}
+
+  const turmaOpts=(turmas||[])
+    .filter(t=>t.id!==mod.turma_id) // exclude origin turma
+    .map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+
+  if(!turmaOpts){
+    toast('Não há outras turmas ativas para clonar.','w');return;
+  }
+
+  const aulasRows=(aulas||[]).map((a,i)=>`
+    <div style="border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px;background:rgba(0,0,0,.18)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:1.1rem">${a.icone||'🎬'}</span>
+        <div style="flex:1"><div style="font-weight:700;font-size:.9rem">${a.ordem}. ${a.titulo}</div>
+        <div style="font-size:.75rem;color:var(--muted)">⏱️ ${Math.round((a.duracao_seg||0)/60)}min · ${a.video_type}</div></div>
+      </div>
+      <label class="fl" style="font-size:.78rem;margin-bottom:4px">🔗 Link do vídeo para nova turma</label>
+      <input class="fi clone-url" data-aula-id="${a.id}" data-ordem="${a.ordem}"
+        style="font-size:.82rem" 
+        placeholder="Deixe em branco para manter o mesmo link"
+        value=""/>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:3px">
+        Atual: <span style="color:rgba(255,255,255,.35)">${a.video_url||'(sem link)'}</span>
+      </div>
+    </div>`).join('');
+
+  const matsCount=(mats||[]).length;
+
+  showModal(`
+    <div class="mtt">📋 Clonar Módulo para Outra Turma</div>
+    <div style="padding:10px 12px;border:1px solid rgba(0,200,255,.2);border-radius:var(--rs);background:rgba(0,200,255,.05);margin-bottom:16px">
+      <div style="font-weight:800;margin-bottom:2px">${mod.icone} ${mod.titulo}</div>
+      <div style="font-size:.82rem;color:var(--muted)">Origem: ${mod.turmas?.nome||'?'} · ${(aulas||[]).length} aula(s) · ${matsCount} material(is)</div>
+    </div>
+    <div class="fg" style="margin-bottom:16px">
+      <label class="fl">Turma destino <span style="color:var(--red)">*</span></label>
+      <select id="cloneTurma" class="fi"><option value="">— Selecione a turma —</option>${turmaOpts}</select>
+    </div>
+    <div class="fg" style="margin-bottom:4px">
+      <label class="fl">Ordem do módulo na nova turma</label>
+      <input id="cloneOrdem" class="fi" type="number" value="${mod.ordem}" min="1" style="max-width:100px"/>
+    </div>
+    ${(aulas||[]).length>0?`
+    <div style="font-weight:800;color:var(--cyan);margin:14px 0 10px;font-size:.88rem">
+      🎬 Atualizar links das aulas <span style="font-weight:400;color:var(--muted)">(opcional — deixe em branco para copiar o mesmo)</span>
+    </div>
+    <div style="max-height:340px;overflow-y:auto;padding-right:4px">${aulasRows}</div>`:''}
+    ${matsCount>0?`
+    <div style="display:flex;align-items:center;gap:9px;margin-top:14px;padding:10px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,0,0,.18)">
+      <input type="checkbox" id="cloneMats" checked style="accent-color:var(--cyan);width:16px;height:16px"/>
+      <label for="cloneMats" style="font-size:.87rem;cursor:pointer">Copiar também os ${matsCount} material(is) do módulo</label>
+    </div>`:''}
+    <div id="cloneErr" style="min-height:18px;font-size:.84rem;color:var(--amber);margin-top:10px"></div>
+    <div style="display:flex;gap:9px;margin-top:14px">
+      <button id="btnClone" class="btn bp">📋 Clonar Módulo</button>
+      <button class="btn bg2" onclick="closeModal()">Cancelar</button>
+    </div>
+  `);
+
+  document.getElementById('btnClone').onclick=async()=>{
+    const turmaDestId=document.getElementById('cloneTurma').value;
+    const novaOrdem=parseInt(document.getElementById('cloneOrdem').value)||mod.ordem;
+    const copyMats=document.getElementById('cloneMats')?.checked??true;
+    const errEl=document.getElementById('cloneErr');
+    if(!turmaDestId){errEl.textContent='⚠️ Selecione a turma destino.';return;}
+    const btn=document.getElementById('btnClone');
+    btn.disabled=true;btn.textContent='Clonando...';
+    try{
+      // 1. Insert new module
+      const{data:newMod,error:modErr}=await sb.from('modules').insert({
+        titulo:mod.titulo,icone:mod.icone,turma_id:turmaDestId,
+        video_type:mod.video_type,video_url:mod.video_url,
+        duracao_seg:mod.duracao_seg,topicos:mod.topicos,
+        ordem:novaOrdem,ativo:true
+      }).select().single();
+      if(modErr)throw modErr;
+
+      // 2. Clone aulas with optional URL override
+      const urlInputs=document.querySelectorAll('.clone-url');
+      for(const inp of urlInputs){
+        const aulaId=inp.dataset.aulaId;
+        const orig=(aulas||[]).find(a=>a.id===aulaId);
+        if(!orig)continue;
+        const newUrl=inp.value.trim()||orig.video_url;
+        await sb.from('aulas').insert({
+          modulo_id:newMod.id,titulo:orig.titulo,icone:orig.icone,
+          video_type:orig.video_type,video_url:newUrl,
+          duracao_seg:orig.duracao_seg,topicos:orig.topicos,
+          ordem:orig.ordem,ativo:true
+        });
+      }
+
+      // 3. Clone materials if checked
+      if(copyMats&&matsCount>0){
+        for(const mat of(mats||[])){
+          await sb.from('materials').insert({
+            nome:mat.nome,tipo:mat.tipo,url:mat.url,
+            descricao:mat.descricao,modulo_id:newMod.id
+          });
+        }
+      }
+
+      toast(`✅ Módulo "${mod.titulo}" clonado com sucesso!`,'s');
+      closeModal();loadAMods();loadAAulas();
+    }catch(err){
+      errEl.textContent='❌ Erro: '+(err.message||'Tente novamente.');
+      btn.disabled=false;btn.textContent='📋 Clonar Módulo';
+    }
+  };
+};
 
 /* ── ADMIN AULAS ── */
 async function loadAAulas(){
@@ -2050,7 +2224,174 @@ window.avaliarProj=async function(id,status){
   loadAProjetos();
 };
 
-/* ── AVALIAÇÃO DO CURSO (STUDENT) ── */
+/* ── GERADOR DE PROPOSTA (ADMIN) ── */
+let _propostaInited=false;
+function initProposta(){
+  if(_propostaInited)return;_propostaInited=true;
+  document.getElementById('bGerarProposta').addEventListener('click',gerarPropostaHTML);
+}
+function gerarPropostaHTML(){
+  const nome=$('#prNome').value.trim()||'[Nome do Cliente]';
+  const empresa=$('#prEmpresa').value.trim()||'[Empresa]';
+  const cargo=$('#prCargo').value.trim()||'[Cargo]';
+  const email=$('#prEmail').value.trim()||'[E-mail]';
+  const tel=$('#prTel').value.trim()||'[Telefone]';
+  const cidade=$('#prCidade').value.trim()||'[Cidade], [Data]';
+  const obs=$('#prObs').value.trim();
+
+  const cursosMap={
+    excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',price:'R$ 497,00',priceNum:497,color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos.'},
+    powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',price:'R$ 597,00',priceNum:597,color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica.'},
+    projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',price:'A partir de R$ 597,00',priceNum:597,color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo.'},
+  };
+
+  const selecionados=[...document.querySelectorAll('[name="prCurso"]:checked')].map(el=>el.value);
+  if(!selecionados.length){toast('⚠️ Selecione ao menos um curso.','w');return;}
+  const cursos=selecionados.map(v=>cursosMap[v]);
+
+  const inclusions=['Aulas ao vivo em turmas de até 5 pessoas','Projetos reais do mercado (80% hands-on)','Suporte direto com o mentor via comunidade exclusiva','Acesso à plataforma de ensino com materiais atualizados','Fórum exclusivo para dúvidas e networking','Certificado de conclusão ao final do curso'];
+
+  const w=window.open('','_blank','width=1100,height=800');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"/>
+<title>Proposta ESC — ${nome}</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Rajdhani',system-ui;background:#f8f9ff;color:#1a2535;padding:0}
+.page{max-width:900px;margin:0 auto;background:#fff;padding:48px 56px;box-shadow:0 4px 40px rgba(0,0,0,.12)}
+h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:1rem;color:#6b8fa8;font-style:italic;margin-bottom:0}
+.cover-top{background:linear-gradient(135deg,#0a1628,#0f1a2e);padding:40px 56px;margin:-48px -56px 40px;color:#fff}
+.cover-meta{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.meta-block{padding:16px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
+.meta-label{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,200,255,.7);margin-bottom:4px}
+.meta-value{font-size:1rem;font-weight:700;color:#fff}
+.section{margin:36px 0 16px;padding-bottom:8px;border-bottom:2px solid #00c8ff;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#00c8ff;letter-spacing:.04em}
+.course-card{border:1px solid;border-radius:10px;padding:22px 24px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.course-name{font-size:1.15rem;font-weight:700;margin-bottom:2px}
+.course-sub{font-size:.88rem;color:#6b8fa8;font-style:italic;margin-bottom:10px}
+.course-desc{font-size:.9rem;color:#2c3e50;line-height:1.6;margin-bottom:12px}
+.inc-item{font-size:.88rem;color:#2c3e50;padding:3px 0;display:flex;align-items:flex-start;gap:7px}
+.inc-item::before{content:'✔';font-weight:700;flex-shrink:0}
+.price-tag{text-align:center;padding:14px 18px;border-radius:8px;background:rgba(0,0,0,.04);min-width:150px}
+.price-main{font-size:1.5rem;font-weight:900;margin-bottom:4px}
+.price-label{font-size:.78rem;color:#6b8fa8}
+.price-table{width:100%;border-collapse:collapse;margin-top:8px}
+.price-table th{background:#0a1628;color:#fff;padding:10px 14px;text-align:left;font-size:.88rem}
+.price-table td{padding:10px 14px;border-bottom:1px solid #e8eef4;font-size:.9rem}
+.price-table tr:last-child td{border-bottom:none}
+.price-table tr:nth-child(even) td{background:#f5f8ff}
+.diferencial-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dif{padding:14px 16px;border-radius:8px;border-left:3px solid #00c8ff;background:#f0f8ff}
+.dif-title{font-weight:700;color:#0a1628;margin-bottom:3px;font-size:.92rem}
+.dif-text{font-size:.85rem;color:#2c3e50;line-height:1.5}
+.payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.pay-card{padding:16px;border-radius:8px;border:1px solid #e0e8f0;background:#f8faff}
+.pay-title{font-weight:700;color:#0a1628;margin-bottom:5px;font-size:.92rem}
+.pay-text{font-size:.85rem;color:#2c3e50}
+.obs-box{padding:16px;border-radius:8px;border:1px solid #f0c040;background:#fffbeb;margin-top:16px;font-size:.9rem;color:#5c4000}
+.steps{counter-reset:step}
+.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
+.step-num{width:32px;height:32px;border-radius:50%;background:#00c8ff;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+.step-text{font-size:.92rem;color:#2c3e50;padding-top:6px;line-height:1.5}
+.footer-bar{background:#0a1628;color:#9ab8cc;text-align:center;padding:18px 56px;margin:40px -56px -48px;font-size:.83rem}
+.footer-bar strong{color:#00c8ff}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.78rem;font-weight:700;background:rgba(0,200,255,.12);color:#00c8ff;border:1px solid rgba(0,200,255,.3)}
+.validity{font-size:.82rem;color:#6b8fa8;text-align:right;margin-top:10px;font-style:italic}
+@media print{
+  body{background:#fff}
+  .page{box-shadow:none;padding:32px 40px}
+  .cover-top{margin:-32px -40px 32px;padding:32px 40px}
+  .footer-bar{margin:32px -40px -32px}
+  .no-print{display:none}
+}
+</style></head><body>
+<div class="page">
+
+<div class="cover-top">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#00c8ff,#7c5cfc);border-radius:10px;display:grid;place-items:center;font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;flex-shrink:0">E</div>
+    <div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:#00c8ff">ESC Data & Analytics</div>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.5)">Mentorias Técnicas em Excel e Power BI</div>
+    </div>
+  </div>
+  <h1>PROPOSTA COMERCIAL</h1>
+  <div class="sub">Mentoria Especializada em Análise de Dados</div>
+  <div class="cover-meta">
+    <div class="meta-block"><div class="meta-label">Para</div><div class="meta-value">${nome}</div>${empresa?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${cargo} · ${empresa}</div>`:''}</div>
+    <div class="meta-block"><div class="meta-label">Contato</div><div class="meta-value" style="font-size:.9rem">${email}</div>${tel?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${tel}</div>`:''}</div>
+    <div class="meta-block"><div class="meta-label">Emitida por</div><div class="meta-value" style="font-size:.9rem">ESC Data & Analytics</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">contato@escdata.com.br</div></div>
+    <div class="meta-block"><div class="meta-label">Data / Validade</div><div class="meta-value" style="font-size:.9rem">${cidade}</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">Válida por 15 dias</div></div>
+  </div>
+</div>
+
+<div class="section">01. PROGRAMAS SELECIONADOS</div>
+${cursos.map(c=>`
+<div class="course-card" style="border-color:${c.color};background:${c.bg}">
+  <div>
+    <div class="course-name" style="color:${c.color}">${c.label}</div>
+    <div class="course-sub">${c.sub}</div>
+    <div class="course-desc">${c.desc}</div>
+    ${inclusions.map(inc=>`<div class="inc-item" style="--c:${c.color}">${inc}</div>`).join('')}
+  </div>
+  <div class="price-tag" style="border:1px solid ${c.color}">
+    <div class="price-main" style="color:${c.color}">${c.price}</div>
+    <div class="price-label">por aluno</div>
+  </div>
+</div>`).join('')}
+
+<div class="section">02. RESUMO — INVESTIMENTO</div>
+<table class="price-table">
+  <thead><tr><th>Programa</th><th>Investimento por Aluno</th></tr></thead>
+  <tbody>
+    ${cursos.map(c=>`<tr><td>${c.label}<br/><span style="font-size:.82rem;color:#6b8fa8;font-style:italic">${c.sub}</span></td><td style="font-weight:700;color:${c.color}">${c.price}</td></tr>`).join('')}
+  </tbody>
+</table>
+
+<div class="section">03. CONDIÇÕES DE PAGAMENTO</div>
+<div class="payment-grid">
+  <div class="pay-card" style="border-left:3px solid #0fba81">
+    <div class="pay-title">💚 PIX / À Vista</div>
+    <div class="pay-text">Melhor condição disponível. Entre em contato para verificar desconto especial aplicável na contratação à vista.</div>
+  </div>
+  <div class="pay-card" style="border-left:3px solid #7c5cfc">
+    <div class="pay-title">💳 Cartão de Crédito Parcelado</div>
+    <div class="pay-text">Parcelamento disponível conforme opções da operadora. Consulte as condições no momento da contratação.</div>
+  </div>
+</div>
+
+<div class="section">04. NOSSOS DIFERENCIAIS</div>
+<div class="diferencial-grid">
+  <div class="dif"><div class="dif-title">🛠️ Aprenda Fazendo</div><div class="dif-text">80% do curso é hands-on com projetos reais do mercado. Zero teoria sem prática.</div></div>
+  <div class="dif" style="border-left-color:#7c5cfc"><div class="dif-title">👥 Turmas Reduzidas</div><div class="dif-text">Máximo de 5 pessoas por turma — acompanhamento próximo e personalizado.</div></div>
+  <div class="dif" style="border-left-color:#0fba81"><div class="dif-title">🔗 Suporte Direto com o Mentor</div><div class="dif-text">Acesso contínuo ao conteúdo, comunidade exclusiva e suporte técnico direto.</div></div>
+  <div class="dif" style="border-left-color:#f59e0b"><div class="dif-title">💻 Plataforma Própria</div><div class="dif-text">Plataforma exclusiva com fórum, materiais atualizados e acompanhamento de progresso.</div></div>
+</div>
+
+${obs?`<div class="obs-box"><strong>⚠️ Observações:</strong> ${obs}</div>`:''}
+
+<div class="section">05. PRÓXIMOS PASSOS</div>
+<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Análise da proposta</strong> — Leia com atenção e nos envie suas dúvidas por e-mail ou WhatsApp.</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Confirmação e contrato</strong> — Após alinhamento, enviamos o contrato de serviços para assinatura.</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text"><strong>Pagamento</strong> — Realize o pagamento via PIX ou cartão e receba a confirmação em até 24h.</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-text"><strong>Início das aulas</strong> — Acesso liberado à plataforma e início na data acordada com a turma.</div></div>
+
+<div class="validity">Proposta válida por 15 dias · ${cidade}</div>
+
+<div class="footer-bar">
+  <strong>ESC Data & Analytics</strong> · contato@escdata.com.br · escdata.com.br<br/>
+  <span style="font-size:.78rem">Dos dados ao Dashboard — transformando profissionais em analistas de alta performance</span>
+</div>
+</div>
+
+<div class="no-print" style="text-align:center;padding:20px;background:#f0f4ff">
+  <button onclick="window.print()" style="padding:12px 32px;background:linear-gradient(135deg,#00c8ff,#7c5cfc);border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Rajdhani',system-ui">🖨️ Salvar como PDF</button>
+  <div style="font-size:.82rem;color:#6b8fa8;margin-top:8px">Imprimir → Salvar como PDF</div>
+</div>
+</body></html>`);
+  w.document.close();
+}
 async function loadAvalAluno(){
   const c2=$('#avalContent');
   if(!sb||!CU){c2.innerHTML='<div style="color:var(--muted)">Indisponível.</div>';return;}
@@ -2214,14 +2555,19 @@ window.editarAvaliacao=async function(){
 };
 
 /* ── AVALIAÇÕES (ADMIN) ── */
+let _avalAdminInited=false;
 async function loadAvalAdmin(){
   if(!sb)return;
+  if(!_avalAdminInited){
+    _avalAdminInited=true;
+    $('#bLoadAval').addEventListener('click',runAvalAdmin);
+    $('#bExportAval').addEventListener('click',exportAvalCSV);
+  }
   const{data:turmas}=await sb.from('turmas').select('*').eq('ativa',true);
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
   $('#avalFiltroTurma').innerHTML='<option value="">Todas as turmas</option>'+opts;
   await runAvalAdmin();
 }
-$('#bLoadAval').addEventListener('click',runAvalAdmin);
 async function runAvalAdmin(){
   const filtroT=$('#avalFiltroTurma').value,filtroN=$('#avalFiltroNota').value;
   let q=sb.from('avaliacoes').select('*,turmas(nome)').order('criado_em',{ascending:false});
@@ -2306,7 +2652,7 @@ async function runAvalAdmin(){
     </div>`
   ).join('')+'</div>';
 }
-$('#bExportAval').addEventListener('click',()=>{
+function exportAvalCSV(){
   const rows=document.querySelectorAll('#avalList [style]');
   // Simple CSV export from data
   if(!sb)return;
@@ -2328,7 +2674,7 @@ $('#bExportAval').addEventListener('click',()=>{
     const a2=document.createElement('a');a2.href=url;a2.download=`avaliacoes_${new Date().toISOString().substring(0,10)}.csv`;a2.click();
     toast('📥 CSV exportado!','s');
   });
-});
+}
 
 /* Show avaliação nav when course nearing completion */
 async function checkAvalNav(){
@@ -2436,6 +2782,27 @@ async function loadAForum(){
 }
 $('#aFF').addEventListener('change',loadAForum);
 $('#bRF').addEventListener('click',loadAForum);
+
+/* ── CUSTOM SELECT WRAPPER (cross-browser dark dropdown) ── */
+function initCustomSelects(){
+  // For any browser that still shows white: wrap native select in a styled div
+  document.querySelectorAll('select.fi').forEach(sel=>{
+    if(sel.dataset.customized)return;
+    sel.dataset.customized='1';
+    sel.style.cssText+='background:#0d1117!important;color:#ddeeff!important;color-scheme:dark';
+    // Force option colors via inline styles on each option
+    Array.from(sel.options).forEach(opt=>{
+      opt.style.background='#0d1117';
+      opt.style.color='#ddeeff';
+    });
+  });
+}
+// Run on load and after any dynamic content renders
+setTimeout(initCustomSelects,500);
+// Observe DOM changes to catch dynamically added selects
+if(window.MutationObserver){
+  new MutationObserver(()=>initCustomSelects()).observe(document.body,{childList:true,subtree:true});
+}
 </script>
 </body>
 </html>
