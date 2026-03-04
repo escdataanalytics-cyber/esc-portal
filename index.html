@@ -2651,9 +2651,9 @@ function gerarPropostaHTML(){
   const obs=$('#prObs').value.trim();
 
   const cursosMap={
-    excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',price:'R$ 497,00',priceNum:497,color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos.'},
-    powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',price:'R$ 597,00',priceNum:597,color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica.'},
-    projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',price:'A partir de R$ 597,00',priceNum:597,color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo.'},
+    excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',price:'R$ 497,00',priceNum:497,color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos. Ao final da mentoria você será capaz de estruturar, tratar e transformar dados brutos em dashboards estratégicos prontos para tomada de decisão corporativa.'},
+    powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',price:'R$ 597,00',priceNum:597,color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica. Ao final da mentoria você será capaz de estruturar, tratar e transformar dados brutos em dashboards estratégicos prontos para tomada de decisão corporativa.'},
+    projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',price:'A partir de R$ 597,00',priceNum:597,color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo. '},
   };
 
   const selecionados=[...document.querySelectorAll('[name="prCurso"]:checked')].map(el=>el.value);
@@ -2728,7 +2728,7 @@ h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff
     </div>
   </div>
   <h1>PROPOSTA COMERCIAL</h1>
-  <div class="sub">Mentoria Especializada em Análise de Dados</div>
+  <div class="sub">Programa estratégico para elevar seu nível analítico e acelerar sua performance profissional.</div>
   <div class="cover-meta">
     <div class="meta-block"><div class="meta-label">Para</div><div class="meta-value">${nome}</div>${empresa?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${cargo} · ${empresa}</div>`:''}</div>
     <div class="meta-block"><div class="meta-label">Contato</div><div class="meta-value" style="font-size:.9rem">${email}</div>${tel?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${tel}</div>`:''}</div>
@@ -2737,7 +2737,7 @@ h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff
   </div>
 </div>
 
-<div class="section">01. PROGRAMAS SELECIONADOS</div>
+<div class="section">01. PRODUTOS SELECIONADOS</div>
 ${cursos.map(c=>`
 <div class="course-card" style="border-color:${c.color};background:${c.bg}">
   <div>
