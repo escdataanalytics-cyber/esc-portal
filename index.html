@@ -952,6 +952,111 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 </div>
 
 
+
+<!-- ══════════════════════════════════
+     CHATBOT ESC — TUTOR IA
+══════════════════════════════════ -->
+
+<!-- Floating button -->
+<button id="chatBtn" onclick="toggleChat()" title="Tutor IA"
+  style="display:none;position:fixed;bottom:28px;right:28px;z-index:9000;
+    width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,#00C8FF,#7C5CFC);
+    box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 0 rgba(0,200,255,.4);
+    align-items:center;justify-content:center;
+    font-size:1.5rem;transition:.2s;animation:chatPulse 2.5s ease-in-out infinite">
+  💬
+</button>
+
+<!-- Chat window -->
+<div id="chatWin" style="display:none;position:fixed;bottom:100px;right:28px;z-index:8999;
+  width:380px;max-height:560px;
+  background:#0d1525;border:1px solid rgba(0,200,255,.2);
+  border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);
+  display:none;flex-direction:column;overflow:hidden;
+  font-family:var(--fb)">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,rgba(0,200,255,.12),rgba(124,92,252,.12));
+    border-bottom:1px solid rgba(0,200,255,.15);padding:14px 18px;
+    display:flex;align-items:center;gap:12px">
+    <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;
+      background:linear-gradient(135deg,#00C8FF,#7C5CFC);
+      display:grid;place-items:center;font-size:1.2rem">🤖</div>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:.92rem;color:var(--text)">ESC Tutor IA</div>
+      <div style="font-size:.72rem;color:var(--green);display:flex;align-items:center;gap:5px">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>
+        Online · Excel & Power BI
+      </div>
+    </div>
+    <button onclick="toggleChat()" style="background:none;border:none;color:var(--muted);
+      cursor:pointer;font-size:1.1rem;padding:4px;line-height:1">✕</button>
+  </div>
+
+  <!-- Messages area -->
+  <div id="chatMsgs" style="flex:1;overflow-y:auto;padding:16px;
+    display:flex;flex-direction:column;gap:12px;max-height:380px;
+    scrollbar-width:thin;scrollbar-color:rgba(0,200,255,.2) transparent">
+  </div>
+
+  <!-- Input area -->
+  <div style="border-top:1px solid rgba(0,200,255,.1);padding:12px 14px;
+    display:flex;gap:8px;align-items:flex-end">
+    <textarea id="chatInput" placeholder="Pergunte sobre Excel, Power BI, fórmulas..."
+      style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(0,200,255,.15);
+        border-radius:10px;padding:9px 13px;color:var(--text);font-size:.88rem;
+        font-family:var(--fb);resize:none;min-height:40px;max-height:100px;
+        outline:none;line-height:1.45;scrollbar-width:thin"
+      rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+      oninput="this.style.height='40px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button onclick="sendChat()" id="chatSend"
+      style="width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;
+        background:linear-gradient(135deg,#00C8FF,#7C5CFC);
+        display:grid;place-items:center;font-size:1rem;flex-shrink:0;transition:.15s">
+      ➤
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes chatPulse{
+  0%,100%{box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 0 rgba(0,200,255,.3)}
+  50%{box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 10px rgba(0,200,255,.0)}
+}
+#chatMsgs::-webkit-scrollbar{width:4px}
+#chatMsgs::-webkit-scrollbar-track{background:transparent}
+#chatMsgs::-webkit-scrollbar-thumb{background:rgba(0,200,255,.2);border-radius:2px}
+#chatInput::-webkit-scrollbar{width:4px}
+#chatWin.open{display:flex!important}
+
+/* Chat bubbles */
+.cb-user{align-self:flex-end;max-width:80%;background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));
+  border:1px solid rgba(0,200,255,.2);border-radius:14px 14px 4px 14px;
+  padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.5}
+.cb-bot{align-self:flex-start;max-width:88%;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);border-radius:4px 14px 14px 14px;
+  padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.6}
+.cb-bot code{background:rgba(0,200,255,.1);border-radius:4px;
+  padding:2px 6px;font-family:monospace;font-size:.82rem;color:#00C8FF}
+.cb-bot pre{background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;
+  margin:8px 0;overflow-x:auto;font-family:monospace;font-size:.8rem;color:#7adcff;line-height:1.6}
+.cb-bot strong{color:#fff;font-weight:700}
+.cb-typing{display:flex;gap:5px;padding:4px 0}
+.cb-typing span{width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  animation:typing .9s ease-in-out infinite}
+.cb-typing span:nth-child(2){animation-delay:.15s}
+.cb-typing span:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,60%,100%{opacity:.2;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* Suggestion chips */
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);
+  border-radius:20px;padding:5px 12px;font-size:.76rem;color:#00C8FF;
+  cursor:pointer;transition:.15s;white-space:nowrap}
+.chip:hover{background:rgba(0,200,255,.16);border-color:rgba(0,200,255,.4)}
+</style>
 <div id="mBg" class="mbg hidden"><div id="mCont" class="modal"></div></div>
 
 
@@ -1090,6 +1195,13 @@ $('#rBtn').addEventListener('click',async()=>{
 });
 
 function doLogout(){
+  const cb=document.getElementById('chatBtn');
+  if(cb)cb.style.display='none';
+  const cw=document.getElementById('chatWin');
+  if(cw)cw.classList.remove('open');
+  chatOpen=false;chatInited=false;chatHistory=[];
+  const msgs=document.getElementById('chatMsgs');
+  if(msgs)msgs.innerHTML='';
   CU=null;CTurma=null;actMod=null;actAula=null;mods=[];
   if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);clearTimeout(inactTimer);
   clearSession();
@@ -1256,7 +1368,7 @@ window.addEventListener('load',async()=>{
 });
 
 /* ── STUDENT ── */
-async function showStudent(){
+async function showStudent(){document.getElementById('chatBtn').style.display='flex';
   $('#ls').style.display='none';$('#sa').classList.remove('hidden');
   const ini=CU.nome.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   $('#sAv').textContent=ini;$('#sNm').textContent=CU.nome;$('#dWel').textContent=CU.nome.split(' ')[0];
@@ -1829,7 +1941,7 @@ function gerarCertificadoHTML(nome,turma,dataAprov,horas,dataEmissao,certId){
 }
 
 /* ── ADMIN ── */
-async function showAdmin(){
+async function showAdmin(){document.getElementById('chatBtn').style.display='flex';
   $('#ls').style.display='none';$('#aa').classList.remove('hidden');
   $$('.ani').forEach(i=>i.addEventListener('click',()=>{
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
@@ -3237,6 +3349,183 @@ setTimeout(initCustomSelects,500);
 if(window.MutationObserver){
   new MutationObserver(()=>initCustomSelects()).observe(document.body,{childList:true,subtree:true});
 }
+
+/* ══════════════════════════════════════════════════
+   CHATBOT ESC — TUTOR IA (Excel & Power BI)
+   Powered by Claude API (Anthropic)
+══════════════════════════════════════════════════ */
+const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+let chatHistory = [];
+let chatOpen = false;
+let chatInited = false;
+
+function toggleChat(){
+  const win = document.getElementById('chatWin');
+  const btn = document.getElementById('chatBtn');
+  chatOpen = !chatOpen;
+  if(chatOpen){
+    win.classList.add('open');
+    btn.textContent = '✕';
+    btn.style.background = 'rgba(255,255,255,.1)';
+    if(!chatInited){ chatInited=true; chatWelcome(); }
+    setTimeout(()=>document.getElementById('chatInput').focus(),100);
+  } else {
+    win.classList.remove('open');
+    btn.textContent = '💬';
+    btn.style.background = 'linear-gradient(135deg,#00C8FF,#7C5CFC)';
+  }
+}
+
+function chatWelcome(){
+  const name = CU?.nome ? CU.nome.split(' ')[0] : 'aluno';
+  const isAdmin = CU?.role === 'admin';
+  const turma = CTurma?.nome || '';
+  const welcomeText = isAdmin
+    ? 'Olá! Sou o **Tutor IA da ESC**. Posso te ajudar com dúvidas de **Excel**, **Power BI**, fórmulas, dashboards e indicadores industriais. Como posso ajudar?'
+    : 'Olá, **' + name + '**! 👋 Sou o Tutor IA da ESC' + (turma ? ' — turma **' + turma + '**' : '') + '. Estou aqui para tirar suas dúvidas de **Excel** e **Power BI**. O que você quer aprender hoje?';
+  appendBotMsg(welcomeText);
+  const chips = isAdmin
+    ? ['Como calcular OEE?','Dashboard de manutenção','ÍNDICE+CORRESP vs PROCV','Power Query básico']
+    : ['Como usar PROCX?','Tabela Dinâmica','Dashboard de OEE','Gráfico de Pareto'];
+  const row = document.createElement('div');
+  row.className = 'chip-row';
+  chips.forEach(chip=>{
+    const el = document.createElement('button');
+    el.className = 'chip';
+    el.textContent = chip;
+    el.onclick = ()=>{ document.getElementById('chatInput').value=chip; sendChat(); };
+    row.appendChild(el);
+  });
+  document.getElementById('chatMsgs').appendChild(row);
+  scrollChat();
+}
+
+function buildSystemPrompt(){
+  const isAdmin = CU?.role === 'admin';
+  const nome = CU?.nome || 'usuário';
+  const turma = CTurma?.nome || '';
+  const curso = turma.toLowerCase().includes('power') ? 'Power BI' : 'Excel';
+  return 'Você é o Tutor IA da ESC Data & Analytics, especialista em Excel Avançado e Power BI com foco em contexto industrial (manutenção, produção, PCM, mineração).\n\nUSUÁRIO ATUAL:\n- Nome: ' + nome + '\n- Perfil: ' + (isAdmin ? 'Administrador / Instrutor' : 'Aluno') + (turma ? '\n- Turma: ' + turma : '') + (!isAdmin ? '\n- Curso principal: ' + curso : '') + '\n\nSUAS REGRAS:\n1. Responda em português do Brasil, de forma direta e prática.\n2. Use exemplos do contexto industrial (OEE, MTBF, MTTR, manutenção, produção, PCM).\n3. Fórmulas: use `=FÓRMULA(argumentos)` (inline code).\n4. Blocos longos: use ``` (code block).\n5. Use **negrito** para termos importantes.\n6. Seja conciso: máx. 4 parágrafos. Se precisar de mais, ofereça continuar.\n7. Sempre dê um exemplo prático imediato.\n8. Se a pergunta for ampla, faça UMA pergunta de clarificação.\n9. Você NÃO é suporte técnico da plataforma — oriente contatar o instrutor.\n10. Tom: amigável, técnico, direto.\n\nTÓPICOS QUE VOCÊ DOMINA:\nExcel: PROCX, ÍNDICE+CORRESP, SOMASES, CONT.SES, SEERRO, Power Query, Tabela Dinâmica, Gráfico de Pareto, formatação condicional, dashboards, OEE, MTBF, MTTR, backlog de manutenção.\nPower BI: modelagem (star schema), DAX (CALCULATE, SUMX, RELATED, FILTER), visuais, slicers, relacionamentos, publicação, relatórios industriais.';
+}
+
+async function sendChat(){
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  appendUserMsg(msg);
+  input.value = '';
+  input.style.height = '40px';
+  chatHistory.push({role:'user', content: msg});
+  const typingId = appendTyping();
+  const sendBtn = document.getElementById('chatSend');
+  sendBtn.disabled = true;
+  sendBtn.style.opacity = '.4';
+  try {
+    const response = await fetch(ANTHROPIC_API, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: buildSystemPrompt(),
+        messages: chatHistory.slice(-10),
+      })
+    });
+    const data = await response.json();
+    removeTyping(typingId);
+    if(data.error){
+      const errMsg = data.error.type === 'authentication_error'
+        ? '⚠️ Configure a chave da API Anthropic no código (ANTHROPIC_API_KEY).'
+        : 'Erro: ' + data.error.message;
+      appendBotMsg(errMsg);
+      chatHistory.pop();
+      return;
+    }
+    const reply = data.content?.map(b=>b.text||'').join('') || '...';
+    chatHistory.push({role:'assistant', content: reply});
+    appendBotMsg(reply);
+    offerFollowUpChips(msg, reply);
+  } catch(err){
+    removeTyping(typingId);
+    appendBotMsg('⚠️ Não consegui conectar. Verifique sua conexão ou a chave de API.');
+    chatHistory.pop();
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = '1';
+  }
+}
+
+function appendUserMsg(text){
+  const el = document.createElement('div');
+  el.className = 'cb-user';
+  el.textContent = text;
+  document.getElementById('chatMsgs').appendChild(el);
+  scrollChat();
+}
+
+function appendBotMsg(text){
+  const el = document.createElement('div');
+  el.className = 'cb-bot';
+  el.innerHTML = formatChatMsg(text);
+  document.getElementById('chatMsgs').appendChild(el);
+  scrollChat();
+}
+
+function appendTyping(){
+  const id = 'typing-' + Date.now();
+  const el = document.createElement('div');
+  el.className = 'cb-bot';
+  el.id = id;
+  el.innerHTML = '<div class="cb-typing"><span></span><span></span><span></span></div>';
+  document.getElementById('chatMsgs').appendChild(el);
+  scrollChat();
+  return id;
+}
+
+function removeTyping(id){
+  const el = document.getElementById(id);
+  if(el) el.remove();
+}
+
+function scrollChat(){
+  const msgs = document.getElementById('chatMsgs');
+  if(msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function formatChatMsg(text){
+  return text
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre>$1</pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function offerFollowUpChips(userMsg, botReply){
+  const lower = (userMsg+' '+botReply).toLowerCase();
+  let chips = [];
+  if(lower.includes('procx')||lower.includes('procv')||lower.includes('índice'))
+    chips = ['Exemplo com tabela de OS','E no Power BI?','Quando usar SEERRO?'];
+  else if(lower.includes('oee')||lower.includes('disponibilidade'))
+    chips = ['Calcular MTBF também','Gráfico de OEE','Dashboard completo'];
+  else if(lower.includes('power query')||lower.includes('tabela dinâmica'))
+    chips = ['Atualização automática','Conectar ao banco','Exemplo prático'];
+  else if(lower.includes('dax')||lower.includes('calculate')||lower.includes('power bi'))
+    chips = ['Exemplo de DAX','Relacionamento de tabelas','Filtro por data'];
+  else if(lower.includes('pareto')||lower.includes('gráfico'))
+    chips = ['Semáforo de indicadores','Dashboard completo','Formatação condicional'];
+  if(chips.length){
+    const row = document.createElement('div');
+    row.className = 'chip-row';
+    chips.forEach(chip=>{
+      const el = document.createElement('button');
+      el.className = 'chip';
+      el.textContent = chip;
+      el.onclick = ()=>{ document.getElementById('chatInput').value=chip; sendChat(); };
+      row.appendChild(el);
+    });
+    document.getElementById('chatMsgs').appendChild(row);
+    scrollChat();
+  }
+}
+
 </script>
-</body>
-</html>
