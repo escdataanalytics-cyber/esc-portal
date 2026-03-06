@@ -1468,6 +1468,8 @@ async function renderDash(){
   });
   if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
 }
+  // First login welcome
+  setTimeout(checkFirstLogin, 600);
 function renderSML(){
   const l=$('#sML');l.innerHTML='';
   mods.forEach(m=>{
@@ -3525,6 +3527,139 @@ function offerFollowUpChips(userMsg, botReply){
     });
     document.getElementById('chatMsgs').appendChild(row);
     scrollChat();
+  }
+}
+
+
+/* ══════════════════════════════════════════════════
+   ONBOARDING — BOAS-VINDAS + TUTORIAL (1º LOGIN)
+══════════════════════════════════════════════════ */
+const ONBOARDING_STEPS = [
+  {
+    icon: '👋',
+    title: 'Seja bem-vindo à plataforma ESC!',
+    body: (nome) => `Olá, <strong>${nome}</strong>! Ficamos felizes em ter você aqui.<br><br>Em poucos passos vou te mostrar como aproveitar ao máximo a sua mentoria. É rápido, prometo! 😊`,
+    img: null
+  },
+  {
+    icon: '📚',
+    title: 'Seus módulos e aulas',
+    body: () => `No menu lateral, acesse <strong>"Meus Módulos"</strong> para ver todo o conteúdo da sua turma.<br><br>As aulas são desbloqueadas conforme você avança. Complete uma para liberar a próxima.`,
+    highlight: 'nav-item-modulos'
+  },
+  {
+    icon: '▶️',
+    title: 'Como assistir uma aula',
+    body: () => `Clique em <strong>"Iniciar"</strong> em qualquer aula disponível. O seu progresso é salvo automaticamente — pode fechar e continuar depois de onde parou.`,
+    img: null
+  },
+  {
+    icon: '📝',
+    title: 'Projeto prático final',
+    body: () => `Ao final da mentoria, você vai enviar um <strong>projeto prático</strong> usando dados reais do seu trabalho.<br><br>Fique de olho na seção <strong>"Projeto Final"</strong> — ela aparece quando você estiver pronto.`,
+    img: null
+  },
+  {
+    icon: '🏆',
+    title: 'Seu certificado',
+    body: () => `Após a aprovação do seu projeto, o <strong>certificado é emitido automaticamente</strong> e fica disponível para download direto na plataforma. 🎓`,
+    img: null
+  },
+  {
+    icon: '🤖',
+    title: 'Tutor IA — tire dúvidas na hora',
+    body: () => `Viu o botão <strong>💬</strong> no canto inferior direito? É o seu tutor de IA!<br><br>Pergunte qualquer coisa sobre <strong>Excel</strong>, <strong>Power BI</strong>, fórmulas e indicadores industriais — disponível 24h.`,
+    img: null
+  },
+  {
+    icon: '🚀',
+    title: 'Tudo pronto!',
+    body: (nome) => `É isso, <strong>${nome}</strong>! Você está pronto para começar.<br><br>Qualquer dúvida fala com o tutor IA ou com o instrutor. <br><br><strong>Bora aprender!</strong> 💪`,
+    img: null
+  }
+];
+
+let _obStep = 0;
+
+function checkFirstLogin(){
+  if(!CU || CU.role === 'admin') return;
+  const key = 'esc_welcomed_' + CU.id;
+  if(localStorage.getItem(key)) return; // already welcomed
+  localStorage.setItem(key, '1');
+  _obStep = 0;
+  showOnboardingStep();
+}
+
+function showOnboardingStep(){
+  const step = ONBOARDING_STEPS[_obStep];
+  const total = ONBOARDING_STEPS.length;
+  const nome = CU.nome.split(' ')[0];
+  const isLast = _obStep === total - 1;
+
+  // Progress dots
+  const dots = ONBOARDING_STEPS.map((_,i) =>
+    `<div style="width:${i===_obStep?24:8}px;height:8px;border-radius:4px;
+      background:${i===_obStep?'var(--cyan)':i<_obStep?'rgba(0,200,255,.4)':'rgba(255,255,255,.12)'};
+      transition:.3s"></div>`
+  ).join('');
+
+  const html = `
+    <div style="text-align:center;padding:8px 0 0">
+      <!-- Icon -->
+      <div style="font-size:3rem;margin-bottom:16px;line-height:1">${step.icon}</div>
+
+      <!-- Title -->
+      <div style="font-family:var(--fh);font-size:1.35rem;font-weight:800;
+        color:var(--text);margin-bottom:14px;line-height:1.3">
+        ${step.title}
+      </div>
+
+      <!-- Body -->
+      <div style="font-size:.97rem;color:var(--muted);line-height:1.7;
+        margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto">
+        ${step.body(nome)}
+      </div>
+
+      <!-- Progress dots -->
+      <div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-bottom:28px">
+        ${dots}
+      </div>
+
+      <!-- Buttons -->
+      <div style="display:flex;gap:12px;justify-content:center;align-items:center">
+        ${_obStep > 0 ? `<button onclick="obPrev()" class="btn bg2 btn-sm"
+          style="min-width:90px">← Voltar</button>` : ''}
+        <button onclick="${isLast ? 'closeModal()' : 'obNext()'}"
+          class="btn bp" style="min-width:${isLast?'160px':'120px'};font-size:.97rem">
+          ${isLast ? '🚀 Começar agora!' : 'Próximo →'}
+        </button>
+      </div>
+
+      <!-- Skip -->
+      ${!isLast ? `<div style="margin-top:16px">
+        <button onclick="closeModal()"
+          style="background:none;border:none;color:var(--muted);font-size:.78rem;
+            cursor:pointer;text-decoration:underline;font-family:var(--fb)">
+          Pular tutorial
+        </button>
+      </div>` : ''}
+    </div>`;
+
+  $('#mCont').innerHTML = html;
+  $('#mBg').classList.remove('hidden');
+}
+
+function obNext(){
+  if(_obStep < ONBOARDING_STEPS.length - 1){
+    _obStep++;
+    showOnboardingStep();
+  }
+}
+
+function obPrev(){
+  if(_obStep > 0){
+    _obStep--;
+    showOnboardingStep();
   }
 }
 
