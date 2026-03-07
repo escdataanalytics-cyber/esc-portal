@@ -208,13 +208,18 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 @media(max-width:1080px){.cgrid{grid-template-columns:1fr}}
 @media(max-width:880px){.l2,.ladm{grid-template-columns:1fr}.sbar,.abar{display:none}.fgrid{grid-template-columns:1fr}}
 @media(max-width:580px){.hdr{padding:0 12px}.bname{display:none}.mcont{padding:14px}.cdv{font-size:1.2rem}}
+
+/* Avaliações form scope fix */
+#avalContent input[type=range]{accent-color:var(--cyan);width:100%;cursor:pointer}
+#avalContent select,#avalContent textarea{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px}
+#avalContent .card{background:var(--card)}
 </style>
 </head>
 <body>
 <div id="tc"></div>
 
 <!-- LOGIN -->
-<div id="ls" style="display:none">
+<div id="ls" style="display:flex">
   <div class="lwrap">
     <div style="text-align:center;margin-bottom:28px">
       <div class="llogobox">ESC</div>
@@ -423,7 +428,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div id="pg-aval" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">⭐ Avaliação do Curso</div>
         <div style="font-size:.88rem;color:var(--muted);margin-bottom:22px">Sua opinião é muito importante para continuarmos melhorando!</div>
-        <div id="avalContent"></div>
+        <div id="avalContent" style="color:var(--text)"></div>
       </div>
 
       <!-- MURAL -->
@@ -519,7 +524,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div id="adm-alunos" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:18px">👥 Gerenciar Alunos</div>
         <div class="card cp" style="margin-bottom:16px">
-          <div style="font-weight:800;color:var(--cyan);margin-bottom:13px">➕ Criar Aluno</div>
+          <div style="font-weight:800;color:var(--cyan);cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none"
+               onclick="const b=this.nextElementSibling;const ic=this.querySelector('.acc-ic');const open=b.style.display!=='none';b.style.display=open?'none':'block';ic.textContent=open?'▶':'▼'">
+            <span>➕ Criar Aluno</span>
+            <span class="acc-ic" style="font-size:.8rem;color:var(--muted);transition:.2s">▼</span>
+          </div>
+          <div class="acc-body" style="display:block;margin-top:13px">
           <div class="fgrid">
             <div class="fg"><label class="fl">Nome</label><input id="aNome" class="fi" placeholder="João da Silva"/></div>
             <div class="fg"><label class="fl">Email</label><input id="aEmail" class="fi" type="email" placeholder="joao@emp.com"/></div>
@@ -569,7 +579,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
             </div>
           </div>
           <button id="bST" class="btn bp" style="margin-top:13px">💾 Salvar</button>
-        </div>
+        </div></div><!-- /acc-body -->
         <div class="card cp"><div style="font-weight:800;color:var(--cyan);margin-bottom:13px">📋 Turmas</div><div class="tw2"><table><thead><tr><th>Nome</th><th>Alunos</th><th>Módulos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="aTT"></tbody></table></div></div>
       </div>
 
@@ -1274,7 +1284,8 @@ window.irParaMural=function(id){
 // ── ADMIN: Activity notifications ──
 let adminNotifsSeen=localStorage.getItem('admin_notifs_seen')||'1970-01-01';
 async function pollAdminNotifs(){
-  if(!sb||!CU||CU.role!=='admin')return;
+  if(!sb||!CU||CU.role!=='admin'||_pollAdminBusy)return;
+  _pollAdminBusy=true;
   const items=[];
   // New forum posts (pending)
   const{data:fposts}=await sb.from('forum_posts').select('id,titulo,criado_em,users(nome)').eq('aprovado',false).gt('criado_em',adminNotifsSeen).order('criado_em',{ascending:false}).limit(10);
@@ -1314,11 +1325,25 @@ async function pollAdminNotifs(){
     document.getElementById('aBellDrop')?.classList.remove('open');
     toast('✅ Notificações limpas.','s');
   };
+  _pollAdminBusy=false;
 }
 window.goAdm=function(panel){
   document.getElementById('aBellDrop')?.classList.remove('open');
+  document.getElementById('sBellDrop')?.classList.remove('open');
   const navItem=document.querySelector(`.ani[data-adm="${panel}"]`);
-  if(navItem)navItem.click();
+  if(navItem){
+    // Use dataset navigation directly to avoid click event bubbling
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAlunos,turmas:loadTurmas,
+      mods:loadMods,mats:loadMats,quiz:loadQuiz,live:loadLive,mural:loadAdmMural,
+      forum:loadAdmForum,aulas:loadAulas,qstats:loadQStats,projetos:loadProjetos,
+      aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('act'));
+    document.querySelectorAll('.ani').forEach(a=>a.classList.remove('act'));
+    const pg=document.getElementById('adm-'+panel);
+    if(pg)pg.classList.add('act');
+    navItem.classList.add('act');
+    if(fns[panel])fns[panel]();
+  }
 };
 // Notify admin when forum reply is sent
 async function criarNotifAdmin(tipo,titulo,desc,extra){
@@ -1328,7 +1353,7 @@ async function criarNotifAdmin(tipo,titulo,desc,extra){
 }
 // ── Auto-poll intervals ──
 setInterval(()=>{if(CU?.role!=='admin')pollStudentNotifs();},60000);
-setInterval(()=>{if(CU?.role==='admin')pollAdminNotifs();},90000);
+setInterval(()=>{if(CU?.role==='admin'&&!_pollAdminBusy)pollAdminNotifs();},90000);
 
 /* ── AUTO-RESTORE SESSION ── */
 window.addEventListener('load',async()=>{
@@ -1554,7 +1579,12 @@ async function startWTAula(aula){
     if(wSec%20===0)await svProgressAula(aula);
   },1000);
 }
-function updVP(m){$('#vPct').textContent=pct(wSec,(m.duracao_seg||1))+'%';}
+function updVP(m){
+  const dur=m.duracao_seg||0;
+  if(!dur){$('#vPct').textContent='';return;}
+  const p=Math.min(pct(wSec,dur),99);
+  $('#vPct').textContent=p+'%';
+}
 async function svProgressAula(aula,done=null){
   if(!sb||!CU)return;
   const pay={user_id:CU.id,aula_id:aula.id,modulo_id:actMod,segundos_vistos:wSec,atualizado_em:new Date().toISOString()};
@@ -3357,7 +3387,7 @@ if(window.MutationObserver){
    Powered by Claude API (Anthropic)
 ══════════════════════════════════════════════════ */
 const ANTHROPIC_API = '/api/chat'; // Proxy seguro — chave fica no servidor
-let chatHistory = [];
+let chatHistory = [], _pollAdminBusy = false;
 let chatOpen = false;
 let chatInited = false;
 
