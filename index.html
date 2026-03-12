@@ -1131,8 +1131,8 @@ $('#mBg').addEventListener('click',e=>{if(e.target===$('#mBg'))closeModal();});
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
 /* ── SESSION PERSISTENCE ── */
-function saveSession(){if(CU)sessionStorage.setItem('esc_user',JSON.stringify(CU));}
-function clearSession(){sessionStorage.removeItem('esc_user');sessionStorage.removeItem('esc_mod');sessionStorage.removeItem('esc_aula');}
+function saveSession(){if(CU)localStorage.setItem('esc_user',JSON.stringify(CU));}
+function clearSession(){localStorage.removeItem('esc_user');sessionStorage.removeItem('esc_mod');sessionStorage.removeItem('esc_aula');}
 // Inactivity logout (30 min no interaction)
 function resetInactTimer(){
   clearTimeout(inactTimer);
@@ -1387,29 +1387,26 @@ setInterval(()=>{if(CU?.role==='admin'&&!_pollAdminBusy)pollAdminNotifs();},9000
 
 /* ── AUTO-RESTORE SESSION ── */
 window.addEventListener('load',async()=>{
-  const saved=sessionStorage.getItem('esc_user');
-  if(!saved){
-    // No session: show login screen
-    $('#ls').style.display='flex';
-    return;
-  }
-  // Session found: keep login hidden, try to restore
+  const saved=localStorage.getItem('esc_user');
+  if(!saved){$('#ls').style.display='flex';return;}
+  let u;
+  try{u=JSON.parse(saved);}catch(e){localStorage.removeItem('esc_user');$('#ls').style.display='flex';return;}
+  if(!sb){CU=u;if(u.role==='admin')showAdmin();else showStudent();return;}
   try{
-    const u=JSON.parse(saved);
-    if(!sb){
-      CU=u;
-      if(u.role==='admin')showAdmin();else showStudent();
+    const{data,error}=await sb.from('users').select('*').eq('id',u.id).single();
+    if(error&&!data){
+      // Erro de rede: restaura sessão local sem forçar logout
+      console.warn('Restore: Supabase indisponível, usando sessão local.');
+      CU=u;resetInactTimer();
+      if(u.role==='admin')showAdmin();else await showStudent();
       return;
     }
-    const{data}=await sb.from('users').select('*').eq('id',u.id).single();
-    if(!data||data.status==='blocked'||data.status==='expired'){
-      clearSession();
-      $('#ls').style.display='flex';
-      return;
+    const vencido=data&&data.validade_acesso&&new Date(data.validade_acesso)<new Date();
+    if(!data||data.status==='blocked'||data.status==='expired'||vencido){
+      clearSession();$('#ls').style.display='flex';return;
     }
     CU=data;resetInactTimer();
     const savedMod=sessionStorage.getItem('esc_mod');
-    const savedAula=sessionStorage.getItem('esc_aula');
     if(data.role==='admin')showAdmin();
     else{
       await setSessionToken();
@@ -1417,8 +1414,11 @@ window.addEventListener('load',async()=>{
       if(savedMod)setTimeout(()=>openMod(savedMod),300);
     }
   }catch(e){
-    clearSession();
-    $('#ls').style.display='flex';
+    // Erro de UI (não de auth): tenta restaurar da sessão local
+    console.error('Session restore error:',e);
+    CU=u;
+    try{if(u.role==='admin')showAdmin();else await showStudent();}
+    catch(e2){clearSession();$('#ls').style.display='flex';}
   }
 });
 
@@ -1518,7 +1518,7 @@ async function renderDash(){
   mods.forEach(m=>{
     const mp=pm[m.id]||{segundos_vistos:0,concluido:false},pp=pct(mp.segundos_vistos||0,m.duracao_seg||1),isDone=mp.concluido,isCur=actMod===m.id;
     const el=document.createElement('div');el.className='tri';
-    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}"}>${esc(m.titulo)}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
+    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${esc(m.titulo)}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
     tr.appendChild(el);
   });
   if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
