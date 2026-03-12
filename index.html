@@ -3,8 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="DENY"/>
+<meta name="referrer" content="no-referrer"/>
 <title>ESC • Plataforma de Ensino</title>
 <script>
+  /* ⚠️ Supabase anon key — pública por design. Proteja via RLS no Supabase Dashboard. */
   const SUPABASE_URL = 'https://zycxnizgauollnafyotk.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5Y3huaXpnYXVvbGxuYWZ5b3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDM4MjIsImV4cCI6MjA4NzExOTgyMn0.t7YJAOoJ3qbthikkwBDIL5nyp-wBEJFkkPbZMrRFcRM';
 </script>
@@ -1088,6 +1092,33 @@ const INACT_LIMIT=30*60*1000; // 30 min
 /* ── HELPERS ── */
 function ft(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60,p=n=>String(n).padStart(2,'0');return h>0?`${h}:${p(m)}:${p(sec)}`:`${p(m)}:${p(sec)}`;}
 function pct(a,b){return b>0?Math.round((a/b)*100):0;}
+/* ── SECURITY HELPERS ── */
+// XSS sanitizer — use em todo dado do banco antes de innerHTML
+function esc(s){
+  if(s==null)return'';
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;')
+    .replace(/\//g,'&#x2F;');
+}
+// URL sanitizer — evita javascript: e data: URIs
+function safeUrl(u){
+  if(!u)return'#';
+  const s=String(u).trim().toLowerCase();
+  if(s.startsWith('javascript:')||s.startsWith('data:')||s.startsWith('vbscript:'))return'#';
+  return u;
+}
+// Login rate limiter (5 tentativas / 3 min)
+const _loginAttempts={count:0,ts:0};
+function loginAllowed(){
+  const now=Date.now();
+  if(now-_loginAttempts.ts>180000){_loginAttempts.count=0;_loginAttempts.ts=now;}
+  _loginAttempts.count++;
+  return _loginAttempts.count<=5;
+}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 function fd(d){return d?new Date(d).toLocaleDateString('pt-BR'):'—';}
 function fdt(d){return d?new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';}
@@ -1171,10 +1202,9 @@ async function doLogin(){
   const lg=$('#lUser').value.trim(),pw=$('#lPass').value.trim(),err=$('#lErr');
   if(!lg||!pw){err.textContent='Preencha login e senha.';return;}
   err.textContent='';
+  if(!loginAllowed()){err.textContent='Muitas tentativas. Aguarde 3 minutos.';return;}
   if(!sb){
-    if(lg==='admin'&&pw==='admin2024'){CU={id:'da',nome:'Administrador',login:'admin',role:'admin',status:'active'};showAdmin();}
-    else if(lg==='aluno1'&&pw==='123456'){CU={id:'ds1',nome:'Carlos Demo',login:'aluno1',role:'student',status:'active',turma_id:null,validade_acesso:'2027-01-01'};showStudent();}
-    else{err.textContent='Demo: admin/admin2024 ou aluno1/123456';}
+    err.textContent='Login ou senha incorretos.';
     return;
   }
   $('#lBtn').disabled=true;$('#lBtn').textContent='Entrando...';
@@ -1251,7 +1281,7 @@ async function pollStudentNotifs(){
   const list=document.getElementById('sBellList');
   if(!list)return;
   if(!count){list.innerHTML='<div class="ndrop-empty">Sem comunicados novos 🎉</div>';return;}
-  list.innerHTML=novos.map(av=>`<div class="ndrop-item unread" onclick="irParaMural('${av.id}')">
+  list.innerHTML=novos.map(av=>`<div class="ndrop-item unread" onclick="irParaMural('${esc(av.id)}')">
     <div class="ndrop-ic" style="background:rgba(0,200,255,.1)">📢</div>
     <div class="ndrop-body">
       <div class="ndrop-title">${av.fixado?'📌 ':''}${av.titulo}</div>
@@ -1488,7 +1518,7 @@ async function renderDash(){
   mods.forEach(m=>{
     const mp=pm[m.id]||{segundos_vistos:0,concluido:false},pp=pct(mp.segundos_vistos||0,m.duracao_seg||1),isDone=mp.concluido,isCur=actMod===m.id;
     const el=document.createElement('div');el.className='tri';
-    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${m.titulo}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
+    el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}"}>${esc(m.titulo)}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
     tr.appendChild(el);
   });
   if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
@@ -1499,7 +1529,7 @@ function renderSML(){
   const l=$('#sML');l.innerHTML='';
   mods.forEach(m=>{
     const el=document.createElement('div');el.className=`ni${actMod===m.id?' act':''}`;
-    el.innerHTML=`<span class="nic">${m.icone}</span><span style="font-size:.84rem">${m.titulo}</span>`;
+    el.innerHTML=`<span class="nic">${esc(m.icone)}</span><span style="font-size:.84rem">${esc(m.titulo)}</span>`;
     el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);
   });
 }
@@ -1564,7 +1594,7 @@ function loadVideoAula(aula){
   if(!aula.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Vídeo em breve</div>';startWTAula(aula);return;}
   if(aula.video_type==='youtube'){const vid=ytId(aula.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
   else if(aula.video_type==='vimeo'){const vid=vmId(aula.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
-  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${aula.video_url}" type="video/mp4"/></video>`;}
+  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${safeUrl(aula.video_url)}" type="video/mp4"/></video>`;}
   startWTAula(aula);
 }
 async function startWTAula(aula){
@@ -1614,7 +1644,7 @@ function loadVideo(m){
   if(!m.video_url){vc.innerHTML='<div style="color:var(--muted)">📹 Vídeo em breve</div>';startWT(m);return;}
   if(m.video_type==='youtube'){const vid=ytId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://www.youtube.com/embed/${vid}?rel=0" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
   else if(m.video_type==='vimeo'){const vid=vmId(m.video_url);vc.innerHTML=vid?`<iframe class="vif" src="https://player.vimeo.com/video/${vid}" allowfullscreen></iframe>`:'<div style="color:var(--muted)">URL inválida</div>';}
-  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${m.video_url}" type="video/mp4"/></video>`;}
+  else{vc.innerHTML=`<video class="vif" controls preload="metadata"><source src="${safeUrl(m.video_url)}" type="video/mp4"/></video>`;}
   startWT(m);
 }
 function ytId(u){const m=u.match(/(?:v=|youtu\.be\/|embed\/)([^#&?]{11})/);return m?m[1]:null;}
@@ -1643,7 +1673,7 @@ function renderCML(){
   mods.forEach(m=>{
     const el=document.createElement('div');
     el.style.cssText=`display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:all .18s;border:1px solid ${m.id===actMod?'rgba(0,200,255,.28)':'transparent'};background:${m.id===actMod?'rgba(0,200,255,.07)':'transparent'}`;
-    el.innerHTML=`<span>${m.icone}</span><span style="font-size:.85rem;font-weight:700">${m.titulo}</span>`;
+    el.innerHTML=`<span>${esc(m.icone)}</span><span style="font-size:.85rem;font-weight:700">${esc(m.titulo)}</span>`;
     el.addEventListener('click',()=>openMod(m.id));l.appendChild(el);
   });
 }
@@ -1651,7 +1681,7 @@ async function loadCMats(id){
   const l=$('#cMat');if(!sb){l.innerHTML='<div style="color:var(--muted)">Conecte o Supabase.</div>';return;}
   const{data}=await sb.from('materials').select('*').or(`modulo_id.eq.${id},modulo_id.is.null`);
   if(!data?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhum material.</div>';return;}
-  l.innerHTML=data.map(mat=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;background:rgba(0,0,0,.18)"><div><div style="font-weight:700">${ti(mat.tipo)} ${mat.nome}</div><div style="font-size:.82rem;color:var(--muted)">${mat.descricao||''}</div></div><a class="btn bp btn-sm" href="${mat.url}" target="_blank" rel="noopener">Acessar</a></div>`).join('');
+  l.innerHTML=data.map(mat=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;background:rgba(0,0,0,.18)"><div><div style="font-weight:700">${ti(mat.tipo)} ${esc(mat.nome)}</div><div style="font-size:.82rem;color:var(--muted)">${esc(mat.descricao||'')}</div></div><a class="btn bp btn-sm" href="${safeUrl(mat.url)}" target="_blank" rel="noopener">Acessar</a></div>`).join('');
 }
 async function loadNote(){
   if(!actMod||!sb||!CU)return;
@@ -1675,7 +1705,7 @@ async function loadQuiz(){
   }
   let qs=[];if(sb){const{data}=await sb.from('quiz').select('*').or(`modulo_id.eq.${actMod},modulo_id.is.null`).limit(10);qs=data||[];}
   if(!qs.length){qc.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão para este módulo.</div>';return;}
-  qc.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${q.question}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${o}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
+  qc.innerHTML=qs.map((q,i)=>`<div class="card cp" style="margin-bottom:12px" data-qid="${q.id}"><div style="font-weight:800;margin-bottom:11px">${i+1}. ${esc(q.question)}</div><div style="display:flex;flex-direction:column;gap:6px">${(q.options||[]).map((o,oi)=>`<label style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer" class="qo"><input type="radio" name="q_${q.id}" value="${oi}" style="accent-color:var(--cyan)"/> ${esc(o)}</label>`).join('')}</div></div>`).join('')+`<button id="bSQ2" class="btn bp">Enviar Respostas</button>`;
   qc.querySelectorAll('.qo').forEach(o=>o.addEventListener('click',function(){const qb=this.closest('[data-qid]');qb.querySelectorAll('.qo').forEach(x=>{x.style.borderColor='var(--border)';x.style.background='';});this.style.borderColor='var(--cyan)';this.style.background='rgba(0,200,255,.08)';}));
   document.getElementById('bSQ2').addEventListener('click',async()=>{
     let sc=0,ok=true,answers=[];
@@ -1740,7 +1770,7 @@ async function renderFL(){
       const rAv=r.is_admin?'ADM':(r.users?.nome||'?').substring(0,2).toUpperCase();
       rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':'')+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div><div style="font-weight:700;font-size:.83rem">'+(r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?'))+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span></div><div style="font-size:.88rem;color:var(--soft);margin-top:2px">'+r.conteudo+'</div></div></div>';
     }
-    card.innerHTML='<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+p.titulo+'</div><div style="font-size:.78rem;color:var(--muted)">por <strong>'+(p.users?.nome||'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">Pendente</span>':'')+'</div></div></div><div class="pbody">'+p.conteudo+'</div><div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 '+(rps||[]).length+'</span><button class="btn bg2 btn-xs tog-rep">Ver respostas</button>'+(p.user_id===CU.id?'<button class="btn bd btn-xs del-post">🗑️</button>':'')+'</div><div class="rlist hidden rep-area">'+rpsHtml+(p.aprovado?'<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta... (aguarda aprovação)"></textarea><button class="btn bp btn-sm rep-send" style="margin-top:7px">Responder</button></div>':'')+'</div>';
+    card.innerHTML='<div class="phead"><div class="pav">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.95rem;margin-bottom:2px">'+(p.fixado?'📌 ':'')+esc(p.titulo)+'</div><div style="font-size:.78rem;color:var(--muted)">por <strong>'+esc(p.users?.nome||'?')+'</strong> · '+fd(p.criado_em)+' · <span class="badge bc" style="font-size:.68rem">'+mn+'</span>'+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:5px">Pendente</span>':'')+'</div></div></div><div class="pbody">'+esc(p.conteudo)+'</div><div class="pfooter"><span style="font-size:.82rem;color:var(--muted)">💬 '+(rps||[]).length+'</span><button class="btn bg2 btn-xs tog-rep">Ver respostas</button>'+(p.user_id===CU.id?'<button class="btn bd btn-xs del-post">🗑️</button>':'')+'</div><div class="rlist hidden rep-area">'+rpsHtml+(p.aprovado?'<div style="padding:9px 14px;border-top:1px solid var(--border)"><textarea class="fi rep-ta" rows="2" placeholder="Sua resposta... (aguarda aprovação)"></textarea><button class="btn bp btn-sm rep-send" style="margin-top:7px">Responder</button></div>':'')+'</div>';
     card.querySelector('.tog-rep').onclick=()=>card.querySelector('.rep-area').classList.toggle('hidden');
     const delBtn=card.querySelector('.del-post');if(delBtn)delBtn.onclick=async()=>{if(!confirm('Excluir?'))return;await sb.from('forum_posts').delete().eq('id',p.id);toast('Excluído.','i');renderFL();};
     const sendBtn=card.querySelector('.rep-send');if(sendBtn)sendBtn.onclick=async()=>{const ta=card.querySelector('.rep-ta'),txt=ta.value.trim();if(!txt){toast('Digite sua resposta.','w');return;}await sb.from('forum_replies').insert({post_id:p.id,user_id:CU.id,conteudo:txt,aprovado:false,is_admin:false});ta.value='';toast('Resposta enviada! Aguarda aprovação.','i');renderFL();};
@@ -1803,7 +1833,7 @@ async function loadFMod(){
   const l=$('#fML');if(!actMod||!sb)return;
   const{data:posts}=await sb.from('forum_posts').select('*,users(nome)').eq('aprovado',true).or('modulo_id.eq.'+actMod+',modulo_id.is.null').order('criado_em',{ascending:false}).limit(15);
   if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Sem dúvidas. Seja o primeiro!</div>';return;}
-  l.innerHTML=posts.map(p=>'<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">'+(p.users?.nome||'?').substring(0,2).toUpperCase()+'</div><div><div style="font-weight:800;font-size:.9rem">'+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+fd(p.criado_em)+'</div></div></div><div class="pbody" style="font-size:.87rem">'+p.conteudo+'</div></div>').join('');
+  l.innerHTML=posts.map(p=>'<div class="pc"><div class="phead"><div class="pav" style="width:26px;height:26px;font-size:.72rem">'+(p.users?.nome||'?').substring(0,2).toUpperCase()+'</div><div><div style="font-weight:800;font-size:.9rem">'+esc(p.titulo)+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+fd(p.criado_em)+'</div></div></div><div class="pbody" style="font-size:.87rem">'+esc(p.conteudo)+'</div></div>').join('');
 }
 
 /* ── PROJETO FINAL (STUDENT) ── */
@@ -3324,7 +3354,7 @@ async function loadAForum(){
       rpsHtml+='<div class="ri'+(r.is_admin?' adm-reply':!r.aprovado?' pending-reply':'')+'" data-rid="'+r.id+'"><div class="rav'+(r.is_admin?' adm':'')+'">'+rAv+'</div><div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="font-weight:700;font-size:.82rem">'+(r.is_admin?'<span style="color:var(--purple)">👨 Admin</span>':(r.users?.nome||'?'))+' <span style="font-weight:400;color:var(--muted)">'+fd(r.criado_em)+'</span>'+(!r.aprovado&&!r.is_admin?'<span class="badge ba" style="font-size:.66rem;margin-left:4px">Pendente</span>':'')+'</div><div style="display:flex;gap:4px">'+(!r.aprovado&&!r.is_admin?'<button class="btn bs btn-xs aprv-rep">✅</button>':'')+'<button class="btn bd btn-xs del-rep">🗑️</button></div></div><div style="font-size:.87rem;color:var(--soft);margin-top:3px">'+r.conteudo+'</div></div></div>';
     }
     const card=document.createElement('div');card.className='pc'+(p.fixado?' pin':'');
-    card.innerHTML='<div class="phead"><div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+p.titulo+'</div><div style="font-size:.76rem;color:var(--muted)">'+(p.users?.nome||'?')+' · '+(p.modules?.titulo||'Geral')+' · '+fd(p.criado_em)+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">Post pendente</span>':'')+(pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">'+pendReps+' pend.</span>':'')+'</div></div><div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">'+(!p.aprovado?'<button class="btn bs btn-xs aprv-post">✅ Aprovar</button>':'')+'<button class="btn bg2 btn-xs pin-post">'+(p.fixado?'📌':'Fixar')+'</button><button class="btn bd btn-xs del-post">🗑️</button></div></div><div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+p.conteudo+'</div><div style="padding:11px 15px"><div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+((rps||[]).length)+')</div><div class="rep-con">'+rpsHtml+'</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨 Responder como Admin</div><textarea class="fi adm-ta" rows="2" placeholder="Resposta publicada imediatamente..."></textarea><button class="btn bp btn-sm adm-rep" style="margin-top:7px">📤 Enviar</button></div></div>';
+    card.innerHTML='<div class="phead"><div class="pav" style="width:30px;height:30px;font-size:.75rem">'+ini+'</div><div style="flex:1"><div style="font-weight:800;font-size:.93rem">'+(p.fixado?'📌 ':'')+esc(p.titulo)+'</div><div style="font-size:.76rem;color:var(--muted)">'+esc(p.users?.nome||'?')+' · '+esc(p.modules?.titulo||'Geral')+' · '+fd(p.criado_em)+(!p.aprovado?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">Post pendente</span>':'')+(pendReps>0?'<span class="badge ba" style="font-size:.68rem;margin-left:4px">'+pendReps+' pend.</span>':'')+'</div></div><div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">'+(!p.aprovado?'<button class="btn bs btn-xs aprv-post">✅ Aprovar</button>':'')+'<button class="btn bg2 btn-xs pin-post">'+(p.fixado?'📌':'Fixar')+'</button><button class="btn bd btn-xs del-post">🗑️</button></div></div><div class="pbody" style="font-size:.87rem;border-bottom:1px solid var(--border);padding-bottom:12px">'+esc(p.conteudo)+'</div><div style="padding:11px 15px"><div style="font-size:.78rem;font-weight:800;color:var(--soft);margin-bottom:8px">💬 Respostas ('+((rps||[]).length)+')</div><div class="rep-con">'+rpsHtml+'</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-size:.75rem;font-weight:800;color:var(--purple);margin-bottom:6px">👨 Responder como Admin</div><textarea class="fi adm-ta" rows="2" placeholder="Resposta publicada imediatamente..."></textarea><button class="btn bp btn-sm adm-rep" style="margin-top:7px">📤 Enviar</button></div></div>';
     (function(post,cardEl,replies){
       const ap=cardEl.querySelector('.aprv-post');if(ap)ap.onclick=async()=>{await sb.from('forum_posts').update({aprovado:true}).eq('id',post.id);toast('✅ Post aprovado!','s');loadAForum();};
       cardEl.querySelector('.pin-post').onclick=async()=>{await sb.from('forum_posts').update({fixado:!post.fixado}).eq('id',post.id);loadAForum();};
@@ -3403,7 +3433,7 @@ function toggleChat(){
     setTimeout(()=>document.getElementById('chatInput').focus(),100);
   } else {
     win.classList.remove('open');
-    btn.textContent = '🤖';
+    btn.textContent = '💬';
     btn.style.background = 'linear-gradient(135deg,#00C8FF,#7C5CFC)';
   }
 }
@@ -3598,7 +3628,7 @@ const ONBOARDING_STEPS = [
   {
     icon: '🤖',
     title: 'Tutor IA — tire dúvidas na hora',
-    body: () => `Viu o botão <strong>🤖</strong> no canto inferior direito? É o seu tutor de IA!<br><br>Pergunte qualquer coisa sobre <strong>Excel</strong>, <strong>Power BI</strong>, fórmulas e indicadores industriais — disponível 24h.`,
+    body: () => `Viu o botão <strong>💬</strong> no canto inferior direito? É o seu tutor de IA!<br><br>Pergunte qualquer coisa sobre <strong>Excel</strong>, <strong>Power BI</strong>, fórmulas e indicadores industriais — disponível 24h.`,
     img: null
   },
   {
