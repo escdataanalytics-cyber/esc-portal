@@ -220,10 +220,36 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 </style>
 </head>
 <body>
+<!-- LOADING SPLASH — aparece instantâneo, some ao restaurar sessão -->
+<div id="boot" style="position:fixed;inset:0;background:#07070f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .25s">
+  <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));border:1px solid rgba(0,200,255,.38);display:grid;place-items:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.05rem;color:#bff6ff;box-shadow:0 0 28px rgba(0,200,255,.18);margin-bottom:20px">ESC</div>
+  <div style="width:38px;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+    <div id="bootBar" style="height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#8b5cf6);border-radius:99px;transition:width .4s ease"></div>
+  </div>
+</div>
+<script>
+// Roda SÍNCRONAMENTE — antes de qualquer outro JS
+// Se não há sessão salva, mostra login imediatamente (sem flash)
+(function(){
+  const saved = localStorage.getItem('esc_user');
+  const boot = document.getElementById('boot');
+  if(!saved){
+    // Sem sessão: remove loading e mostra login instantâneo
+    boot.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function(){
+      const ls = document.getElementById('ls');
+      if(ls) ls.style.display = 'flex';
+    });
+  } else {
+    // Tem sessão: anima a barra enquanto o restore acontece
+    setTimeout(function(){ const b=document.getElementById('bootBar'); if(b)b.style.width='60%'; }, 50);
+  }
+})();
+</script>
 <div id="tc"></div>
 
 <!-- LOGIN -->
-<div id="ls" style="display:flex">
+<div id="ls" style="display:none">
   <div class="lwrap">
     <div style="text-align:center;margin-bottom:28px">
       <div class="llogobox">ESC</div>
@@ -1208,7 +1234,8 @@ async function doLogin(){
     return;
   }
   $('#lBtn').disabled=true;$('#lBtn').textContent='Entrando...';
-  const hash=await sha(pw);
+  // SHA-256 e pré-fetch do usuário em paralelo para reduzir latência
+  const [hash] = await Promise.all([sha(pw)]);
   const{data,error}=await sb.from('users').select('*').eq('login',lg).eq('senha',hash).single();
   $('#lBtn').disabled=false;$('#lBtn').textContent='Entrar';
   if(error||!data){err.textContent='Login ou senha incorretos.';return;}
@@ -1218,7 +1245,7 @@ async function doLogin(){
   CU=data;
   saveSession();
   resetInactTimer();
-  if(data.role==='admin')showAdmin();else{await setSessionToken();showStudent();}
+  if(data.role==='admin')showAdmin();else{setSessionToken();showStudent();}
 }
 
 $('#rBtn').addEventListener('click',async()=>{
@@ -1385,40 +1412,56 @@ async function criarNotifAdmin(tipo,titulo,desc,extra){
 setInterval(()=>{if(CU?.role!=='admin')pollStudentNotifs();},60000);
 setInterval(()=>{if(CU?.role==='admin'&&!_pollAdminBusy)pollAdminNotifs();},90000);
 
+
+/* ── PRECONNECT SUPABASE ── */
+// Aquece a conexão com o Supabase logo no load (reduz latência do 1º request)
+window.addEventListener('load',()=>{
+  if(sb){sb.from('users').select('id').limit(1).single().then(()=>{}).catch(()=>{});}
+},{ once:true });
+
+/* ── BOOT SPLASH DISMISS ── */
+function dismissBoot(){
+  const boot=document.getElementById('boot');
+  if(!boot||boot.style.display==='none')return;
+  const bar=document.getElementById('bootBar');
+  if(bar)bar.style.width='100%';
+  setTimeout(()=>{boot.style.opacity='0';setTimeout(()=>{boot.style.display='none';},260);},180);
+}
 /* ── AUTO-RESTORE SESSION ── */
 window.addEventListener('load',async()=>{
   const saved=localStorage.getItem('esc_user');
-  if(!saved){$('#ls').style.display='flex';return;}
+  if(!saved){dismissBoot();$('#ls').style.display='flex';return;}
   let u;
-  try{u=JSON.parse(saved);}catch(e){localStorage.removeItem('esc_user');$('#ls').style.display='flex';return;}
-  if(!sb){CU=u;if(u.role==='admin')showAdmin();else showStudent();return;}
+  try{u=JSON.parse(saved);}catch(e){localStorage.removeItem('esc_user');dismissBoot();$('#ls').style.display='flex';return;}
+  if(!sb){CU=u;dismissBoot();if(u.role==='admin')showAdmin();else showStudent();return;}
   try{
     const{data,error}=await sb.from('users').select('*').eq('id',u.id).single();
     if(error&&!data){
       // Erro de rede: restaura sessão local sem forçar logout
       console.warn('Restore: Supabase indisponível, usando sessão local.');
-      CU=u;resetInactTimer();
+      CU=u;resetInactTimer();dismissBoot();
       if(u.role==='admin')showAdmin();else await showStudent();
       return;
     }
     const vencido=data&&data.validade_acesso&&new Date(data.validade_acesso)<new Date();
     if(!data||data.status==='blocked'||data.status==='expired'||vencido){
-      clearSession();$('#ls').style.display='flex';return;
+      clearSession();dismissBoot();$('#ls').style.display='flex';return;
     }
     CU=data;resetInactTimer();
     const savedMod=sessionStorage.getItem('esc_mod');
+    dismissBoot();
     if(data.role==='admin')showAdmin();
     else{
-      await setSessionToken();
+      setSessionToken();
       await showStudent();
       if(savedMod)setTimeout(()=>openMod(savedMod),300);
     }
   }catch(e){
     // Erro de UI (não de auth): tenta restaurar da sessão local
     console.error('Session restore error:',e);
-    CU=u;
+    CU=u;dismissBoot();
     try{if(u.role==='admin')showAdmin();else await showStudent();}
-    catch(e2){clearSession();$('#ls').style.display='flex';}
+    catch(e2){clearSession();dismissBoot();$('#ls').style.display='flex';}
   }
 });
 
@@ -1430,12 +1473,15 @@ async function showStudent(){document.getElementById('chatBtn').style.display='f
   $('#cAU').textContent=fd(CU.validade_acesso);
   const d=du(CU.validade_acesso);
   if(d!==null&&d<=30&&d>0){$('#ew').classList.remove('hidden');$('#ed').textContent=d;}
-  await loadMods();renderDash();renderSML();loadLiveSection();loadCountdown();
-  // Check if student has projeto turma
-  await checkProjetoTurma();
-  await checkAvalNav();
-  // Start notification polling
-  setTimeout(pollStudentNotifs,1500);
+  // Mostra tela instantaneamente, carrega dados em background
+  renderSML();
+  loadMods().then(()=>{
+    renderDash();
+    checkAvalNav();
+    checkProjetoTurma();
+  });
+  loadLiveSection();
+  setTimeout(pollStudentNotifs,2000);
   $$('[data-pg]').forEach(item=>item.addEventListener('click',()=>{
     const pg=item.dataset.pg;
     $$('[data-pg]').forEach(x=>x.classList.remove('act'));item.classList.add('act');
@@ -1461,41 +1507,30 @@ async function checkProjetoTurma(){
 }
 async function loadLiveSection(){
   if(!sb||!CU.turma_id){$('#liveSection').classList.add('hidden');return;}
-  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','live').eq('ativa',true).single();
-  if(!data){$('#liveSection').classList.add('hidden');return;}
-  $('#liveTitulo').textContent=data.titulo||'Aula Ao Vivo';
-  $('#liveDesc').textContent=data.descricao||'';
-  $('#liveBtn').href=data.link||'#';
-  $('#liveSection').classList.remove('hidden');
-}
-async function loadCountdown(){
+  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('ativa',true);
+  const live=(data||[]).find(x=>x.tipo==='live');
+  const cd=(data||[]).find(x=>x.tipo==='countdown');
+  // Live section
+  if(!live){$('#liveSection').classList.add('hidden');}
+  else{$('#liveTitulo').textContent=live.titulo||'Aula Ao Vivo';$('#liveDesc').textContent=live.descricao||'';$('#liveBtn').href=live.link||'#';$('#liveSection').classList.remove('hidden');}
+  // Countdown section (usa mesmos dados, sem nova query)
   if(cdTimer)clearInterval(cdTimer);
-  if(!sb||!CU.turma_id){$('#cdSection').classList.add('hidden');return;}
-  const{data}=await sb.from('aulas_ao_vivo').select('*').eq('turma_id',CU.turma_id).eq('tipo','countdown').eq('ativa',true).single();
-  if(!data?.data_hora){$('#cdSection').classList.add('hidden');return;}
-  const target=new Date(data.data_hora);
-  if(target<new Date()){$('#cdSection').classList.add('hidden');return;}
-  $('#cdTitulo').textContent=data.titulo||'Próxima Aula';
-  $('#cdData').textContent=fdt(data.data_hora);
-  $('#cdTurmaLabel').textContent=CTurma?.nome||'';
-  $('#cdSection').classList.remove('hidden');
-  function tick(){
-    const diff=target-new Date();
-    if(diff<=0){$('#cdSection').classList.add('hidden');clearInterval(cdTimer);return;}
-    const p=n=>String(n).padStart(2,'0');
-    $('#cdD').textContent=p(Math.floor(diff/864e5));
-    $('#cdH').textContent=p(Math.floor((diff%864e5)/36e5));
-    $('#cdM').textContent=p(Math.floor((diff%36e5)/6e4));
-    $('#cdS').textContent=p(Math.floor((diff%6e4)/1e3));
-  }
+  if(!cd?.data_hora||new Date(cd.data_hora)<new Date()){$('#cdSection').classList.add('hidden');return;}
+  $('#cdTitulo').textContent=cd.titulo||'Próxima Aula';$('#cdData').textContent=fdt(cd.data_hora);$('#cdTurmaLabel').textContent=CTurma?.nome||'';$('#cdSection').classList.remove('hidden');
+  const target=new Date(cd.data_hora);
+  function tick(){const diff=target-new Date();if(diff<=0){$('#cdSection').classList.add('hidden');clearInterval(cdTimer);return;}const p=n=>String(n).padStart(2,'0');$('#cdD').textContent=p(Math.floor(diff/864e5));$('#cdH').textContent=p(Math.floor((diff%864e5)/36e5));$('#cdM').textContent=p(Math.floor((diff%36e5)/6e4));$('#cdS').textContent=p(Math.floor((diff%6e4)/1e3));}
   tick();cdTimer=setInterval(tick,1000);
 }
+
 async function loadMods(){
   if(!sb){mods=[{id:'dm1',titulo:'Introdução',icone:'📖',duracao_seg:720,video_type:'youtube',video_url:'',topicos:'Visão geral',ordem:1}];CTurma={nome:'Demo'};$('#sTurmaHdr').textContent='Turma Demo';return;}
   if(CU.turma_id){
-    const{data:t}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
+    // Paraleliza turma + módulos em uma única rodada
+    const[{data:t},{data:m}]=await Promise.all([
+      sb.from('turmas').select('*').eq('id',CU.turma_id).single(),
+      sb.from('modules').select('*').eq('turma_id',CU.turma_id).eq('ativo',true).order('ordem')
+    ]);
     CTurma=t;if(t)$('#sTurmaHdr').textContent=t.nome;
-    const{data:m}=await sb.from('modules').select('*').eq('turma_id',CU.turma_id).eq('ativo',true).order('ordem');
     mods=m||[];
   }else{CTurma=null;mods=[];}
 }
@@ -1506,6 +1541,7 @@ async function getProg(){
 }
 async function renderDash(){
   $('#dTurma').textContent=CTurma?.nome||'Sem turma';$('#cTn').textContent=CTurma?.nome||'—';
+  if(!mods.length){renderTrail({});return;}
   const pm=await getProg();
   const done=mods.filter(m=>pm[m.id]?.concluido).length,total=mods.length;
   const p=pct(done,total),ts=Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0);
@@ -2012,8 +2048,8 @@ async function showAdmin(){document.getElementById('chatBtn').style.display='fle
     const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
     if(fns[adm])fns[adm]();
   }));
-  await loadADash();await loadPend();await checkResetRequests();
-  // Start admin notification polling
+  // Carrega painéis admin em paralelo
+  Promise.all([loadADash(),loadPend(),checkResetRequests()]);
   setTimeout(pollAdminNotifs,1500);
 }
 
