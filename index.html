@@ -217,6 +217,34 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 #avalContent input[type=range]{accent-color:var(--cyan);width:100%;cursor:pointer}
 #avalContent select,#avalContent textarea{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px}
 #avalContent .card{background:var(--card)}
+
+/* ── BADGES / CONQUISTAS ── */
+.badges-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.badge-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.22);min-width:80px;max-width:90px;text-align:center;transition:all .2s;cursor:default}
+.badge-card.earned{border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.07);box-shadow:0 0 14px rgba(0,200,255,.12)}
+.badge-card.locked{opacity:.38;filter:grayscale(.8)}
+.badge-icon{font-size:1.7rem;line-height:1}
+.badge-name{font-size:.68rem;font-weight:800;color:var(--soft);line-height:1.2}
+.badge-card.earned .badge-name{color:#bff6ff}
+
+/* ── ANOTAÇÕES TIMESTAMP ── */
+.note-ts-item{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;background:rgba(0,0,0,.18);cursor:pointer;transition:all .18s}
+.note-ts-item:hover{border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.04)}
+.note-ts-badge{background:rgba(0,200,255,.15);color:var(--cyan);font-size:.72rem;font-weight:900;padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;align-self:flex-start;margin-top:2px;font-family:var(--fb)}
+.note-ts-text{font-size:.88rem;color:var(--soft);line-height:1.5;flex:1}
+.note-ts-del{color:var(--muted);font-size:.78rem;cursor:pointer;flex-shrink:0;align-self:flex-start;margin-top:2px;padding:2px 6px;border-radius:4px;transition:all .15s}
+.note-ts-del:hover{color:var(--red);background:rgba(239,68,68,.1)}
+.note-add-bar{display:flex;gap:8px;margin-bottom:12px;align-items:flex-start}
+.note-add-bar textarea{flex:1;min-height:52px}
+
+/* ── ENGAJAMENTO ADMIN ── */
+.eng-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.eng-card{padding:14px;border-radius:var(--r);border:1px solid var(--border);background:rgba(0,0,0,.22);text-align:center}
+.eng-val{font-size:1.5rem;font-weight:900;color:#bff6ff;margin-bottom:3px}
+.eng-lbl{font-size:.75rem;color:var(--muted);font-weight:700}
+.eng-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.eng-hot{background:#10b981}.eng-warm{background:#f59e0b}.eng-cold{background:#ef4444}.eng-new{background:#8b5cf6}
+
 </style>
 </head>
 <body>
@@ -335,6 +363,11 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
 
         <!-- LIVE CARD -->
+        <!-- CONQUISTAS -->
+        <div id="badgesSection" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:10px;display:flex;align-items:center;gap:7px">🏆 Conquistas <span id="badgeCount" class="badge bc" style="font-size:.7rem">0</span></div>
+          <div class="badges-grid" id="badgesGrid"></div>
+        </div>
         <div id="liveSection" class="hidden">
           <div class="livecard">
             <div class="livecard-inner">
@@ -420,10 +453,21 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
               <div id="tab-note" class="tp">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
                   <h3 style="color:var(--cyan)">📝 Anotações</h3>
-                  <button id="bNote" class="btn bo btn-sm">💾 Salvar</button>
+                  <span style="font-size:.75rem;color:var(--muted)" id="noteTsHint">⏱️ Clique em + para anotar com timestamp do vídeo</span>
                 </div>
-                <textarea id="nta" class="nta" placeholder="Suas anotações...&#10;&#10;💡 Salvas automaticamente a cada 30s."></textarea>
-                <div style="font-size:.75rem;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between"><span><span id="nch">0</span> chars</span><span>Salvo: <span id="nSv">nunca</span></span></div>
+                <!-- Anotação rápida com timestamp -->
+                <div class="note-add-bar">
+                  <textarea id="ntaNew" class="fi" rows="2" placeholder="Nova anotação... (será vinculada ao segundo atual do vídeo)"></textarea>
+                  <button id="bNoteAdd" class="btn bp btn-sm" style="white-space:nowrap">+ Anotar</button>
+                </div>
+                <!-- Lista de anotações com timestamp -->
+                <div id="notesList"></div>
+                <!-- Anotações gerais do módulo (legacy) -->
+                <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+                  <div style="font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">📄 Anotações livres do módulo</div>
+                  <textarea id="nta" class="nta" placeholder="Anotações gerais deste módulo...&#10;💡 Salvas automaticamente a cada 30s."></textarea>
+                  <div style="font-size:.75rem;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between"><span><span id="nch">0</span> chars</span><span>Salvo: <span id="nSv">nunca</span></span></div>
+                </div>
               </div>
               <div id="tab-fmod" class="tp">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
@@ -523,6 +567,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="ani" data-adm="live">🔴 Aulas Ao Vivo</div>
       <div class="ani" data-adm="mural">📋 Mural</div>
       <div class="ani" data-adm="forum">💬 Fórum</div>
+      <div class="ani" data-adm="engajamento">📈 Engajamento</div>
       <div class="ani" data-adm="aval">⭐ Avaliações</div>
       <div class="ani" data-adm="proposta">📄 Gerar Proposta</div>
       <div class="ani" data-adm="crm">🗂️ CRM</div>
@@ -870,6 +915,38 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
 
 
       <!-- CRM -->
+      <!-- ENGAJAMENTO ADMIN -->
+      <div id="adm-engajamento" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📈 Relatório de Engajamento</div>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px">Monitore a atividade e progresso de cada aluno em tempo real.</div>
+        <div class="eng-grid" id="engSummary"></div>
+        <div class="card cp" style="margin-bottom:14px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:0">
+            <select id="engFiltroTurma" class="fi" style="width:auto;min-width:180px"><option value="">Todas as turmas</option></select>
+            <select id="engFiltroStatus" class="fi" style="width:auto">
+              <option value="">Todos</option>
+              <option value="hot">🟢 Ativos (últimos 3 dias)</option>
+              <option value="warm">🟡 Mornos (4–14 dias)</option>
+              <option value="cold">🔴 Inativos (15+ dias)</option>
+              <option value="new">🟣 Novos (sem acesso)</option>
+            </select>
+            <button id="bEngFiltrar" class="btn bp btn-sm">🔍 Filtrar</button>
+            <button id="bEngExport" class="btn bg2 btn-sm">📥 CSV</button>
+          </div>
+        </div>
+        <div class="card cp">
+          <div class="tw2">
+            <table>
+              <thead><tr>
+                <th>Status</th><th>Aluno</th><th>Turma</th><th>Último acesso</th>
+                <th>Progresso</th><th>Tempo total</th><th>Módulos feitos</th><th>Validade</th>
+              </tr></thead>
+              <tbody id="engTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div id="adm-crm" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">🗂️ CRM — Clientes & Contratos</div>
         <div style="font-size:.88rem;color:var(--muted);margin-bottom:18px">Histórico completo: proposta → contrato → curso → certificado.</div>
@@ -1393,7 +1470,7 @@ window.goAdm=function(panel){
     const fns={dash:loadADash,pend:loadPend,alunos:loadAlunos,turmas:loadTurmas,
       mods:loadMods,mats:loadMats,quiz:loadQuiz,live:loadLive,mural:loadAdmMural,
       forum:loadAdmForum,aulas:loadAulas,qstats:loadQStats,projetos:loadProjetos,
-      aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
+      engajamento:loadEngajamento,aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('act'));
     document.querySelectorAll('.ani').forEach(a=>a.classList.remove('act'));
     const pg=document.getElementById('adm-'+panel);
@@ -1411,6 +1488,7 @@ async function criarNotifAdmin(tipo,titulo,desc,extra){
 // ── Auto-poll intervals ──
 setInterval(()=>{if(CU?.role!=='admin')pollStudentNotifs();},60000);
 setInterval(()=>{if(CU?.role==='admin'&&!_pollAdminBusy)pollAdminNotifs();},90000);
+
 
 
 /* ── PRECONNECT SUPABASE ── */
@@ -1494,7 +1572,7 @@ async function showStudent(){document.getElementById('chatBtn').style.display='f
     $$('.tb').forEach(x=>x.classList.remove('act'));b.classList.add('act');
     $$('.tp').forEach(p=>p.classList.remove('act'));
     document.getElementById(`tab-${tab}`).classList.add('act');
-    if(tab==='note')loadNote();if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();if(tab==='aulas')loadAulasList();
+    if(tab==='note'){loadNote();loadTsNotes();}if(tab==='fmod')loadFMod();if(tab==='quiz')loadQuiz();if(tab==='aulas')loadAulasList();
   }));
 }
 async function checkProjetoTurma(){
@@ -1543,6 +1621,7 @@ async function renderDash(){
   $('#dTurma').textContent=CTurma?.nome||'Sem turma';$('#cTn').textContent=CTurma?.nome||'—';
   if(!mods.length){renderTrail({});return;}
   const pm=await getProg();
+  renderBadges();
   const done=mods.filter(m=>pm[m.id]?.concluido).length,total=mods.length;
   const p=pct(done,total),ts=Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0);
   const qs=Object.values(pm).filter(x=>x.quiz_score!=null);
@@ -1624,6 +1703,8 @@ window.openAula=async function(id){
   $('#cMT').textContent=aula.titulo;
   $('#cTop').innerHTML=(aula.topicos||'').split('\n').filter(Boolean).map(t=>`• ${t}<br/>`).join('')||'<span style="color:var(--muted)">Sem tópicos.</span>';
   loadVideoAula(aula);loadAulasList();
+  // Refresh timestamp notes if note tab is active
+  if(document.querySelector('.tb[data-tab="note"]')?.classList.contains('act'))loadTsNotes();
 };
 function loadVideoAula(aula){
   const vc=$('#vc');if(wTimer)clearInterval(wTimer);
@@ -1664,7 +1745,7 @@ $('#bDone').addEventListener('click',async()=>{
       const p=pct(wSec,aula.duracao_seg||1);
       if(p<70&&!confirm(`Assistiu apenas ${p}%. Concluir mesmo assim?`))return;
       await svProgressAula(aula,true);toast('✅ Aula concluída!','s');
-      loadAulasList();renderDash();return;
+      loadAulasList();renderDash();renderBadges();checkNewBadge();return;
     }
   }
   // fallback: module done
@@ -1725,10 +1806,9 @@ async function loadNote(){
   $('#nta').value=data?.conteudo||'';$('#nch').textContent=$('#nta').value.length;
   $('#nSv').textContent=data?.atualizado_em?new Date(data.atualizado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'nunca';
 }
-$('#bNote').addEventListener('click',async()=>{
-  if(!sb||!actMod||!CU)return;
-  await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});
-  $('#nSv').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});toast('📝 Anotações salvas!','s');
+// bNote substituído por bNoteAdd (anotações com timestamp)
+document.getElementById('nta')?.addEventListener('input',()=>{
+  const n=document.getElementById('nch');if(n)n.textContent=document.getElementById('nta').value.length;
 });
 setInterval(async()=>{if(sb&&CU&&actMod&&$('#nta').value)await sb.from('notes').upsert({user_id:CU.id,modulo_id:actMod,conteudo:$('#nta').value,atualizado_em:new Date().toISOString()},{onConflict:'user_id,modulo_id'});},30000);
 
@@ -2045,7 +2125,7 @@ async function showAdmin(){document.getElementById('chatBtn').style.display='fle
     $$('.ani').forEach(x=>x.classList.remove('act'));i.classList.add('act');
     $$('#aa .page').forEach(p=>p.classList.remove('act'));
     const adm=i.dataset.adm;document.getElementById(`adm-${adm}`).classList.add('act');
-    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
+    const fns={dash:loadADash,pend:loadPend,alunos:loadAAlunos,turmas:loadATurmas,mods:loadAMods,aulas:loadAAulas,mats:loadAMats,quiz:loadAQuiz,qstats:loadQStats,projetos:loadAProjetos,live:loadALive,mural:loadAMural,forum:loadAForum,engajamento:loadEngajamento,aval:loadAvalAdmin,proposta:initProposta,crm:loadCRM};
     if(fns[adm])fns[adm]();
   }));
   // Carrega painéis admin em paralelo
@@ -3331,6 +3411,212 @@ async function checkAvalNav(){
   }
 }
 
+
+/* ════════════════════════════════════════════════════════
+   FEATURE 1 — CONQUISTAS / BADGES
+   ════════════════════════════════════════════════════════ */
+const BADGES=[
+  {id:'primeiro_login',   icon:'🚀', name:'Primeiro Acesso',   desc:'Fez login pela primeira vez',         fn:(pm,ms)=>true},
+  {id:'mod1_done',        icon:'🎯', name:'Módulo 1 Concluído',desc:'Concluiu o primeiro módulo',           fn:(pm,ms)=>ms.filter(m=>pm[m.id]?.concluido).length>=1},
+  {id:'meio_caminho',     icon:'⚡', name:'Metade do Caminho', desc:'50% do curso concluído',               fn:(pm,ms)=>ms.length>0&&pct(ms.filter(m=>pm[m.id]?.concluido).length,ms.length)>=50},
+  {id:'maratona',         icon:'⏱️', name:'Maratonista',       desc:'Mais de 5h de estudo',                 fn:(pm,ms)=>Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0)>=18000},
+  {id:'quiz_master',      icon:'🧠', name:'Quiz Master',       desc:'Acertou 80%+ em algum quiz',           fn:(pm,ms)=>Object.values(pm).some(x=>x.quiz_total>0&&(x.quiz_score/x.quiz_total)>=0.8)},
+  {id:'dedicado',         icon:'💪', name:'Dedicado',          desc:'Mais de 10h de estudo',                fn:(pm,ms)=>Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0)>=36000},
+  {id:'curso_completo',   icon:'🏆', name:'Curso Completo',    desc:'Concluiu todos os módulos',            fn:(pm,ms)=>ms.length>0&&ms.every(m=>pm[m.id]?.concluido)},
+  {id:'anotador',         icon:'📝', name:'Anotador',          desc:'Fez 5 anotações com timestamp',        fn:(pm,ms,nc)=>nc>=5},
+];
+
+let _notesCount=0;
+async function renderBadges(){
+  if(!mods.length)return;
+  const pm=await getProg();
+  const nc=_notesCount;
+  const grid=document.getElementById('badgesGrid');
+  const countEl=document.getElementById('badgeCount');
+  if(!grid)return;
+  let earned=0;
+  grid.innerHTML=BADGES.map(b=>{
+    const ok=b.fn(pm,mods,nc);
+    if(ok)earned++;
+    return `<div class="badge-card ${ok?'earned':'locked'}" title="${b.desc}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+    </div>`;
+  }).join('');
+  if(countEl)countEl.textContent=earned+'/'+BADGES.length;
+}
+
+/* ════════════════════════════════════════════════════════
+   FEATURE 3 — ANOTAÇÕES COM TIMESTAMP
+   ════════════════════════════════════════════════════════ */
+let _tsNotes=[];
+
+function fmtSec(s){const m=Math.floor(s/60),sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
+
+async function loadTsNotes(){
+  const list=document.getElementById('notesList');
+  if(!list)return;
+  if(!sb||!CU||!actAula){list.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:8px 0">Abra uma aula para ver as anotações com timestamp.</div>';return;}
+  const{data}=await sb.from('anotacoes').select('*').eq('user_id',CU.id).eq('aula_id',actAula).order('segundo');
+  _tsNotes=data||[];
+  _notesCount=_tsNotes.length;
+  if(!_tsNotes.length){list.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:8px 0">Sem anotações para esta aula ainda.</div>';return;}
+  list.innerHTML=_tsNotes.map(n=>`
+    <div class="note-ts-item" data-sec="${n.segundo}">
+      <span class="note-ts-badge">⏱️ ${fmtSec(n.segundo)}</span>
+      <span class="note-ts-text">${esc(n.texto)}</span>
+      <span class="note-ts-del" onclick="delTsNote('${n.id}',event)">✕</span>
+    </div>`).join('');
+  // click → seek video
+  list.querySelectorAll('.note-ts-item').forEach(el=>{
+    el.addEventListener('click',e=>{
+      if(e.target.classList.contains('note-ts-del'))return;
+      const sec=parseInt(el.dataset.sec);
+      // MP4 direct seek
+      const vid=document.querySelector('#vc video');
+      if(vid){vid.currentTime=sec;vid.play();return;}
+      // For iframe (YouTube/Vimeo): jump wSec and show toast
+      wSec=sec;
+      toast(`▶️ Vídeo no timestamp ${fmtSec(sec)} — arraste o vídeo manualmente se necessário.`,'i');
+    });
+  });
+}
+
+window.delTsNote=async function(id,e){
+  e.stopPropagation();
+  if(!sb)return;
+  await sb.from('anotacoes').delete().eq('id',id);
+  toast('🗑️ Anotação removida.','i');
+  loadTsNotes();renderBadges();
+};
+
+// Hook add button
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('bNoteAdd');
+  if(btn){
+    btn.addEventListener('click',async()=>{
+      const ta=document.getElementById('ntaNew');
+      const txt=ta?.value.trim();
+      if(!txt){toast('⚠️ Escreva algo antes de anotar.','w');return;}
+      if(!sb||!CU){toast('⚠️ Faça login para salvar anotações.','w');return;}
+      if(!actAula&&!actMod){toast('⚠️ Abra uma aula primeiro.','w');return;}
+      const payload={
+        user_id:CU.id,
+        aula_id:actAula||null,
+        modulo_id:actMod||null,
+        segundo:Math.floor(wSec),
+        texto:txt,
+        criado_em:new Date().toISOString()
+      };
+      const{error}=await sb.from('anotacoes').insert(payload);
+      if(error){toast('❌ Erro ao salvar: '+error.message,'e');return;}
+      ta.value='';
+      toast(`✅ Anotação salva em ${fmtSec(Math.floor(wSec))}!`,'s');
+      loadTsNotes();renderBadges();
+    });
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   FEATURE 2 — RELATÓRIO DE ENGAJAMENTO (ADMIN)
+   ════════════════════════════════════════════════════════ */
+let _engData=[];
+function engStatus(ultimo_acesso){
+  if(!ultimo_acesso)return{key:'new',label:'🟣 Nunca',cls:'eng-new'};
+  const dias=Math.floor((Date.now()-new Date(ultimo_acesso))/(864e5));
+  if(dias<=3) return{key:'hot', label:'🟢 '+dias+'d',cls:'eng-hot'};
+  if(dias<=14)return{key:'warm',label:'🟡 '+dias+'d',cls:'eng-warm'};
+  return{key:'cold',label:'🔴 '+dias+'d',cls:'eng-cold'};
+}
+
+async function loadEngajamento(){
+  if(!sb)return;
+  const turmaFiltro=document.getElementById('engFiltroTurma')?.value||'';
+  const statusFiltro=document.getElementById('engFiltroStatus')?.value||'';
+
+  // Load turmas for filter select
+  const ts=document.getElementById('engFiltroTurma');
+  if(ts&&ts.options.length<=1){
+    const{data:turmas}=await sb.from('turmas').select('id,nome').order('nome');
+    (turmas||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.nome;ts.appendChild(o);});
+  }
+
+  // Fetch users + progress
+  let q=sb.from('users').select('id,nome,login,turma_id,ultimo_acesso,validade_acesso,status,turmas(nome)').eq('role','student').eq('status','active');
+  if(turmaFiltro)q=q.eq('turma_id',turmaFiltro);
+  const{data:users}=await q.order('nome');
+  if(!users?.length){document.getElementById('engTable').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Nenhum aluno encontrado.</td></tr>';return;}
+
+  // Fetch all progress for these users
+  const uids=users.map(u=>u.id);
+  const{data:progs}=await sb.from('progress').select('user_id,modulo_id,segundos_vistos,concluido').in('user_id',uids);
+  const{data:modsAll}=await sb.from('modules').select('id,turma_id').eq('ativo',true);
+
+  // Build per-user stats
+  _engData=users.map(u=>{
+    const up=progs?.filter(p=>p.user_id===u.id)||[];
+    const um=modsAll?.filter(m=>m.turma_id===u.turma_id)||[];
+    const totalSeg=up.reduce((s,p)=>s+(p.segundos_vistos||0),0);
+    const done=up.filter(p=>p.concluido).length;
+    const progPct=um.length?pct(done,um.length):0;
+    const st=engStatus(u.ultimo_acesso);
+    return{...u,totalSeg,done,totalMods:um.length,progPct,st};
+  }).filter(u=>!statusFiltro||u.st.key===statusFiltro);
+
+  // Summary cards
+  const hot=_engData.filter(u=>u.st.key==='hot').length;
+  const warm=_engData.filter(u=>u.st.key==='warm').length;
+  const cold=_engData.filter(u=>u.st.key==='cold').length;
+  const nvr=_engData.filter(u=>u.st.key==='new').length;
+  document.getElementById('engSummary').innerHTML=`
+    <div class="eng-card"><div class="eng-val" style="color:#10b981">${hot}</div><div class="eng-lbl">🟢 Ativos (3d)</div></div>
+    <div class="eng-card"><div class="eng-val" style="color:#f59e0b">${warm}</div><div class="eng-lbl">🟡 Mornos (4–14d)</div></div>
+    <div class="eng-card"><div class="eng-val" style="color:#ef4444">${cold}</div><div class="eng-lbl">🔴 Inativos (15d+)</div></div>
+    <div class="eng-card"><div class="eng-val" style="color:#8b5cf6">${nvr}</div><div class="eng-lbl">🟣 Nunca acessaram</div></div>
+    <div class="eng-card"><div class="eng-val">${_engData.length}</div><div class="eng-lbl">👥 Total filtrado</div></div>`;
+
+  // Table
+  const tb=document.getElementById('engTable');
+  if(!_engData.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Nenhum aluno para este filtro.</td></tr>';return;}
+  tb.innerHTML=_engData.map(u=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:6px"><div class="eng-status ${u.st.cls}"></div><span style="font-size:.82rem">${u.st.label}</span></div></td>
+    <td><div style="font-weight:700">${esc(u.nome)}</div><div style="font-size:.76rem;color:var(--muted)">${esc(u.login)}</div></td>
+    <td style="font-size:.85rem">${esc(u.turmas?.nome||'—')}</td>
+    <td style="font-size:.82rem;color:var(--muted)">${u.ultimo_acesso?fd(u.ultimo_acesso):'—'}</td>
+    <td><div style="display:flex;align-items:center;gap:7px"><div class="pw" style="width:70px"><div class="pf" style="width:${u.progPct}%"></div></div><span style="font-size:.82rem">${u.progPct}%</span></div></td>
+    <td style="font-size:.85rem">${(u.totalSeg/3600).toFixed(1)}h</td>
+    <td style="font-size:.85rem;text-align:center">${u.done}/${u.totalMods}</td>
+    <td style="font-size:.82rem;color:${du(u.validade_acesso)!==null&&du(u.validade_acesso)<=7?'var(--red)':'var(--muted)'}">${fd(u.validade_acesso)}</td>
+  </tr>`).join('');
+}
+
+// Engagement filter button
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('bEngFiltrar')?.addEventListener('click',loadEngajamento);
+  document.getElementById('bEngExport')?.addEventListener('click',()=>{
+    if(!_engData.length){toast('⚠️ Carregue os dados primeiro.','w');return;}
+    const rows=[['Nome','Login','Turma','Último acesso','Progresso%','Horas','Módulos feitos','Validade']];
+    _engData.forEach(u=>rows.push([u.nome,u.login,u.turmas?.nome||'',u.ultimo_acesso||'',u.progPct,(u.totalSeg/3600).toFixed(1),u.done+'/'+u.totalMods,u.validade_acesso||'']));
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='engajamento.csv';a.click();
+    toast('📥 CSV exportado!','s');
+  });
+});
+
+function checkNewBadge(){
+  // Small delay so renderBadges updates _notesCount first
+  setTimeout(async()=>{
+    if(!mods.length)return;
+    const pm=await getProg();
+    BADGES.forEach(b=>{
+      const key='badge_notified_'+b.id;
+      if(!b.fn(pm,mods,_notesCount))return;
+      if(localStorage.getItem(key))return;
+      localStorage.setItem(key,'1');
+      toast('🏆 Nova conquista: '+b.name+'!','s');
+    });
+  },500);
+}
 /* ── ADMIN LIVE ── */
 async function loadALive(){
   if(!sb)return;await loadTurmaSelects();
