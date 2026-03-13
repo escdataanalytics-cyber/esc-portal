@@ -99,8 +99,8 @@ select.fi option:checked{background-color:#162030 !important;color:#00c8ff !impo
 .uname{font-size:.86rem;font-weight:700}
 .expw{display:flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--amber);border-radius:999px;background:rgba(245,158,11,.07);color:var(--amber);font-size:.8rem;font-weight:700;animation:wp 3s ease-in-out infinite}
 @keyframes wp{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.2)}50%{box-shadow:0 0 0 5px rgba(245,158,11,0)}}
-.l2{display:grid;grid-template-columns:255px 1fr;min-height:calc(100vh - 58px)}
-.sbar{border-right:1px solid var(--border);padding:14px;overflow-y:auto;max-height:calc(100vh - 58px);background:rgba(0,0,0,.1)}
+.l2{display:grid;grid-template-columns:215px 1fr;height:calc(100vh - 58px);overflow:hidden}
+.sbar{border-right:1px solid var(--border);padding:14px;background:rgba(0,0,0,.1);height:100%;overflow-y:auto;box-sizing:border-box}
 .nsect{font-size:.7rem;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:3px 7px;margin:14px 0 5px}
 .ni{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--rs);color:var(--soft);font-weight:600;cursor:pointer;transition:all .18s;margin-bottom:2px;border:1px solid transparent;font-size:.9rem}
 .ni:hover{color:var(--text);background:rgba(255,255,255,.04)}
@@ -131,9 +131,9 @@ select.fi option:checked{background-color:#162030 !important;color:#00c8ff !impo
 .ndrop-empty{padding:28px 14px;text-align:center;color:var(--muted);font-size:.85rem}
 .nbell-wrap{position:relative}
 .nbadge{background:var(--red);color:#fff;border-radius:999px;font-size:.66rem;font-weight:900;padding:2px 5px;margin-left:auto}
-.mcont{overflow-y:auto;max-height:calc(100vh - 58px);padding:22px}
-.ladm{display:grid;grid-template-columns:215px 1fr;min-height:calc(100vh - 58px)}
-.abar{border-right:1px solid var(--border);padding:14px;background:rgba(0,0,0,.18)}
+.mcont{overflow-y:auto;height:100%;padding:22px;box-sizing:border-box}
+.ladm{display:grid;grid-template-columns:215px 1fr;height:calc(100vh - 58px);overflow:hidden}
+.abar{border-right:1px solid var(--border);padding:14px;background:rgba(0,0,0,.18);height:100%;overflow-y:auto;box-sizing:border-box}
 .ani{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:var(--rs);color:var(--muted);font-weight:700;cursor:pointer;transition:all .18s;margin-bottom:3px;border:1px solid transparent;font-size:.9rem}
 .ani:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .ani.act{color:#c9f2ff;border-color:rgba(0,200,255,.25);background:rgba(0,200,255,.07)}
