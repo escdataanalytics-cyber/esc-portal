@@ -1065,60 +1065,62 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
         </div>
       </div>
       <!-- LEADS DO TESTE DE PROFICIÊNCIA -->
-<div id="adm-leads" class="page">
-  <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📊 Leads — Teste de Proficiência</div>
-  <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px">Pessoas que realizaram o teste de nivelamento no site.</div>
-</div>
-  </div>
-</div>
+<!-- LEADS DO TESTE DE PROFICIÊNCIA -->
+      <div id="adm-leads" class="page">
+        <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📊 Leads — Teste de Proficiência</div>
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px">Pessoas que realizaram o teste de nivelamento no site.</div>
 
-  <!-- RESUMO -->
-  <div id="leadsResumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px"></div>
+        <!-- RESUMO -->
+        <div id="leadsResumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px"></div>
 
-  <!-- FILTROS -->
-  <div class="card cp" style="margin-bottom:14px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <select id="leadsFiltroFerramenta" class="fi" style="width:auto;min-width:160px">
-        <option value="">Todas as ferramentas</option>
-        <option value="excel">📊 Excel</option>
-        <option value="powerbi">📈 Power BI</option>
-      </select>
-      <select id="leadsFiltroNivel" class="fi" style="width:auto;min-width:180px">
-        <option value="">Todos os níveis</option>
-        <option value="🌱 Iniciante">🌱 Iniciante</option>
-        <option value="📚 Em Desenvolvimento">📚 Em Desenvolvimento</option>
-        <option value="✅ Intermediário">✅ Intermediário</option>
-        <option value="⭐ Avançado">⭐ Avançado</option>
-        <option value="🏆 Expert">🏆 Expert</option>
-      </select>
-      <select id="leadsFiltroTemp" class="fi" style="width:auto;min-width:160px">
-        <option value="">Todos os status</option>
-        <option value="hot">🔥 Quente (até 3 dias)</option>
-        <option value="warm">🟡 Morno (4–14 dias)</option>
-        <option value="cold">❄️ Frio (15+ dias)</option>
-      </select>
-      <button id="bLeadsFiltrar" class="btn bp btn-sm">🔍 Filtrar</button>
-      <button id="bLeadsExport" class="btn bg2 btn-sm">📥 CSV</button>
-    </div>
-  </div>
+        <!-- FILTROS -->
+        <div class="card cp" style="margin-bottom:14px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <select id="leadsFiltroFerramenta" class="fi" style="width:auto;min-width:160px">
+              <option value="">Todas as ferramentas</option>
+              <option value="excel">📊 Excel</option>
+              <option value="powerbi">📈 Power BI</option>
+            </select>
+            <select id="leadsFiltroNivel" class="fi" style="width:auto;min-width:180px">
+              <option value="">Todos os níveis</option>
+              <option value="🌱 Iniciante">🌱 Iniciante</option>
+              <option value="📚 Em Desenvolvimento">📚 Em Desenvolvimento</option>
+              <option value="✅ Intermediário">✅ Intermediário</option>
+              <option value="⭐ Avançado">⭐ Avançado</option>
+              <option value="🏆 Expert">🏆 Expert</option>
+            </select>
+            <select id="leadsFiltroTemp" class="fi" style="width:auto;min-width:160px">
+              <option value="">Todos os status</option>
+              <option value="hot">🔥 Quente (até 3 dias)</option>
+              <option value="warm">🟡 Morno (4–14 dias)</option>
+              <option value="cold">❄️ Frio (15+ dias)</option>
+            </select>
+            <button id="bLeadsFiltrar" class="btn bp btn-sm">🔍 Filtrar</button>
+            <button id="bLeadsExport" class="btn bg2 btn-sm">📥 CSV</button>
+          </div>
+        </div>
 
-  <!-- TABELA -->
-  <div class="card cp">
-    <div class="tw2">
-      <table>
-        <thead><tr>
-          <th>Status</th><th>Nome</th><th>Cargo / Empresa</th>
-          <th>Ferramenta</th><th>Nível</th><th>Pontuação</th>
-          <th>Tópicos de Interesse</th><th>Data</th><th>Ação</th>
-        </tr></thead>
-        <tbody id="leadsTable"></tbody>
-      </table>
-    </div>
-    <div id="leadsEmpty" class="hidden" style="text-align:center;padding:40px;color:var(--muted)">
-      Nenhum lead encontrado com esses filtros.
-    </div>
-  </div>
-</div>
+        <!-- TABELA -->
+        <div class="card cp">
+          <div class="tw2">
+            <table>
+              <thead><tr>
+                <th>Status</th><th>Nome</th><th>Cargo / Empresa</th>
+                <th>Ferramenta</th><th>Nível</th><th>Pontuação</th>
+                <th>Tópicos de Interesse</th><th>Data</th><th>Ação</th>
+              </tr></thead>
+              <tbody id="leadsTable"></tbody>
+            </table>
+          </div>
+          <div id="leadsEmpty" class="hidden" style="text-align:center;padding:40px;color:var(--muted)">
+            Nenhum lead encontrado com esses filtros.
+          </div>
+        </div>
+      </div><!-- /adm-leads -->
+
+    </div><!-- /mcont -->
+  </div><!-- /ladm -->
+</div><!-- /aa -->
 
 <!-- ══════════════════════════════════
      CHATBOT ESC — TUTOR IA
