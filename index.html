@@ -878,35 +878,105 @@ hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
       <!-- GERADOR DE PROPOSTA -->
       <div id="adm-proposta" class="page">
         <div style="font-family:var(--fd);font-size:1.2rem;color:var(--cyan);margin-bottom:6px">📄 Gerador de Proposta Comercial</div>
-        <div style="font-size:.88rem;color:var(--muted);margin-bottom:22px">Preencha os dados do cliente e selecione os cursos para gerar uma proposta personalizada em HTML pronta para imprimir como PDF.</div>
+        <div style="font-size:.88rem;color:var(--muted);margin-bottom:18px">Preencha os dados do cliente e selecione os cursos para gerar uma proposta personalizada em HTML pronta para imprimir como PDF.</div>
+
+        <!-- TIPO DE PROPOSTA -->
         <div class="card cp" style="margin-bottom:16px">
-          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">👤 Dados do Cliente</div>
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">🎯 Tipo de Proposta</div>
+          <div style="display:flex;gap:10px">
+            <button id="prTipoPF" onclick="setPrTipo('pf')" class="btn bp" style="flex:1;padding:14px;font-size:.95rem;transition:all .2s">👤 Pessoa Física</button>
+            <button id="prTipoPJ" onclick="setPrTipo('pj')" class="btn bo" style="flex:1;padding:14px;font-size:.95rem;transition:all .2s">🏢 Pessoa Jurídica</button>
+          </div>
+          <input type="hidden" id="prTipo" value="pf"/>
+        </div>
+
+        <!-- DADOS COMUNS -->
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="font-weight:800;color:var(--cyan);margin-bottom:14px" id="prDadosTitle">👤 Dados do Cliente — Pessoa Física</div>
           <div class="fgrid">
-            <div class="fg"><label class="fl">Nome do Cliente</label><input id="prNome" class="fi" placeholder="João da Silva"/></div>
-            <div class="fg"><label class="fl">Empresa</label><input id="prEmpresa" class="fi" placeholder="Empresa S.A."/></div>
-            <div class="fg"><label class="fl">Cargo</label><input id="prCargo" class="fi" placeholder="Analista de Produção"/></div>
-            <div class="fg"><label class="fl">E-mail</label><input id="prEmail" class="fi" type="email" placeholder="joao@empresa.com"/></div>
+            <div class="fg"><label class="fl">Nome Completo</label><input id="prNome" class="fi" placeholder="João da Silva"/></div>
+            <div class="fg"><label class="fl">E-mail</label><input id="prEmail" class="fi" type="email" placeholder="joao@email.com"/></div>
             <div class="fg"><label class="fl">Telefone / WhatsApp</label><input id="prTel" class="fi" placeholder="(11) 9 9999-9999"/></div>
-            <div class="fg"><label class="fl">Cidade / Data</label><input id="prCidade" class="fi" placeholder="São Paulo, março de 2026"/></div>
+            <div class="fg"><label class="fl">Cargo / Profissão</label><input id="prCargo" class="fi" placeholder="Analista de Produção"/></div>
+            <!-- Campo PF: empresa (opcional) -->
+            <div class="fg" id="grpEmpresaPF"><label class="fl">Empresa (opcional)</label><input id="prEmpresa" class="fi" placeholder="Empresa onde trabalha"/></div>
+            <div class="fg"><label class="fl">Cidade / Data</label><input id="prCidade" class="fi" placeholder="São Paulo, maio de 2026"/></div>
+          </div>
+
+          <!-- CAMPOS EXCLUSIVOS PJ -->
+          <div id="camposPJ" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+            <div style="font-size:.8rem;font-weight:800;color:var(--amber);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px">📋 Dados Corporativos</div>
+            <div class="fgrid">
+              <div class="fg"><label class="fl">Razão Social</label><input id="prRazaoSocial" class="fi" placeholder="Empresa Ltda."/></div>
+              <div class="fg"><label class="fl">CNPJ</label><input id="prCNPJ" class="fi" placeholder="00.000.000/0001-00" maxlength="18"/></div>
+              <div class="fg"><label class="fl">Responsável pela Contratação</label><input id="prResponsavel" class="fi" placeholder="Maria Oliveira — RH"/></div>
+              <div class="fg"><label class="fl">Setor / Departamento</label><input id="prSetor" class="fi" placeholder="TI, Operações, Financeiro..."/></div>
+              <div class="fg"><label class="fl">Nº de Colaboradores a Treinar</label><input id="prColabs" class="fi" type="number" min="1" placeholder="Ex: 8"/></div>
+              <div class="fg full"><label class="fl">Endereço de Cobrança</label><input id="prEndereco" class="fi" placeholder="Rua, número, cidade, CEP"/></div>
+            </div>
           </div>
         </div>
+
+        <!-- CURSOS COM VALOR EDITÁVEL -->
         <div class="card cp" style="margin-bottom:16px">
           <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">📚 Cursos da Proposta</div>
           <div style="display:flex;flex-direction:column;gap:10px" id="prCursos">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,200,255,.04)">
-              <input type="checkbox" name="prCurso" value="excel" data-price="497" style="accent-color:var(--cyan);width:18px;height:18px" checked/>
-              <div><div style="font-weight:700">Mentoria em Excel — Método dos Dados ao Dashboard</div><div style="font-size:.8rem;color:var(--muted)">R$ 497,00 por aluno</div></div>
-            </label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(124,92,252,.04)">
-              <input type="checkbox" name="prCurso" value="powerbi" data-price="597" style="accent-color:var(--purple);width:18px;height:18px"/>
-              <div><div style="font-weight:700">Mentoria em Power BI — Método dos Dados ao Dashboard</div><div style="font-size:.8rem;color:var(--muted)">R$ 597,00 por aluno</div></div>
-            </label>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:var(--rs);background:rgba(15,186,129,.04)">
-              <input type="checkbox" name="prCurso" value="projetos" data-price="597" style="accent-color:var(--green);width:18px;height:18px"/>
-              <div><div style="font-weight:700">Mentoria em Projetos de Análise de Dados</div><div style="font-size:.8rem;color:var(--muted)">A partir de R$ 597,00 — valor conforme escopo</div></div>
-            </label>
+
+            <!-- Excel -->
+            <div style="border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,200,255,.04);overflow:hidden">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px">
+                <input type="checkbox" name="prCurso" value="excel" style="accent-color:var(--cyan);width:18px;height:18px;flex-shrink:0" checked/>
+                <div style="flex:1">
+                  <div style="font-weight:700">Mentoria em Excel — Método dos Dados ao Dashboard</div>
+                  <div style="font-size:.8rem;color:var(--muted)">Do zero ao dashboard profissional em Excel</div>
+                </div>
+              </label>
+              <div style="padding:0 12px 12px;display:flex;align-items:center;gap:10px">
+                <span style="font-size:.8rem;color:var(--soft);font-weight:700;white-space:nowrap">💰 Valor (R$):</span>
+                <input id="prPrecoExcel" class="fi" type="number" min="0" value="497" style="max-width:140px;padding:7px 11px"/>
+                <span style="font-size:.78rem;color:var(--muted)" id="prLabelExcel">por aluno</span>
+              </div>
+            </div>
+
+            <!-- Power BI -->
+            <div style="border:1px solid var(--border);border-radius:var(--rs);background:rgba(124,92,252,.04);overflow:hidden">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px">
+                <input type="checkbox" name="prCurso" value="powerbi" style="accent-color:var(--purple);width:18px;height:18px;flex-shrink:0"/>
+                <div style="flex:1">
+                  <div style="font-weight:700">Mentoria em Power BI — Método dos Dados ao Dashboard</div>
+                  <div style="font-size:.8rem;color:var(--muted)">Do dado bruto ao dashboard estratégico</div>
+                </div>
+              </label>
+              <div style="padding:0 12px 12px;display:flex;align-items:center;gap:10px">
+                <span style="font-size:.8rem;color:var(--soft);font-weight:700;white-space:nowrap">💰 Valor (R$):</span>
+                <input id="prPrecoPBI" class="fi" type="number" min="0" value="597" style="max-width:140px;padding:7px 11px"/>
+                <span style="font-size:.78rem;color:var(--muted)" id="prLabelPBI">por aluno</span>
+              </div>
+            </div>
+
+            <!-- Projetos -->
+            <div style="border:1px solid var(--border);border-radius:var(--rs);background:rgba(15,186,129,.04);overflow:hidden">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px">
+                <input type="checkbox" name="prCurso" value="projetos" style="accent-color:var(--green);width:18px;height:18px;flex-shrink:0"/>
+                <div style="flex:1">
+                  <div style="font-weight:700">Mentoria em Projetos de Análise de Dados</div>
+                  <div style="font-size:.8rem;color:var(--muted)">Consultoria e desenvolvimento aplicado</div>
+                </div>
+              </label>
+              <div style="padding:0 12px 12px;display:flex;align-items:center;gap:10px">
+                <span style="font-size:.8rem;color:var(--soft);font-weight:700;white-space:nowrap">💰 Valor (R$):</span>
+                <input id="prPrecoProjetos" class="fi" type="number" min="0" value="597" style="max-width:140px;padding:7px 11px"/>
+                <span style="font-size:.78rem;color:var(--muted)" id="prLabelProjetos">por aluno</span>
+              </div>
+            </div>
+
+          </div>
+          <!-- Resumo PJ -->
+          <div id="prResumoValor" style="display:none;margin-top:14px;padding:12px 16px;border-radius:var(--rs);background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2)">
+            <div style="font-size:.82rem;color:var(--soft)">💼 Com <strong id="prColabsResumo">1</strong> colaboradores · os valores acima são <strong>por aluno</strong>. O total será calculado automaticamente na proposta.</div>
           </div>
         </div>
+
         <div class="card cp" style="margin-bottom:16px">
           <div style="font-weight:800;color:var(--cyan);margin-bottom:14px">💬 Observações (opcional)</div>
           <textarea id="prObs" class="fi" rows="3" placeholder="Condições especiais, contexto do cliente, desconto negociado..."></textarea>
@@ -2978,48 +3048,198 @@ async function salvarPropostaCRM(){
 }
 
 /* ── GERADOR DE PROPOSTA (ADMIN) ── */
+// ── PROPOSTA: TIPO PF / PJ ──
+function setPrTipo(tipo){
+  document.getElementById('prTipo').value=tipo;
+  const isPJ=tipo==='pj';
+  document.getElementById('prTipoPF').className=isPJ?'btn bo':'btn bp';
+  document.getElementById('prTipoPF').style.flex='1';document.getElementById('prTipoPF').style.padding='14px';
+  document.getElementById('prTipoPJ').className=isPJ?'btn bp':'btn bo';
+  document.getElementById('prTipoPJ').style.flex='1';document.getElementById('prTipoPJ').style.padding='14px';
+  document.getElementById('camposPJ').style.display=isPJ?'block':'none';
+  document.getElementById('grpEmpresaPF').style.display=isPJ?'none':'';
+  document.getElementById('prDadosTitle').textContent=isPJ?'🏢 Dados do Cliente — Pessoa Jurídica':'👤 Dados do Cliente — Pessoa Física';
+  document.getElementById('prResumoValor').style.display=isPJ?'block':'none';
+  // atualiza labels dos preços
+  const lbl=isPJ?'por aluno':'por aluno';
+  ['prLabelExcel','prLabelPBI','prLabelProjetos'].forEach(id=>{ const el=document.getElementById(id); if(el)el.textContent=lbl; });
+  // mascara CNPJ
+  if(isPJ){
+    const cnpjEl=document.getElementById('prCNPJ');
+    if(cnpjEl && !cnpjEl._maskOk){
+      cnpjEl._maskOk=true;
+      cnpjEl.addEventListener('input',function(){
+        let v=this.value.replace(/\D/g,'').substring(0,14);
+        v=v.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
+          .replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2');
+        this.value=v;
+      });
+    }
+    const colabsEl=document.getElementById('prColabs');
+    if(colabsEl){
+      colabsEl.addEventListener('input',function(){
+        const v=parseInt(this.value)||1;
+        document.getElementById('prColabsResumo').textContent=v;
+      });
+    }
+  }
+}
+
+function fmtBRL(num){return'R$ '+Number(num).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
 let _propostaInited=false;
 function initProposta(){
   if(_propostaInited)return;_propostaInited=true;
   document.getElementById('bGerarProposta').addEventListener('click',gerarPropostaHTML);
+  // estado inicial PF
+  setPrTipo('pf');
 }
 function gerarPropostaHTML(){
+  const tipo=document.getElementById('prTipo').value;
+  const isPJ=tipo==='pj';
   const nome=$('#prNome').value.trim()||'[Nome do Cliente]';
-  const empresa=$('#prEmpresa').value.trim()||'[Empresa]';
-  const cargo=$('#prCargo').value.trim()||'[Cargo]';
+  const cargo=$('#prCargo').value.trim()||'';
   const email=$('#prEmail').value.trim()||'[E-mail]';
-  const tel=$('#prTel').value.trim()||'[Telefone]';
+  const tel=$('#prTel').value.trim()||'';
   const cidade=$('#prCidade').value.trim()||'[Cidade], [Data]';
   const obs=$('#prObs').value.trim();
+  // PF
+  const empresa=isPJ?'':($('#prEmpresa').value.trim()||'');
+  // PJ extras
+  const razaoSocial=isPJ?($('#prRazaoSocial').value.trim()||'[Razão Social]'):'';
+  const cnpj=isPJ?($('#prCNPJ').value.trim()||''):'';
+  const responsavel=isPJ?($('#prResponsavel').value.trim()||''):'';
+  const setor=isPJ?($('#prSetor').value.trim()||''):'';
+  const colabs=isPJ?(parseInt($('#prColabs').value)||1):1;
+  const endereco=isPJ?($('#prEndereco').value.trim()||''):'';
+
+  // Preços editáveis
+  const precos={
+    excel: parseFloat($('#prPrecoExcel').value)||497,
+    powerbi: parseFloat($('#prPrecoPBI').value)||597,
+    projetos: parseFloat($('#prPrecoProjetos').value)||597,
+  };
 
   const cursosMap={
-    excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',price:'R$ 497,00',priceNum:497,color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos.'},
-    powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',price:'R$ 597,00',priceNum:597,color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica.'},
-    projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',price:'A partir de R$ 597,00',priceNum:597,color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo.'},
+    excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos.'},
+    powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica.'},
+    projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo.'},
   };
 
   const selecionados=[...document.querySelectorAll('[name="prCurso"]:checked')].map(el=>el.value);
   if(!selecionados.length){toast('⚠️ Selecione ao menos um curso.','w');return;}
-  const cursos=selecionados.map(v=>cursosMap[v]);
+  const cursos=selecionados.map(v=>({...cursosMap[v],priceNum:precos[v],price:fmtBRL(precos[v]),totalPrice:fmtBRL(precos[v]*colabs)}));
 
   const inclusions=['Aulas ao vivo em turmas de até 5 pessoas','Projetos reais do mercado (80% hands-on)','Suporte direto com o mentor via comunidade exclusiva','Acesso à plataforma de ensino com materiais atualizados','Fórum exclusivo para dúvidas e networking','Certificado de conclusão ao final do curso'];
 
+  // ── CAPA: dados variam PF x PJ ──
+  const capaTitle       = isPJ ? 'PROPOSTA COMERCIAL CORPORATIVA' : 'PROPOSTA COMERCIAL';
+  const capaSub         = isPJ
+    ? `Capacitação Corporativa em Análise de Dados · ${colabs} colaborador${colabs>1?'es':''}`
+    : 'Mentoria Especializada em Análise de Dados';
+  const coverAccent     = isPJ ? '#f59e0b' : '#00c8ff';
+  const coverBg         = isPJ ? 'linear-gradient(135deg,#1a1200,#1a1600)' : 'linear-gradient(135deg,#0a1628,#0f1a2e)';
+  const labelAccent     = isPJ ? 'rgba(245,158,11,.7)' : 'rgba(0,200,255,.7)';
+  const sectionBorder   = isPJ ? '#f59e0b' : '#00c8ff';
+  const stepBg          = isPJ ? '#f59e0b' : '#00c8ff';
+  const footerBg        = isPJ ? '#1a1200' : '#0a1628';
+  const badgeBg         = isPJ ? 'rgba(245,158,11,.12)' : 'rgba(0,200,255,.12)';
+  const badgeColor      = isPJ ? '#f59e0b' : '#00c8ff';
+  const badgeBorder     = isPJ ? 'rgba(245,158,11,.3)' : 'rgba(0,200,255,.3)';
+  const dif1Border      = isPJ ? '#f59e0b' : '#00c8ff';
+  const dif1Bg          = isPJ ? '#fffbea' : '#f0f8ff';
+
+  // Bloco de capa PJ inclui mais dados
+  const capaPJExtra = isPJ ? `
+    ${cnpj?`<div class="meta-block"><div class="meta-label">CNPJ</div><div class="meta-value" style="font-size:.9rem">${cnpj}</div></div>`:''}
+    ${setor?`<div class="meta-block"><div class="meta-label">Setor / Departamento</div><div class="meta-value" style="font-size:.9rem">${setor}</div></div>`:''}
+    ${responsavel?`<div class="meta-block"><div class="meta-label">Responsável pela Contratação</div><div class="meta-value" style="font-size:.9rem">${responsavel}</div></div>`:''}
+    ${endereco?`<div class="meta-block" style="grid-column:1/-1"><div class="meta-label">Endereço de Cobrança</div><div class="meta-value" style="font-size:.88rem;font-weight:400;color:rgba(255,255,255,.75)">${endereco}</div></div>`:''}
+  ` : '';
+
+  const capaPFInfo = !isPJ
+    ? `<div class="meta-block"><div class="meta-label">Para</div><div class="meta-value">${nome}</div>${(cargo||empresa)?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${[cargo,empresa].filter(Boolean).join(' · ')}</div>`:''}</div>`
+    : `<div class="meta-block"><div class="meta-label" style="color:${labelAccent}">Empresa</div><div class="meta-value">${razaoSocial}</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${[cargo,nome].filter(Boolean).join(' · ')}</div></div>`;
+
+  // Tabela de investimento (PJ mostra total por curso)
+  const tabelaInvestimento = isPJ
+    ? `<table class="price-table">
+        <thead><tr><th>Programa</th><th>Valor por Aluno</th><th>Colaboradores</th><th>Total do Programa</th></tr></thead>
+        <tbody>
+          ${cursos.map(c=>`<tr>
+            <td>${c.label}<br/><span style="font-size:.82rem;color:#6b8fa8;font-style:italic">${c.sub}</span></td>
+            <td style="font-weight:700;color:${c.color}">${c.price}</td>
+            <td style="text-align:center;font-weight:700">${colabs}</td>
+            <td style="font-weight:900;color:${c.color};font-size:1rem">${c.totalPrice}</td>
+          </tr>`).join('')}
+          ${cursos.length>1?`<tr style="background:#f0f8ff"><td colspan="3" style="font-weight:800;text-align:right">TOTAL GERAL</td><td style="font-weight:900;color:#0a1628;font-size:1.1rem">${fmtBRL(cursos.reduce((s,c)=>s+(c.priceNum*colabs),0))}</td></tr>`:''}
+        </tbody>
+      </table>`
+    : `<table class="price-table">
+        <thead><tr><th>Programa</th><th>Investimento por Aluno</th></tr></thead>
+        <tbody>
+          ${cursos.map(c=>`<tr><td>${c.label}<br/><span style="font-size:.82rem;color:#6b8fa8;font-style:italic">${c.sub}</span></td><td style="font-weight:700;color:${c.color}">${c.price}</td></tr>`).join('')}
+        </tbody>
+      </table>`;
+
+  // Diferenciais variam PF x PJ
+  const diferenciais = isPJ
+    ? `<div class="dif" style="border-left-color:${dif1Border};background:${dif1Bg}"><div class="dif-title">🏭 Aplicação ao Contexto Corporativo</div><div class="dif-text">Projetos desenvolvidos com dados reais da empresa — seus colaboradores aprendem resolvendo problemas do seu negócio.</div></div>
+       <div class="dif" style="border-left-color:#7c5cfc;background:#f5f0ff"><div class="dif-title">👥 Turmas Reduzidas</div><div class="dif-text">Máximo de 5 colaboradores por turma, garantindo atenção individual e alta taxa de conclusão.</div></div>
+       <div class="dif" style="border-left-color:#0fba81;background:#f0fff8"><div class="dif-title">📊 Relatório de Progresso</div><div class="dif-text">Acompanhamento individual via plataforma. Gestor pode monitorar desempenho de cada colaborador em tempo real.</div></div>
+       <div class="dif" style="border-left-color:#ef4444;background:#fff0f0"><div class="dif-title">🏆 Certificação Corporativa</div><div class="dif-text">Certificados individuais emitidos após aprovação no projeto final — comprova competência técnica adquirida.</div></div>`
+    : `<div class="dif" style="border-left-color:${dif1Border};background:${dif1Bg}"><div class="dif-title">🛠️ Aprenda Fazendo</div><div class="dif-text">80% do curso é hands-on com projetos reais do mercado. Zero teoria sem prática.</div></div>
+       <div class="dif" style="border-left-color:#7c5cfc"><div class="dif-title">👥 Turmas Reduzidas</div><div class="dif-text">Máximo de 5 pessoas por turma — acompanhamento próximo e personalizado.</div></div>
+       <div class="dif" style="border-left-color:#0fba81"><div class="dif-title">🔗 Suporte Direto com o Mentor</div><div class="dif-text">Acesso contínuo ao conteúdo, comunidade exclusiva e suporte técnico direto.</div></div>
+       <div class="dif" style="border-left-color:#f59e0b"><div class="dif-title">💻 Plataforma Própria</div><div class="dif-text">Plataforma exclusiva com fórum, materiais atualizados e acompanhamento de progresso.</div></div>`;
+
+  // Próximos passos variam PF x PJ
+  const proximosPassos = isPJ
+    ? `<div class="step"><div class="step-num" style="background:${stepBg}">1</div><div class="step-text"><strong>Análise interna</strong> — Compartilhe a proposta com os decisores da empresa e nos envie dúvidas.</div></div>
+       <div class="step"><div class="step-num" style="background:${stepBg}">2</div><div class="step-text"><strong>Reunião de alinhamento</strong> — Agende uma call com nosso time para ajustar escopo, turmas e cronograma.</div></div>
+       <div class="step"><div class="step-num" style="background:${stepBg}">3</div><div class="step-text"><strong>Contrato e NF</strong> — Assinatura do contrato de prestação de serviços com emissão de Nota Fiscal.</div></div>
+       <div class="step"><div class="step-num" style="background:${stepBg}">4</div><div class="step-text"><strong>Pagamento corporativo</strong> — PIX, boleto bancário ou transferência. Parcelamento disponível para empresas.</div></div>
+       <div class="step"><div class="step-num" style="background:${stepBg}">5</div><div class="step-text"><strong>Início das turmas</strong> — Acesso liberado na plataforma para todos os colaboradores na data acordada.</div></div>`
+    : `<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Análise da proposta</strong> — Leia com atenção e nos envie suas dúvidas por e-mail ou WhatsApp.</div></div>
+       <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Confirmação e contrato</strong> — Após alinhamento, enviamos o contrato de serviços para assinatura.</div></div>
+       <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Pagamento</strong> — Realize o pagamento via PIX ou cartão e receba a confirmação em até 24h.</div></div>
+       <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Início das aulas</strong> — Acesso liberado à plataforma e início na data acordada com a turma.</div></div>`;
+
+  // Pagamento
+  const pagamento = isPJ
+    ? `<div class="pay-card" style="border-left:3px solid #0fba81">
+        <div class="pay-title">🏦 PIX / Transferência / Boleto</div>
+        <div class="pay-text">Pagamento corporativo com emissão de Nota Fiscal. Boleto bancário disponível para empresas com prazo de até 5 dias úteis.</div>
+       </div>
+       <div class="pay-card" style="border-left:3px solid #7c5cfc">
+        <div class="pay-title">💳 Parcelamento Corporativo</div>
+        <div class="pay-text">Parcelamento em até 12x via cartão de crédito. Consulte condições especiais para contratos com múltiplos colaboradores.</div>
+       </div>`
+    : `<div class="pay-card" style="border-left:3px solid #0fba81">
+        <div class="pay-title">💚 PIX / À Vista</div>
+        <div class="pay-text">Melhor condição disponível. Entre em contato para verificar desconto especial aplicável na contratação à vista.</div>
+       </div>
+       <div class="pay-card" style="border-left:3px solid #7c5cfc">
+        <div class="pay-title">💳 Cartão de Crédito Parcelado</div>
+        <div class="pay-text">Parcelamento disponível conforme opções da operadora. Consulte as condições no momento da contratação.</div>
+       </div>`;
+
   const w=window.open('','_blank','width=1100,height=800');
   w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"/>
-<title>Proposta ESC — ${nome}</title>
+<title>Proposta ESC — ${isPJ?razaoSocial:nome}</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Rajdhani',system-ui;background:#f8f9ff;color:#1a2535;padding:0}
 .page{max-width:900px;margin:0 auto;background:#fff;padding:48px 56px;box-shadow:0 4px 40px rgba(0,0,0,.12)}
-h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff;letter-spacing:-.02em;margin-bottom:4px}
-.sub{font-size:1rem;color:#6b8fa8;font-style:italic;margin-bottom:0}
-.cover-top{background:linear-gradient(135deg,#0a1628,#0f1a2e);padding:40px 56px;margin:-48px -56px 40px;color:#fff}
+h1{font-family:'Orbitron',monospace;font-size:1.85rem;font-weight:900;color:${coverAccent};letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:1rem;color:rgba(255,255,255,.6);font-style:italic;margin-bottom:0}
+.cover-top{background:${coverBg};padding:40px 56px;margin:-48px -56px 40px;color:#fff}
 .cover-meta{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .meta-block{padding:16px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
-.meta-label{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,200,255,.7);margin-bottom:4px}
+.meta-label{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:${labelAccent};margin-bottom:4px}
 .meta-value{font-size:1rem;font-weight:700;color:#fff}
-.section{margin:36px 0 16px;padding-bottom:8px;border-bottom:2px solid #00c8ff;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#00c8ff;letter-spacing:.04em}
+.section{margin:36px 0 16px;padding-bottom:8px;border-bottom:2px solid ${sectionBorder};font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:${sectionBorder};letter-spacing:.04em}
 .course-card{border:1px solid;border-radius:10px;padding:22px 24px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
 .course-name{font-size:1.15rem;font-weight:700;margin-bottom:2px}
 .course-sub{font-size:.88rem;color:#6b8fa8;font-style:italic;margin-bottom:10px}
@@ -3030,12 +3250,12 @@ h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff
 .price-main{font-size:1.5rem;font-weight:900;margin-bottom:4px}
 .price-label{font-size:.78rem;color:#6b8fa8}
 .price-table{width:100%;border-collapse:collapse;margin-top:8px}
-.price-table th{background:#0a1628;color:#fff;padding:10px 14px;text-align:left;font-size:.88rem}
+.price-table th{background:${footerBg};color:#fff;padding:10px 14px;text-align:left;font-size:.88rem}
 .price-table td{padding:10px 14px;border-bottom:1px solid #e8eef4;font-size:.9rem}
 .price-table tr:last-child td{border-bottom:none}
 .price-table tr:nth-child(even) td{background:#f5f8ff}
 .diferencial-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.dif{padding:14px 16px;border-radius:8px;border-left:3px solid #00c8ff;background:#f0f8ff}
+.dif{padding:14px 16px;border-radius:8px;border-left:3px solid ${dif1Border};background:${dif1Bg}}
 .dif-title{font-weight:700;color:#0a1628;margin-bottom:3px;font-size:.92rem}
 .dif-text{font-size:.85rem;color:#2c3e50;line-height:1.5}
 .payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
@@ -3043,13 +3263,12 @@ h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff
 .pay-title{font-weight:700;color:#0a1628;margin-bottom:5px;font-size:.92rem}
 .pay-text{font-size:.85rem;color:#2c3e50}
 .obs-box{padding:16px;border-radius:8px;border:1px solid #f0c040;background:#fffbeb;margin-top:16px;font-size:.9rem;color:#5c4000}
-.steps{counter-reset:step}
 .step{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
-.step-num{width:32px;height:32px;border-radius:50%;background:#00c8ff;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+.step-num{width:32px;height:32px;border-radius:50%;background:${stepBg};color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
 .step-text{font-size:.92rem;color:#2c3e50;padding-top:6px;line-height:1.5}
-.footer-bar{background:#0a1628;color:#9ab8cc;text-align:center;padding:18px 56px;margin:40px -56px -48px;font-size:.83rem}
-.footer-bar strong{color:#00c8ff}
-.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.78rem;font-weight:700;background:rgba(0,200,255,.12);color:#00c8ff;border:1px solid rgba(0,200,255,.3)}
+.footer-bar{background:${footerBg};color:#9ab8cc;text-align:center;padding:18px 56px;margin:40px -56px -48px;font-size:.83rem}
+.footer-bar strong{color:${coverAccent}}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.78rem;font-weight:700;background:${badgeBg};color:${badgeColor};border:1px solid ${badgeBorder}}
 .validity{font-size:.82rem;color:#6b8fa8;text-align:right;margin-top:10px;font-style:italic}
 @media print{
   body{background:#fff}
@@ -3063,19 +3282,21 @@ h1{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:#00c8ff
 
 <div class="cover-top">
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-    <div style="width:48px;height:48px;background:linear-gradient(135deg,#00c8ff,#7c5cfc);border-radius:10px;display:grid;place-items:center;font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;flex-shrink:0">E</div>
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,${coverAccent},#7c5cfc);border-radius:10px;display:grid;place-items:center;font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;flex-shrink:0">E</div>
     <div>
-      <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:#00c8ff">ESC Data & Analytics</div>
-      <div style="font-size:.85rem;color:rgba(255,255,255,.5)">Mentorias Técnicas em Excel e Power BI</div>
+      <div style="font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:${coverAccent}">ESC Data & Analytics</div>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.5)">${isPJ?'Capacitação Corporativa em Análise de Dados':'Mentorias Técnicas em Excel e Power BI'}</div>
     </div>
+    ${isPJ?`<div style="margin-left:auto"><span class="badge" style="font-size:.82rem;padding:5px 14px">🏢 PROPOSTA CORPORATIVA</span></div>`:''}
   </div>
-  <h1>PROPOSTA COMERCIAL</h1>
-  <div class="sub">Mentoria Especializada em Análise de Dados</div>
+  <h1>${capaTitle}</h1>
+  <div class="sub">${capaSub}</div>
   <div class="cover-meta">
-    <div class="meta-block"><div class="meta-label">Para</div><div class="meta-value">${nome}</div>${empresa?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${cargo} · ${empresa}</div>`:''}</div>
-    <div class="meta-block"><div class="meta-label">Contato</div><div class="meta-value" style="font-size:.9rem">${email}</div>${tel?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${tel}</div>`:''}</div>
-    <div class="meta-block"><div class="meta-label">Emitida por</div><div class="meta-value" style="font-size:.9rem">ESC Data & Analytics</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">contato@escdata.com.br</div></div>
-    <div class="meta-block"><div class="meta-label">Data / Validade</div><div class="meta-value" style="font-size:.9rem">${cidade}</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">Válida por 15 dias</div></div>
+    ${capaPFInfo}
+    <div class="meta-block"><div class="meta-label" style="color:${labelAccent}">Contato</div><div class="meta-value" style="font-size:.9rem">${email}</div>${tel?`<div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">${tel}</div>`:''}</div>
+    <div class="meta-block"><div class="meta-label" style="color:${labelAccent}">Emitida por</div><div class="meta-value" style="font-size:.9rem">ESC Data & Analytics</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">contato@escdata.com.br</div></div>
+    <div class="meta-block"><div class="meta-label" style="color:${labelAccent}">Data / Validade</div><div class="meta-value" style="font-size:.9rem">${cidade}</div><div style="font-size:.85rem;color:rgba(255,255,255,.55);margin-top:2px">Válida por 15 dias</div></div>
+    ${capaPJExtra}
   </div>
 </div>
 
@@ -3086,11 +3307,12 @@ ${cursos.map(c=>`
     <div class="course-name" style="color:${c.color}">${c.label}</div>
     <div class="course-sub">${c.sub}</div>
     <div class="course-desc">${c.desc}</div>
-    ${inclusions.map(inc=>`<div class="inc-item" style="--c:${c.color}">${inc}</div>`).join('')}
+    ${inclusions.map(inc=>`<div class="inc-item">${inc}</div>`).join('')}
   </div>
   <div class="price-tag" style="border:1px solid ${c.color}">
     <div class="price-main" style="color:${c.color}">${c.price}</div>
     <div class="price-label">por aluno</div>
+    ${isPJ?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid ${c.color};font-size:.78rem;color:#6b8fa8">${colabs} colabs.</div><div style="font-weight:900;color:${c.color}">${c.totalPrice}</div>`:''}
   </div>
 </div>`).join('')}
 
@@ -3099,70 +3321,48 @@ ${cursos.map(c=>`
   <div style="padding:18px 20px;border-radius:10px;border:1px solid #00c8ff;background:rgba(0,200,255,.06)">
     <div style="font-size:1.6rem;font-weight:900;color:#00c8ff;margin-bottom:4px">10</div>
     <div style="font-weight:700;font-size:.95rem;color:#1a2535;margin-bottom:6px">Aulas ao Vivo</div>
-    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">Encontros síncronos em turmas de até 5 alunos. Cada aula combina teoria aplicada e resolução de desafios práticos em tempo real com o mentor.</div>
+    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">Encontros síncronos em turmas de até 5 ${isPJ?'colaboradores':'alunos'}. Cada aula combina teoria aplicada e resolução de desafios práticos em tempo real com o mentor.</div>
   </div>
   <div style="padding:18px 20px;border-radius:10px;border:1px solid #7c5cfc;background:rgba(124,92,252,.06)">
     <div style="font-size:1.6rem;font-weight:900;color:#7c5cfc;margin-bottom:4px">1</div>
     <div style="font-weight:700;font-size:.95rem;color:#1a2535;margin-bottom:6px">Projeto Prático Final</div>
-    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">Ao final do curso, o aluno desenvolve e entrega um projeto real aplicado ao seu contexto profissional. A aprovação gera o certificado de conclusão automaticamente.</div>
+    <div style="font-size:.87rem;color:#2c3e50;line-height:1.6">${isPJ?'Cada colaborador desenvolve e entrega um projeto aplicado ao contexto da empresa. A aprovação gera o certificado individual automaticamente.':'Ao final do curso, o aluno desenvolve e entrega um projeto real aplicado ao seu contexto profissional. A aprovação gera o certificado de conclusão automaticamente.'}</div>
   </div>
 </div>
 <div style="padding:14px 18px;border-radius:8px;border:1px solid #0fba81;background:rgba(15,186,129,.06);margin-bottom:8px;display:flex;align-items:center;gap:14px">
   <div style="font-size:2rem;flex-shrink:0">🏆</div>
-  <div><div style="font-weight:700;color:#0a1628;margin-bottom:3px">Certificado de Conclusão</div><div style="font-size:.87rem;color:#2c3e50;line-height:1.5">Emitido automaticamente após aprovação do projeto final. Comprova domínio técnico aplicado — não apenas participação.</div></div>
+  <div><div style="font-weight:700;color:#0a1628;margin-bottom:3px">Certificado de Conclusão</div><div style="font-size:.87rem;color:#2c3e50;line-height:1.5">${isPJ?`Certificados individuais emitidos automaticamente após aprovação. Comprova qualificação técnica de cada colaborador — ideal para portfólio e registros de RH.`:'Emitido automaticamente após aprovação do projeto final. Comprova domínio técnico aplicado — não apenas participação.'}</div></div>
 </div>
 <div style="padding:12px 16px;border-radius:8px;background:#f0f8ff;border:1px solid #cce8ff;margin-bottom:8px">
   <div style="font-size:.82rem;color:#2c3e50;line-height:1.7">
-    📅 <strong>Cronograma:</strong> 10 aulas semanais &nbsp;·&nbsp; ⏱️ <strong>Duração média por aula:</strong> 1h30 a 2h &nbsp;·&nbsp; 👥 <strong>Turmas:</strong> máx. 5 alunos &nbsp;·&nbsp; 🛠️ <strong>80% prático</strong>
+    📅 <strong>Cronograma:</strong> 10 aulas semanais &nbsp;·&nbsp; ⏱️ <strong>Duração média por aula:</strong> 1h30 a 2h &nbsp;·&nbsp; 👥 <strong>Turmas:</strong> máx. 5 ${isPJ?'colaboradores':'alunos'} &nbsp;·&nbsp; 🛠️ <strong>80% prático</strong>
   </div>
 </div>
 
 <div class="section">03. RESUMO — INVESTIMENTO</div>
-<table class="price-table">
-  <thead><tr><th>Programa</th><th>Investimento por Aluno</th></tr></thead>
-  <tbody>
-    ${cursos.map(c=>`<tr><td>${c.label}<br/><span style="font-size:.82rem;color:#6b8fa8;font-style:italic">${c.sub}</span></td><td style="font-weight:700;color:${c.color}">${c.price}</td></tr>`).join('')}
-  </tbody>
-</table>
+${tabelaInvestimento}
 
 <div class="section">04. CONDIÇÕES DE PAGAMENTO</div>
-<div class="payment-grid">
-  <div class="pay-card" style="border-left:3px solid #0fba81">
-    <div class="pay-title">💚 PIX / À Vista</div>
-    <div class="pay-text">Melhor condição disponível. Entre em contato para verificar desconto especial aplicável na contratação à vista.</div>
-  </div>
-  <div class="pay-card" style="border-left:3px solid #7c5cfc">
-    <div class="pay-title">💳 Cartão de Crédito Parcelado</div>
-    <div class="pay-text">Parcelamento disponível conforme opções da operadora. Consulte as condições no momento da contratação.</div>
-  </div>
-</div>
+<div class="payment-grid">${pagamento}</div>
 
-<div class="section">05. NOSSOS DIFERENCIAIS</div>
-<div class="diferencial-grid">
-  <div class="dif"><div class="dif-title">🛠️ Aprenda Fazendo</div><div class="dif-text">80% do curso é hands-on com projetos reais do mercado. Zero teoria sem prática.</div></div>
-  <div class="dif" style="border-left-color:#7c5cfc"><div class="dif-title">👥 Turmas Reduzidas</div><div class="dif-text">Máximo de 5 pessoas por turma — acompanhamento próximo e personalizado.</div></div>
-  <div class="dif" style="border-left-color:#0fba81"><div class="dif-title">🔗 Suporte Direto com o Mentor</div><div class="dif-text">Acesso contínuo ao conteúdo, comunidade exclusiva e suporte técnico direto.</div></div>
-  <div class="dif" style="border-left-color:#f59e0b"><div class="dif-title">💻 Plataforma Própria</div><div class="dif-text">Plataforma exclusiva com fórum, materiais atualizados e acompanhamento de progresso.</div></div>
-</div>
+<div class="section">05. ${isPJ?'POR QUE A ESC?':'NOSSOS DIFERENCIAIS'}</div>
+<div class="diferencial-grid">${diferenciais}</div>
 
 ${obs?`<div class="obs-box"><strong>⚠️ Observações:</strong> ${obs}</div>`:''}
 
 <div class="section">06. PRÓXIMOS PASSOS</div>
-<div class="step"><div class="step-num">1</div><div class="step-text"><strong>Análise da proposta</strong> — Leia com atenção e nos envie suas dúvidas por e-mail ou WhatsApp.</div></div>
-<div class="step"><div class="step-num">2</div><div class="step-text"><strong>Confirmação e contrato</strong> — Após alinhamento, enviamos o contrato de serviços para assinatura.</div></div>
-<div class="step"><div class="step-num">3</div><div class="step-text"><strong>Pagamento</strong> — Realize o pagamento via PIX ou cartão e receba a confirmação em até 24h.</div></div>
-<div class="step"><div class="step-num">4</div><div class="step-text"><strong>Início das aulas</strong> — Acesso liberado à plataforma e início na data acordada com a turma.</div></div>
+${proximosPassos}
 
 <div class="validity">Proposta válida por 15 dias · ${cidade}</div>
 
 <div class="footer-bar">
   <strong>ESC Data & Analytics</strong> · contato@escdata.com.br · escdata.com.br<br/>
-  <span style="font-size:.78rem">Dos dados ao Dashboard — transformando profissionais em analistas de alta performance</span>
+  <span style="font-size:.78rem">${isPJ?'Capacitando equipes — transformando empresas em referência em análise de dados':'Dos dados ao Dashboard — transformando profissionais em analistas de alta performance'}</span>
 </div>
 </div>
 
-<div class="no-print" style="text-align:center;padding:20px;background:#f0f4ff">
-  <button onclick="window.print()" style="padding:12px 32px;background:linear-gradient(135deg,#00c8ff,#7c5cfc);border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Rajdhani',system-ui">🖨️ Salvar como PDF</button>
+<div class="no-print" style="text-align:center;padding:20px;background:${isPJ?'#fffbea':'#f0f4ff'}">
+  <button onclick="window.print()" style="padding:12px 32px;background:linear-gradient(135deg,${coverAccent},#7c5cfc);border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Rajdhani',system-ui">🖨️ Salvar como PDF</button>
   <div style="font-size:.82rem;color:#6b8fa8;margin-top:8px">Imprimir → Salvar como PDF</div>
 </div>
 </body></html>`);
