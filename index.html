@@ -499,6 +499,71 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
 .eng-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .eng-hot{background:#10b981}.eng-warm{background:#f59e0b}.eng-cold{background:#ef4444}.eng-new{background:#8b5cf6}
 
+/* ── HAMBURGER / DRAWER ── */
+.ham{display:none;flex-direction:column;justify-content:center;gap:5px;width:38px;height:38px;border-radius:10px;border:1px solid rgba(0,200,255,.2);background:rgba(0,200,255,.06);cursor:pointer;padding:0 9px;flex-shrink:0;transition:all .18s}
+.ham:hover{background:rgba(0,200,255,.12);border-color:rgba(0,200,255,.4)}
+.ham span{display:block;height:2px;border-radius:2px;background:var(--cyan);transition:all .28s cubic-bezier(.4,0,.2,1)}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1100}
+.drawer-overlay.open{display:block;animation:fi .2s}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:rgba(8,12,22,.97);border-right:1px solid rgba(0,200,255,.2);z-index:1200;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:18px 12px;overflow-y:auto;box-shadow:6px 0 40px rgba(0,0,0,.5)}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:16px}
+@media(max-width:880px){
+  .ham{display:flex}
+  .sbar,.abar{display:none!important}
+  .l2,.ladm{grid-template-columns:1fr!important}
+}
+
+/* ── TOOLTIPS ── */
+[data-tip]{position:relative}
+[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) scale(.9);
+  background:rgba(8,12,22,.97);color:var(--text);
+  font-size:.75rem;font-weight:600;white-space:nowrap;
+  padding:5px 10px;border-radius:8px;
+  border:1px solid rgba(0,200,255,.2);
+  pointer-events:none;opacity:0;
+  transition:opacity .18s,transform .18s;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  z-index:9999;font-family:var(--fb);
+}
+[data-tip]::before{
+  content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:rgba(0,200,255,.2);
+  pointer-events:none;opacity:0;transition:opacity .18s;z-index:9999;
+}
+[data-tip]:hover::after,[data-tip]:hover::before{opacity:1;transform:translateX(-50%) scale(1)}
+
+/* ── CONFIRM MODAL ── */
+#confirmBg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fi .18s}
+.confirm-modal{
+  background:linear-gradient(145deg,rgba(14,20,34,.98),rgba(8,13,24,.99));
+  border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:28px;
+  width:100%;max-width:400px;text-align:center;
+  box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(239,68,68,.08);
+  animation:mi .25s cubic-bezier(.34,1.3,.64,1);
+}
+.confirm-icon{width:56px;height:56px;border-radius:16px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px}
+.confirm-title{font-family:var(--fd);font-size:1rem;color:var(--text);margin-bottom:8px}
+.confirm-sub{font-size:.88rem;color:var(--soft);line-height:1.6;margin-bottom:22px}
+.confirm-btns{display:flex;gap:10px;justify-content:center}
+
+/* ── DASHBOARD ALUNO RICO — PROGRESSO RADIAL ── */
+.radial-wrap{position:relative;width:110px;height:110px;flex-shrink:0}
+.radial-wrap svg{transform:rotate(-90deg)}
+.radial-wrap .radial-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fd)}
+.stat-mini{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(0,0,0,.2);transition:all .2s}
+.stat-mini:hover{border-color:rgba(0,200,255,.2);transform:translateY(-2px)}
+.stat-mini-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.stat-mini-val{font-size:1.15rem;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-mini-lbl{font-size:.72rem;color:var(--muted);margin-top:2px}
+.next-aula-card{border:1px solid rgba(0,200,255,.2);border-radius:14px;padding:16px;background:linear-gradient(135deg,rgba(0,200,255,.06),rgba(124,92,252,.04));display:flex;align-items:center;gap:14px;margin-bottom:16px;transition:all .2s}
+.next-aula-card:hover{border-color:rgba(0,200,255,.35);transform:translateY(-2px)}
+
 </style>
 </head>
 <body>
@@ -571,7 +636,22 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
 
 <!-- STUDENT APP -->
 <div id="sa" class="hidden">
+<!-- Drawer overlay + panel (student) -->
+<div class="drawer-overlay" id="sDrawerOv" onclick="closeDrawer('s')"></div>
+<div class="drawer" id="sDrawer">
+  <div class="drawer-header">
+    <div class="blog">ESC</div><div><div class="bname" style="font-size:.85rem">ESC Plataforma</div><div class="bsub" id="sTurmaDrawer"></div></div>
+  </div>
+  <div class="nsect" style="margin-top:0">Navegação</div>
+  <div class="ni act" data-pg="dash" onclick="closeDrawer('s')"><span class="nic">🏠</span>Meu Progresso</div>
+  <div class="ni" data-pg="class" onclick="closeDrawer('s')"><span class="nic">🎓</span>Sala de Aula</div>
+  <div class="ni" data-pg="mural" onclick="closeDrawer('s')"><span class="nic">📋</span>Mural</div>
+  <div class="ni" data-pg="forum" onclick="closeDrawer('s')"><span class="nic">💬</span>Fórum</div>
+  <div class="ni" id="navProjetoD" data-pg="projeto" style="display:none" onclick="closeDrawer('s')"><span class="nic">🎓</span>Projeto Final</div>
+  <div class="ni" id="navAvalD" data-pg="aval" style="display:none" onclick="closeDrawer('s')"><span class="nic">⭐</span>Avaliar Curso</div>
+</div>
   <header class="hdr">
+    <button class="ham" id="sHam" onclick="toggleDrawer('s')" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="brand"><div class="blog">ESC</div><div><div class="bname">ESC Plataforma</div><div class="bsub" id="sTurmaHdr">Telemetria B30</div></div></div>
     <div class="hright">
       <div id="ew" class="expw hidden">⚠️ Expira em <span id="ed"></span>d</div>
@@ -611,7 +691,7 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
 
       <!-- DASHBOARD -->
       <div id="pg-dash" class="page act">
-        <div style="margin-bottom:22px">
+        <div style="margin-bottom:20px">
           <h1 style="font-family:var(--fd);font-size:1.3rem;color:#bff6ff;margin-bottom:3px">Olá, <span id="dWel"></span>! 👋</h1>
           <div style="color:var(--soft);font-size:.93rem">Continue de onde parou.</div>
         </div>
@@ -628,9 +708,7 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
               <div class="livebadge"><div class="livedot"></div> AO VIVO AGORA</div>
               <div style="font-family:var(--fd);font-size:1.05rem;color:#fff;margin-bottom:6px" id="liveTitulo">Aula ao Vivo</div>
               <div style="font-size:.88rem;color:rgba(255,255,255,.7);margin-bottom:16px" id="liveDesc">Sua turma está em aula agora!</div>
-              <a id="liveBtn" href="#" target="_blank" rel="noopener" class="btn blv">
-                <div class="livedot"></div> ENTRAR NA AULA
-              </a>
+              <a id="liveBtn" href="#" target="_blank" rel="noopener" class="btn blv"><div class="livedot"></div> ENTRAR NA AULA</a>
             </div>
           </div>
         </div>
@@ -655,11 +733,50 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
           </div>
         </div>
 
-        <div class="sgrid" style="margin-bottom:20px">
-          <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">📚</div><div class="sval" id="dPct">0%</div><div class="slbl">Concluído</div></div>
-          <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">✅</div><div class="sval" id="dDone">0/0</div><div class="slbl">Módulos</div></div>
-          <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">⏱️</div><div class="sval" id="dTime">0h</div><div class="slbl">Tempo total</div></div>
-          <div class="sc"><div style="font-size:1.4rem;margin-bottom:8px">🎯</div><div class="sval" id="dQuiz">—</div><div class="slbl">Último quiz</div></div>
+        <!-- STAT CARDS RICOS -->
+        <div class="card cp" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+            <!-- Progresso radial -->
+            <div class="radial-wrap">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(0,200,255,.1)" stroke-width="10"/>
+                <circle id="radialArc" cx="55" cy="55" r="44" fill="none" stroke="url(#radGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+                <defs><linearGradient id="radGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00c8ff"/><stop offset="100%" stop-color="#7c5cfc"/></linearGradient></defs>
+              </svg>
+              <div class="radial-label">
+                <div style="font-size:1.3rem;font-weight:900;color:var(--cyan);line-height:1" id="dPct">0%</div>
+                <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">concluído</div>
+              </div>
+            </div>
+            <!-- Mini stats -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1;min-width:200px">
+              <div class="stat-mini">
+                <div class="stat-mini-icon" style="background:rgba(0,200,255,.1)">✅</div>
+                <div><div class="stat-mini-val" id="dDone">0/0</div><div class="stat-mini-lbl">Módulos</div></div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-icon" style="background:rgba(124,92,252,.1)">⏱️</div>
+                <div><div class="stat-mini-val" id="dTime">0h</div><div class="stat-mini-lbl">Tempo total</div></div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-icon" style="background:rgba(15,186,129,.1)">🎯</div>
+                <div><div class="stat-mini-val" id="dQuiz">—</div><div class="stat-mini-lbl">Último quiz</div></div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-icon" style="background:rgba(245,158,11,.1)">🔥</div>
+                <div><div class="stat-mini-val" id="dStreak">—</div><div class="stat-mini-lbl">Dias ativos</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Barra de progresso geral -->
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+              <span style="font-size:.78rem;color:var(--soft);font-weight:700">Progresso geral</span>
+              <span style="font-size:.78rem;font-weight:900;color:var(--cyan)" id="dPctBar">0%</span>
+            </div>
+            <div class="pw lg"><div id="sBarRich" class="pf" style="width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div></div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:5px" id="sLbl">0 de 0 módulos concluídos</div>
+          </div>
         </div>
         <div class="card cp">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
@@ -787,7 +904,36 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
 
 <!-- ADMIN APP -->
 <div id="aa" class="hidden">
+<!-- Drawer overlay + panel (admin) -->
+<div class="drawer-overlay" id="aDrawerOv" onclick="closeDrawer('a')"></div>
+<div class="drawer" id="aDrawer">
+  <div class="drawer-header">
+    <div class="blog">ESC</div><div><div class="bname" style="font-size:.85rem">Painel Admin</div><div class="bsub">Gerenciamento</div></div>
+  </div>
+  <div class="nsect" style="margin-top:0">Visão Geral</div>
+  <div class="ani act" data-adm="dash" onclick="closeDrawer('a')"><span class="anic">📊</span> Dashboard</div>
+  <div class="ani" data-adm="pend" onclick="closeDrawer('a')"><span class="anic">🔔</span> Pendentes</div>
+  <div class="nsect">Conteúdo</div>
+  <div class="ani" data-adm="alunos" onclick="closeDrawer('a')"><span class="anic">👥</span> Alunos</div>
+  <div class="ani" data-adm="turmas" onclick="closeDrawer('a')"><span class="anic">🏫</span> Turmas</div>
+  <div class="ani" data-adm="mods" onclick="closeDrawer('a')"><span class="anic">🎬</span> Módulos</div>
+  <div class="ani" data-adm="aulas" onclick="closeDrawer('a')"><span class="anic">📚</span> Aulas</div>
+  <div class="ani" data-adm="mats" onclick="closeDrawer('a')"><span class="anic">📎</span> Materiais</div>
+  <div class="nsect">Avaliação</div>
+  <div class="ani" data-adm="quiz" onclick="closeDrawer('a')"><span class="anic">🎯</span> Quiz</div>
+  <div class="ani" data-adm="projetos" onclick="closeDrawer('a')"><span class="anic">🎓</span> Projetos</div>
+  <div class="ani" data-adm="aval" onclick="closeDrawer('a')"><span class="anic">⭐</span> Avaliações</div>
+  <div class="nsect">Comunidade</div>
+  <div class="ani" data-adm="live" onclick="closeDrawer('a')"><span class="anic">🔴</span> Aulas Ao Vivo</div>
+  <div class="ani" data-adm="mural" onclick="closeDrawer('a')"><span class="anic">📋</span> Mural</div>
+  <div class="ani" data-adm="forum" onclick="closeDrawer('a')"><span class="anic">💬</span> Fórum</div>
+  <div class="nsect">Comercial</div>
+  <div class="ani" data-adm="proposta" onclick="closeDrawer('a')"><span class="anic">📄</span> Proposta</div>
+  <div class="ani" data-adm="crm" onclick="closeDrawer('a')"><span class="anic">🗂️</span> CRM</div>
+  <div class="ani" data-adm="leads" onclick="closeDrawer('a')"><span class="anic">🔭</span> Leads</div>
+</div>
   <header class="hdr">
+    <button class="ham" id="aHam" onclick="toggleDrawer('a')" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="brand"><div class="blog">ESC</div><div><div class="bname">Painel Admin</div><div class="bsub">Gerenciamento</div></div></div>
     <div class="hright">
       <span class="badge br" style="padding:5px 11px;font-size:.8rem">🔧 ADMIN</span>
@@ -1604,6 +1750,48 @@ function closeModal(){$('#mBg').classList.add('hidden');}
 $('#mBg').addEventListener('click',e=>{if(e.target===$('#mBg'))closeModal();});
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
+/* ── DRAWER (hamburger) ── */
+function toggleDrawer(side){
+  const ham=$(`#${side}Ham`),ov=$(`#${side}DrawerOv`),dr=$(`#${side}Drawer`);
+  if(!ham||!ov||!dr)return;
+  const open=dr.classList.toggle('open');
+  ov.classList.toggle('open',open);
+  ham.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeDrawer(side){
+  const ham=$(`#${side}Ham`),ov=$(`#${side}DrawerOv`),dr=$(`#${side}Drawer`);
+  if(!dr)return;
+  dr.classList.remove('open');ov.classList.remove('open');ham&&ham.classList.remove('open');
+  document.body.style.overflow='';
+}
+// Sync drawer nav items with the main nav clicks
+document.addEventListener('click',e=>{
+  const ni=e.target.closest('[data-pg],[data-adm]');
+  if(!ni)return;
+  // Close any open drawer
+  ['s','a'].forEach(s=>closeDrawer(s));
+});
+
+/* ── CONFIRM DIALOG (replaces browser confirm()) ── */
+function confirmDialog({icon='🗑️',title='Tem certeza?',sub='Esta ação não pode ser desfeita.',confirmText='Confirmar',dangerText='',onConfirm}){
+  const existing=document.getElementById('confirmBg');if(existing)existing.remove();
+  const bg=document.createElement('div');bg.id='confirmBg';
+  bg.innerHTML=`<div class="confirm-modal">
+    <div class="confirm-icon">${icon}</div>
+    <div class="confirm-title">${title}</div>
+    <div class="confirm-sub">${sub}</div>
+    <div class="confirm-btns">
+      <button id="cfCancel" class="btn bg2">Cancelar</button>
+      <button id="cfOk" class="btn bd" style="background:rgba(239,68,68,.15)">${dangerText||confirmText}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(bg);
+  bg.querySelector('#cfCancel').onclick=()=>bg.remove();
+  bg.querySelector('#cfOk').onclick=()=>{bg.remove();onConfirm&&onConfirm();};
+  bg.addEventListener('click',e=>{if(e.target===bg)bg.remove();});
+}
+
 /* ── SKELETON LOADERS ── */
 function skelRows(n=4,cols=3){
   const widths=[['90%','60%','40%'],['80%','70%','50%'],['95%','55%','45%'],['75%','65%','55%']];
@@ -2052,10 +2240,22 @@ async function renderDash(){
   const done=mods.filter(m=>pm[m.id]?.concluido).length,total=mods.length;
   const p=pct(done,total),ts=Object.values(pm).reduce((s,x)=>s+(x.segundos_vistos||0),0);
   const qs=Object.values(pm).filter(x=>x.quiz_score!=null);
-  $('#dPct').textContent=p+'%';$('#dDone').textContent=`${done}/${total}`;
+  // Count-up animations
+  countUp($('#dPct'),p,900,'%');
+  $('#dDone').textContent=`${done}/${total}`;
   $('#dTime').textContent=(ts/3600).toFixed(1)+'h';
   $('#dQuiz').textContent=qs.length?`${qs[qs.length-1].quiz_score}/${qs[qs.length-1].quiz_total||'?'}`:'—';
-  $('#sPct').textContent=p+'%';$('#sBar').style.width=p+'%';$('#sLbl').textContent=`${done} de ${total} módulos`;
+  $('#dStreak').textContent=done>0?`${done}d`:'—';
+  // Radial arc (circumference = 2π×44 ≈ 276.46)
+  const arc=$('#radialArc');if(arc){setTimeout(()=>{arc.style.strokeDashoffset=276.46*(1-p/100);},150);}
+  // Rich bar
+  const pctBar=$('#dPctBar');if(pctBar)pctBar.textContent=p+'%';
+  const barR=$('#sBarRich');if(barR)setTimeout(()=>{barR.style.width=p+'%';},150);
+  const sLbl=$('#sLbl');if(sLbl)sLbl.textContent=`${done} de ${total} módulos concluídos`;
+  // Sidebar progress
+  const sPct=$('#sPct');if(sPct)sPct.textContent=p+'%';
+  const sBar=$('#sBar');if(sBar)sBar.style.width=p+'%';
+  const sLbl2=$('#sLbl');if(sLbl2)sLbl2.textContent=`${done} de ${total} módulos`;
   const tr=$('#trail');tr.innerHTML='';
   mods.forEach(m=>{
     const mp=pm[m.id]||{segundos_vistos:0,concluido:false},pp=pct(mp.segundos_vistos||0,m.duracao_seg||1),isDone=mp.concluido,isCur=actMod===m.id;
@@ -2063,7 +2263,7 @@ async function renderDash(){
     el.innerHTML=`<div class="tdot ${isDone?'done':isCur?'cur':'lock'}">${isDone?'✅':m.icone}</div><div style="flex:1;padding-top:7px"><div style="font-weight:800;font-size:.97rem;margin-bottom:5px;color:${isDone?'var(--green)':isCur?'var(--cyan)':'var(--text)'}">${esc(m.titulo)}</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:.8rem;color:var(--muted)">⏱️ ${ft(m.duracao_seg||0)}</span>${isDone?'<span class="badge bg3">Concluído</span>':pp>0?`<span class="badge bc">Em andamento ${pp}%</span>`:'<span class="badge bw2">Não iniciado</span>'}</div><div class="pw" style="max-width:260px"><div class="pf" style="width:${isDone?100:pp}%"></div></div><div style="margin-top:9px"><button class="btn bp btn-sm" onclick="openMod('${m.id}')">${isDone?'🔁 Rever':pp>0?'▶️ Continuar':'▶️ Iniciar'}</button></div></div>`;
     tr.appendChild(el);
   });
-  if(!mods.length)tr.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum módulo disponível para sua turma.</div>';
+  if(!mods.length)tr.innerHTML=emptyState('modulos');
 }
   // First login welcome
   setTimeout(checkFirstLogin, 600);
