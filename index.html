@@ -299,6 +299,82 @@ tbody tr:hover td{background:rgba(0,200,255,.03)}
 .slbl{font-size:.76rem;color:var(--muted);margin-top:5px;font-weight:600;letter-spacing:.03em}
 .sdelta{font-size:.72rem;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:3px}
 .sdelta.up{color:#14d494}.sdelta.down{color:#f87171}
+
+/* ── SKELETON LOADERS ── */
+@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skel{
+  background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 75%);
+  background-size:600px 100%;
+  animation:shimmer 1.6s ease-in-out infinite;
+  border-radius:6px;
+}
+.skel-line{height:12px;margin-bottom:8px}
+.skel-line.sm{height:9px;width:60%}
+.skel-line.lg{height:16px;width:40%}
+.skel-circle{border-radius:50%}
+.skel-block{border-radius:10px}
+.skel-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.skel-row:last-child{border-bottom:none}
+
+/* ── EMPTY STATES ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:52px 24px;text-align:center;
+}
+.empty-icon{
+  width:72px;height:72px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;margin-bottom:18px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+}
+.empty-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:.85rem;color:var(--muted);max-width:300px;line-height:1.6}
+
+/* ── CHAT IA ── */
+#chatBtn{
+  display:none;position:fixed;bottom:28px;right:28px;z-index:9000;
+  width:56px;height:56px;border-radius:16px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  box-shadow:0 4px 20px rgba(0,200,255,.4),0 2px 8px rgba(0,0,0,.4);
+  align-items:center;justify-content:center;
+  font-size:1.4rem;transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  animation:chatPulse 3s ease-in-out infinite;
+}
+#chatBtn:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 8px 32px rgba(0,200,255,.55)}
+@keyframes chatPulse{0%,100%{box-shadow:0 4px 20px rgba(0,200,255,.4),0 0 0 0 rgba(0,200,255,.3)}60%{box-shadow:0 4px 20px rgba(0,200,255,.4),0 0 0 10px rgba(0,200,255,0)}}
+#chatWin{
+  display:none;position:fixed;bottom:96px;right:28px;z-index:8999;
+  width:380px;max-height:560px;
+  background:rgba(7,10,18,.94);
+  border:1px solid rgba(0,200,255,.28);
+  border-radius:20px;
+  box-shadow:0 24px 72px rgba(0,0,0,.7),0 0 0 1px rgba(0,200,255,.06);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  flex-direction:column;overflow:hidden;
+  font-family:var(--fb);
+}
+.chat-open{display:flex!important;animation:chatSlideIn .3s cubic-bezier(.34,1.3,.64,1)}
+@keyframes chatSlideIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.chat-msg-user{
+  align-self:flex-end;max-width:80%;
+  background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));
+  border:1px solid rgba(0,200,255,.25);
+  border-radius:14px 14px 4px 14px;
+  padding:10px 13px;font-size:.88rem;color:var(--text);line-height:1.5;
+}
+.chat-msg-ai{
+  align-self:flex-start;max-width:85%;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:4px 14px 14px 14px;
+  padding:10px 13px;font-size:.88rem;color:var(--soft);line-height:1.5;
+}
+.chat-typing{display:flex;gap:5px;padding:12px 14px;align-self:flex-start}
+.chat-dot{width:7px;height:7px;border-radius:50%;background:rgba(0,200,255,.5);animation:typingBounce 1.2s ease-in-out infinite}
+.chat-dot:nth-child(2){animation-delay:.2s}
+.chat-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-8px);opacity:1}}
+
 /* ── TRILHA ── */
 .trail{display:flex;flex-direction:column}
 .tri{display:flex;gap:15px;padding:15px 0;position:relative}
@@ -1411,103 +1487,62 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
 ══════════════════════════════════ -->
 
 <!-- Floating button -->
-<button id="chatBtn" onclick="toggleChat()" title="Tutor IA"
-  style="display:none;position:fixed;bottom:28px;right:28px;z-index:9000;
-    width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;
-    background:linear-gradient(135deg,#00C8FF,#7C5CFC);
-    box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 0 rgba(0,200,255,.4);
-    align-items:center;justify-content:center;
-    font-size:1.5rem;transition:.2s;animation:chatPulse 2.5s ease-in-out infinite">
-  💬
-</button>
+<button id="chatBtn" onclick="toggleChat()">💬</button>
 
 <!-- Chat window -->
-<div id="chatWin" style="display:none;position:fixed;bottom:100px;right:28px;z-index:8999;
-  width:380px;max-height:560px;
-  background:#0d1525;border:1px solid rgba(0,200,255,.2);
-  border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);
-  display:none;flex-direction:column;overflow:hidden;
-  font-family:var(--fb)">
+<div id="chatWin" style="display:none;flex-direction:column;overflow:hidden;font-family:var(--fb);position:fixed;bottom:96px;right:28px;z-index:8999;width:380px;max-height:560px;background:rgba(7,10,18,.94);border:1px solid rgba(0,200,255,.28);border-radius:20px;box-shadow:0 24px 72px rgba(0,0,0,.7),0 0 0 1px rgba(0,200,255,.06);backdrop-filter:blur(20px)">
 
   <!-- Header -->
-  <div style="background:linear-gradient(135deg,rgba(0,200,255,.12),rgba(124,92,252,.12));
-    border-bottom:1px solid rgba(0,200,255,.15);padding:14px 18px;
-    display:flex;align-items:center;gap:12px">
-    <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;
-      background:linear-gradient(135deg,#00C8FF,#7C5CFC);
-      display:grid;place-items:center;font-size:1.2rem">🤖</div>
+  <div style="background:linear-gradient(135deg,rgba(0,200,255,.1),rgba(124,92,252,.1));border-bottom:1px solid rgba(0,200,255,.15);padding:14px 18px;display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--cyan),var(--purple));display:grid;place-items:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(0,200,255,.3)">🤖</div>
     <div style="flex:1">
       <div style="font-weight:800;font-size:.92rem;color:var(--text)">ESC Tutor IA</div>
       <div style="font-size:.72rem;color:var(--green);display:flex;align-items:center;gap:5px">
-        <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        Online · Excel & Power BI
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 6px var(--green)"></span>
+        Online · Excel &amp; Power BI
       </div>
     </div>
-    <button onclick="toggleChat()" style="background:none;border:none;color:var(--muted);
-      cursor:pointer;font-size:1.1rem;padding:4px;line-height:1">✕</button>
+    <button onclick="toggleChat()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted);cursor:pointer;font-size:.9rem;padding:6px 8px;border-radius:8px;line-height:1;transition:all .15s" onmouseenter="this.style.background='rgba(239,68,68,.15)';this.style.color='#f87171'" onmouseleave="this.style.background='rgba(255,255,255,.06)';this.style.color='var(--muted)'">✕</button>
   </div>
 
   <!-- Messages area -->
-  <div id="chatMsgs" style="flex:1;overflow-y:auto;padding:16px;
-    display:flex;flex-direction:column;gap:12px;max-height:380px;
-    scrollbar-width:thin;scrollbar-color:rgba(0,200,255,.2) transparent">
+  <div id="chatMsgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:380px;scrollbar-width:thin;scrollbar-color:rgba(0,200,255,.2) transparent">
   </div>
 
   <!-- Input area -->
-  <div style="border-top:1px solid rgba(0,200,255,.1);padding:12px 14px;
-    display:flex;gap:8px;align-items:flex-end">
+  <div style="border-top:1px solid rgba(0,200,255,.1);padding:12px 14px;display:flex;gap:8px;align-items:flex-end;background:rgba(0,0,0,.2)">
     <textarea id="chatInput" placeholder="Pergunte sobre Excel, Power BI, fórmulas..."
-      style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(0,200,255,.15);
-        border-radius:10px;padding:9px 13px;color:var(--text);font-size:.88rem;
-        font-family:var(--fb);resize:none;min-height:40px;max-height:100px;
-        outline:none;line-height:1.45;scrollbar-width:thin"
+      style="flex:1;background:rgba(0,200,255,.04);border:1px solid rgba(0,200,255,.18);border-radius:12px;padding:10px 13px;color:var(--text);font-size:.88rem;font-family:var(--fb);resize:none;min-height:42px;max-height:100px;outline:none;line-height:1.5;scrollbar-width:thin;transition:border-color .2s"
       rows="1"
+      onfocus="this.style.borderColor='rgba(0,200,255,.45)'"
+      onblur="this.style.borderColor='rgba(0,200,255,.18)'"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
-      oninput="this.style.height='40px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      oninput="this.style.height='42px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button onclick="sendChat()" id="chatSend"
-      style="width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;
-        background:linear-gradient(135deg,#00C8FF,#7C5CFC);
-        display:grid;place-items:center;font-size:1rem;flex-shrink:0;transition:.15s">
+      style="width:42px;height:42px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--purple));display:grid;place-items:center;font-size:1rem;flex-shrink:0;transition:all .18s;box-shadow:0 4px 12px rgba(0,200,255,.3)">
       ➤
     </button>
   </div>
 </div>
 
 <style>
-@keyframes chatPulse{
-  0%,100%{box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 0 rgba(0,200,255,.3)}
-  50%{box-shadow:0 4px 20px rgba(0,200,255,.35),0 0 0 10px rgba(0,200,255,.0)}
-}
 #chatMsgs::-webkit-scrollbar{width:4px}
 #chatMsgs::-webkit-scrollbar-track{background:transparent}
 #chatMsgs::-webkit-scrollbar-thumb{background:rgba(0,200,255,.2);border-radius:2px}
 #chatInput::-webkit-scrollbar{width:4px}
 #chatWin.open{display:flex!important}
-
-/* Chat bubbles */
-.cb-user{align-self:flex-end;max-width:80%;background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));
-  border:1px solid rgba(0,200,255,.2);border-radius:14px 14px 4px 14px;
-  padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.5}
-.cb-bot{align-self:flex-start;max-width:88%;background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);border-radius:4px 14px 14px 14px;
-  padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.6}
-.cb-bot code{background:rgba(0,200,255,.1);border-radius:4px;
-  padding:2px 6px;font-family:monospace;font-size:.82rem;color:#00C8FF}
-.cb-bot pre{background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;
-  margin:8px 0;overflow-x:auto;font-family:monospace;font-size:.8rem;color:#7adcff;line-height:1.6}
+.cb-user{align-self:flex-end;max-width:80%;background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(124,92,252,.18));border:1px solid rgba(0,200,255,.2);border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.5}
+.cb-bot{align-self:flex-start;max-width:88%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px 14px 14px 14px;padding:10px 14px;font-size:.86rem;color:var(--text);line-height:1.6}
+.cb-bot code{background:rgba(0,200,255,.1);border-radius:4px;padding:2px 6px;font-family:monospace;font-size:.82rem;color:#00C8FF}
+.cb-bot pre{background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;margin:8px 0;overflow-x:auto;font-family:monospace;font-size:.8rem;color:#7adcff;line-height:1.6}
 .cb-bot strong{color:#fff;font-weight:700}
 .cb-typing{display:flex;gap:5px;padding:4px 0}
-.cb-typing span{width:7px;height:7px;border-radius:50%;background:var(--cyan);
-  animation:typing .9s ease-in-out infinite}
+.cb-typing span{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:typing .9s ease-in-out infinite}
 .cb-typing span:nth-child(2){animation-delay:.15s}
 .cb-typing span:nth-child(3){animation-delay:.3s}
 @keyframes typing{0%,60%,100%{opacity:.2;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
-
-/* Suggestion chips */
 .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.chip{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);
-  border-radius:20px;padding:5px 12px;font-size:.76rem;color:#00C8FF;
-  cursor:pointer;transition:.15s;white-space:nowrap}
+.chip{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);border-radius:20px;padding:5px 12px;font-size:.76rem;color:#00C8FF;cursor:pointer;transition:.15s;white-space:nowrap}
 .chip:hover{background:rgba(0,200,255,.16);border-color:rgba(0,200,255,.4)}
 </style>
 <div id="mBg" class="mbg hidden"><div id="mCont" class="modal"></div></div>
@@ -1568,6 +1603,62 @@ function showModal(html){$('#mCont').innerHTML=html;$('#mBg').classList.remove('
 function closeModal(){$('#mBg').classList.add('hidden');}
 $('#mBg').addEventListener('click',e=>{if(e.target===$('#mBg'))closeModal();});
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+
+/* ── SKELETON LOADERS ── */
+function skelRows(n=4,cols=3){
+  const widths=[['90%','60%','40%'],['80%','70%','50%'],['95%','55%','45%'],['75%','65%','55%']];
+  return Array.from({length:n},(_,i)=>`
+    <div class="skel-row">
+      ${Array.from({length:cols},(_,c)=>`
+        <div class="skel skel-line" style="width:${widths[i%4][c%3]};flex:${c===0?2:1}"></div>
+      `).join('')}
+    </div>`).join('');
+}
+function skelCards(n=3){
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">`+
+    Array.from({length:n},()=>`
+      <div class="card cp" style="display:flex;flex-direction:column;gap:10px">
+        <div class="skel skel-block" style="height:36px;width:36px"></div>
+        <div class="skel skel-line lg"></div>
+        <div class="skel skel-line sm"></div>
+      </div>`).join('')+`</div>`;
+}
+
+/* ── EMPTY STATES ── */
+const EMPTY={
+  alunos:   {icon:'👥',title:'Nenhum aluno ainda',sub:'Adicione o primeiro aluno para começar.'},
+  turmas:   {icon:'🏫',title:'Nenhuma turma criada',sub:'Crie uma turma para organizar seus alunos.'},
+  modulos:  {icon:'🎬',title:'Nenhum módulo disponível',sub:'Os módulos aparecerão aqui após serem criados.'},
+  mural:    {icon:'📋',title:'Mural em silêncio',sub:'Nenhum aviso publicado ainda.'},
+  forum:    {icon:'💬',title:'Fórum tranquilo',sub:'Seja o primeiro a abrir uma discussão!'},
+  projetos: {icon:'🎓',title:'Sem projetos enviados',sub:'Os projetos dos alunos aparecem aqui.'},
+  materiais:{icon:'📎',title:'Sem materiais',sub:'Adicione arquivos e links de apoio.'},
+  leads:    {icon:'🔭',title:'Sem leads ainda',sub:'Os leads captados aparecem aqui.'},
+  default:  {icon:'🗂️',title:'Nada por aqui',sub:'Quando houver dados, eles aparecem aqui.'},
+};
+function emptyState(type='default'){
+  const e=EMPTY[type]||EMPTY.default;
+  return `<div class="empty-state">
+    <div class="empty-icon">${e.icon}</div>
+    <div class="empty-title">${e.title}</div>
+    <div class="empty-sub">${e.sub}</div>
+  </div>`;
+}
+
+/* ── COUNT-UP ANIMATION ── */
+function countUp(el,target,duration=900,suffix=''){
+  if(!el)return;
+  const start=performance.now();
+  const from=0;
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=Math.round(from+(target-from)*ease);
+    el.textContent=val+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 /* ── SESSION PERSISTENCE ── */
 function saveSession(){if(CU)localStorage.setItem('esc_user',JSON.stringify(CU));}
@@ -2181,12 +2272,12 @@ window.retakeQuiz=async function(){
 
 /* ── MURAL (STUDENT) ── */
 async function loadMural(){
-  const l=$('#muralList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#muralList');l.innerHTML='<div style="padding:16px">'+skelRows(4,3)+'</div>';
   if(!sb){l.innerHTML='<div style="color:var(--muted)">Configure o Supabase.</div>';return;}
   let q=sb.from('mural_avisos').select('*').eq('ativo',true).order('fixado',{ascending:false}).order('criado_em',{ascending:false});
   if(CU.turma_id)q=q.or('turma_id.eq.'+CU.turma_id+',turma_id.is.null');else q=q.is('turma_id',null);
   const{data}=await q.limit(30);
-  if(!data?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">📭 Nenhum aviso no momento.</div>';return;}
+  if(!data?.length){l.innerHTML=emptyState('mural');return;}
   l.innerHTML=data.map(av=>'<div class="muralcard'+(av.fixado?' fix':'')+'">'+
     (av.fixado?'<div class="muralfix">📌 FIXADO</div>':'')+
     '<div style="display:flex;align-items:start;gap:11px"><div style="font-size:1.5rem;flex-shrink:0">📢</div><div style="flex:1">'+
@@ -2203,7 +2294,7 @@ async function loadFPage(){
   $('#fMF').onchange=renderFL;$('#fSF').onchange=renderFL;
 }
 async function renderFL(){
-  const l=$('#fList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#fList');l.innerHTML='<div style="padding:16px">'+skelRows(4,3)+'</div>';
   if(!sb)return;
   const mi=$('#fMF').value,sf=$('#fSF').value;
   let q=sb.from('forum_posts').select('*,users(nome,login)').order('fixado',{ascending:false}).order('criado_em',{ascending:false});
@@ -2211,7 +2302,7 @@ async function renderFL(){
   else{q=q.eq('aprovado',true);if(mi)q=q.eq('modulo_id',mi);else if(CU.turma_id&&mods.length)q=q.or('modulo_id.is.null,'+mods.map(m=>'modulo_id.eq.'+m.id).join(','));}
   const{data:posts}=await q.limit(50);
   l.innerHTML='';
-  if(!posts?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma postagem encontrada.</div>';return;}
+  if(!posts?.length){l.innerHTML=emptyState('forum');return;}
   for(const p of posts){
     const ini=(p.users?.nome||'?').substring(0,2).toUpperCase();
     const mn=mods.find(m=>m.id===p.modulo_id)?.titulo||'Geral';
@@ -2290,7 +2381,7 @@ async function loadFMod(){
 
 /* ── PROJETO FINAL (STUDENT) ── */
 async function loadProjetoAluno(){
-  const c2=$('#projetoContent');c2.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const c2=$('#projetoContent');c2.innerHTML='<div style="padding:16px">'+skelRows(3,2)+'</div>';
   if(!sb||!CU.turma_id)return;
   const{data:turma}=await sb.from('turmas').select('*').eq('id',CU.turma_id).single();
   if(!turma?.tem_projeto){c2.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Sua turma não possui módulo de projeto.</div>';return;}
@@ -2474,10 +2565,11 @@ async function loadADash(){
   if(!sb)return;
   const[{data:al},{data:pe},{data:mo}]=await Promise.all([sb.from('users').select('*,turmas(nome)').eq('role','student').eq('status','active'),sb.from('users').select('id').eq('status','pending'),sb.from('modules').select('id')]);
   const alunos=al||[],pc=(pe||[]).length,mc=(mo||[]).length;
-  $('#aA').textContent=alunos.length;$('#aP').textContent=pc;$('#aMo').textContent=mc;
+  // Count-up animations
+  countUp($('#aA'),alunos.length,800);
+  countUp($('#aP'),pc,800);
+  countUp($('#aMo'),mc,800);
   if(pc>0){$('#pBadge').textContent=pc;$('#pBadge').classList.remove('hidden');}else $('#pBadge').classList.add('hidden');
-  // Animate bars
-  const maxA=Math.max(alunos.length,1);
   setTimeout(()=>{
     const barA=$('#aA-bar');if(barA)barA.style.width=Math.min(100,Math.round(alunos.length/Math.max(50,alunos.length)*100))+'%';
     const barP=$('#aP-bar');if(barP)barP.style.width=Math.min(100,pc*10)+'%';
@@ -2485,9 +2577,11 @@ async function loadADash(){
   let tot=0;
   for(const a of alunos){const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);tot+=pct((pr||[]).filter(x=>x.concluido).length,mc);}
   const avg=alunos.length?Math.round(tot/alunos.length):0;
-  $('#aMd').textContent=avg+'%';
+  countUp($('#aMd'),avg,900,'%');
   setTimeout(()=>{const bar=$('#aMd-bar');if(bar)bar.style.width=avg+'%';},200);
-  const tb=$('#aDT');tb.innerHTML='';
+  const tb=$('#aDT');
+  if(!alunos.length){tb.innerHTML=`<tr><td colspan="6">${emptyState('alunos')}</td></tr>`;return;}
+  tb.innerHTML='';
   for(const a of alunos){
     const{data:pr}=await sb.from('progress').select('concluido').eq('user_id',a.id);
     const dn=(pr||[]).filter(x=>x.concluido).length,p2=pct(dn,mc),d2=du(a.validade_acesso),dc=d2!==null&&d2<=30?'color:var(--amber)':'';
@@ -2559,6 +2653,7 @@ async function loadAAlunos(){
   const opts=(turmas||[]).map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
   $('#aTurma').innerHTML='<option value="">Sem turma</option>'+opts;
   const{data:al}=await sb.from('users').select('*,turmas(nome)').eq('role','student').order('criado_em',{ascending:false});
+  if(!(al||[]).length){$('#aAT').innerHTML=`<tr><td colspan="6">${emptyState('alunos')}</td></tr>`;return;}
   $('#aAT').innerHTML=(al||[]).map(a=>{const d2=du(a.validade_acesso),sb2={active:'bg3',pending:'ba',expired:'br',blocked:'br'}[a.status]||'bw2';return `<tr><td><strong>${a.nome}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${a.login}</span></td><td>${a.email||''}</td><td>${a.turmas?.nome||'—'}</td><td style="${d2!==null&&d2<=30?'color:var(--amber)':''}">${fd(a.validade_acesso)}</td><td><span class="badge ${sb2}">${a.status}</span></td><td style="display:flex;gap:6px"><button class="btn bg2 btn-xs" onclick="editA('${a.id}')">✏️</button><button class="btn bd btn-xs" onclick="delA('${a.id}')">🗑️</button></td></tr>`;}).join('');
   // Setup tab switching
   $$('.alunoTab').forEach(btn=>btn.addEventListener('click',function(){
@@ -2571,9 +2666,9 @@ async function loadAAlunos(){
   }));
 }
 async function loadCertificadosAdmin(){
-  const l=$('#certList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#certList');l.innerHTML='<div style="padding:16px">'+skelRows(4,3)+'</div>';
   const{data:certs}=await sb.from('certificados').select('*,users(nome,login),turmas(nome)').order('emitido_em',{ascending:false});
-  if(!certs?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">🏆 Nenhum certificado emitido ainda.</div>';return;}
+  if(!certs?.length){l.innerHTML=emptyState('default');return;}
   l.innerHTML='<div class="tw2"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Carga H.</th><th>Emitido em</th><th>ID Cert.</th><th></th></tr></thead><tbody>'+
     certs.map(c=>`<tr><td><strong>${c.users?.nome||'?'}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${c.users?.login||'?'}</span></td><td><span class="badge bc">${c.turmas?.nome||'?'}</span></td><td>${c.carga_horaria||0}h</td><td>${fdt(c.emitido_em)}</td><td style="font-family:monospace;font-size:.78rem;color:var(--cyan)">${c.cert_id||'—'}</td><td><button class="btn bg2 btn-xs" onclick="verCertAdmin('${c.id}')">🏆 Ver</button></td></tr>`).join('')+
     '</tbody></table></div>';
@@ -2584,10 +2679,10 @@ window.verCertAdmin=async function(id){
   gerarCertificadoHTML(cert.users?.nome||cert.nome_aluno,cert.turmas?.nome||cert.nome_turma,fd(cert.aprovado_em),cert.carga_horaria||0,cert.emitido_em,cert.cert_id);
 };
 async function loadHistoricoAdmin(){
-  const l=$('#histList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#histList');l.innerHTML='<div style="padding:16px">'+skelRows(4,3)+'</div>';
   // Get all students with their turmas history (from projetos aprovados)
   const{data:al}=await sb.from('users').select('id,nome,login').eq('role','student').order('nome');
-  if(!al?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Nenhum aluno.</div>';return;}
+  if(!al?.length){l.innerHTML=emptyState('alunos');return;}
   const{data:certs}=await sb.from('certificados').select('*,turmas(nome)');
   const certsByUser={};(certs||[]).forEach(c=>{if(!certsByUser[c.user_id])certsByUser[c.user_id]=[];certsByUser[c.user_id].push(c);});
   const{data:projs}=await sb.from('projetos').select('*,turmas(nome)').eq('status','aprovado');
@@ -2607,9 +2702,9 @@ async function loadHistoricoAdmin(){
     }).join('')+'</div>';
 }
 async function loadUpsellAdmin(){
-  const l=$('#upsellList');l.innerHTML='<div style="color:var(--muted)">Carregando...</div>';
+  const l=$('#upsellList');l.innerHTML='<div style="padding:16px">'+skelRows(4,3)+'</div>';
   const{data:interesse}=await sb.from('upsell_interesse').select('*,users(nome,login)').order('registrado_em',{ascending:false});
-  if(!interesse?.length){l.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">💡 Nenhum interesse registrado ainda.</div>';return;}
+  if(!interesse?.length){l.innerHTML=emptyState('default');return;}
   const powerbi=interesse.filter(x=>x.curso_interesse==='powerbi');
   const mentoria=interesse.filter(x=>x.curso_interesse==='mentoria');
   l.innerHTML=
@@ -2897,7 +2992,7 @@ async function loadAQuiz(){
   $('#qMod').innerHTML='<option value="">Geral (todos)</option>'+opts;
   const{data:qs}=await sb.from('quiz').select('*,modules(titulo)').order('criado_em',{ascending:false});
   const l=$('#aQL');
-  if(!qs?.length){l.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão.</div>';return;}
+  if(!qs?.length){l.innerHTML=emptyState('default');return;}
   l.innerHTML=qs.map((q,i)=>`<div style="border:1px solid var(--border);border-radius:var(--r);padding:15px;background:rgba(0,0,0,.18);margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:11px"><div style="font-weight:800">${i+1}. ${q.question}</div><button class="btn bd btn-xs" onclick="delQ('${q.id}')">🗑️</button></div><div style="display:flex;flex-direction:column;gap:5px">${(q.options||[]).map((opt,oi)=>`<div style="padding:7px 11px;border-radius:6px;font-size:.88rem;border:1px solid ${oi===q.correct_option?'var(--green)':'var(--border)'};background:${oi===q.correct_option?'rgba(15,186,129,.1)':'rgba(0,0,0,.18)'}">${String.fromCharCode(65+oi)}) ${opt}${oi===q.correct_option?' ✓':''}</div>`).join('')}</div><div style="font-size:.75rem;color:var(--muted);margin-top:8px">Módulo: ${q.modules?.titulo||'Geral'}</div></div>`).join('');
 }
 $('#bSQ').addEventListener('click',async()=>{
@@ -2923,7 +3018,7 @@ async function runQStats(){
   let qQuery=sb.from('quiz').select('*,modules(titulo)').order('criado_em');
   if(filtro)qQuery=qQuery.eq('modulo_id',filtro);
   const{data:qs}=await qQuery;
-  if(!qs?.length){$('#qStatsList').innerHTML='<div style="text-align:center;padding:28px;color:var(--muted)">Nenhuma questão encontrada.</div>';$('#qStatsResume').innerHTML='';return;}
+  if(!qs?.length){$('#qStatsList').innerHTML=''+emptyState('default')+'';$('#qStatsResume').innerHTML='';return;}
   // Get all answers
   let rQuery=sb.from('quiz_respostas').select('*,users(nome)');
   if(filtro)rQuery=rQuery.eq('modulo_id',filtro);
@@ -2960,7 +3055,7 @@ async function loadAProjetos(){
   if(filtroT)q=q.eq('turma_id',filtroT);if(filtroS)q=q.eq('status',filtroS);
   const{data:projs}=await q;
   const l=$('#projList');l.innerHTML='';
-  if(!projs?.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum projeto encontrado.</div>';return;}
+  if(!projs?.length){l.innerHTML=emptyState('projetos');return;}
   for(const p of projs){
     const statusColors={enviado:'var(--amber)',em_revisao:'var(--cyan)',aprovado:'var(--green)',reprovado:'var(--red)'};
     const card=document.createElement('div');card.style.cssText='border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;background:rgba(0,0,0,.18)';
@@ -3022,7 +3117,7 @@ async function loadSelectAlunos(){
 /* ── HISTÓRICO ── */
 async function loadCRMHist(){
   const l=$('#crmHistList');if(!l)return;
-  l.innerHTML='<div style="color:var(--muted);padding:20px">Carregando...</div>';
+  l.innerHTML='<div style="padding:16px">'+skelRows(5,3)+'</div>';
   const search=$('#crmSearch').value.trim().toLowerCase();
   const statusF=$('#crmFiltroStatus').value;
 
@@ -3061,7 +3156,7 @@ async function loadCRMHist(){
   if(search)clients=clients.filter(cl=>cl.nome.toLowerCase().includes(search)||cl.empresa.toLowerCase().includes(search)||cl.email.toLowerCase().includes(search));
   if(statusF)clients=clients.filter(cl=>cl.propostas.some(p=>p.status===statusF));
 
-  if(!clients.length){l.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum cliente encontrado.</div>';return;}
+  if(!clients.length){l.innerHTML=emptyState('default');return;}
 
   l.innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'+
     clients.map(cl=>{
@@ -4222,15 +4317,19 @@ function toggleChat(){
   const btn = document.getElementById('chatBtn');
   chatOpen = !chatOpen;
   if(chatOpen){
-    win.classList.add('open');
-    btn.textContent = '✕';
-    btn.style.background = 'rgba(255,255,255,.1)';
+    win.style.display='flex';
+    requestAnimationFrame(()=>win.classList.add('chat-open'));
+    btn.innerHTML='✕';
+    btn.style.background='rgba(255,255,255,.15)';
+    btn.style.boxShadow='none';
     if(!chatInited){ chatInited=true; chatWelcome(); }
     setTimeout(()=>document.getElementById('chatInput').focus(),100);
   } else {
-    win.classList.remove('open');
-    btn.textContent = '💬';
-    btn.style.background = 'linear-gradient(135deg,#00C8FF,#7C5CFC)';
+    win.classList.remove('chat-open');
+    setTimeout(()=>{win.style.display='none';},280);
+    btn.innerHTML='💬';
+    btn.style.background='linear-gradient(135deg,var(--cyan),var(--purple))';
+    btn.style.boxShadow='0 4px 20px rgba(0,200,255,.4)';
   }
 }
 
