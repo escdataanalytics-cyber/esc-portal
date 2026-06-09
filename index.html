@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="DENY"/>
-<meta name="referrer" content="no-referrer"/>
+<meta http-equiv="X-XSS-Protection" content="1; mode=block"/>
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()"/>
 <title>ESC • Plataforma de Ensino</title>
 <script>
   /* ⚠️ Supabase anon key — pública por design. Proteja via RLS no Supabase Dashboard. */
@@ -1406,6 +1408,26 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
               </div>
             </div>
 
+            <!-- IA na Prática -->
+            <div style="border:1px solid rgba(0,255,136,.25);border-radius:var(--rs);background:rgba(0,255,136,.04);overflow:hidden;position:relative">
+              <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00c8ff,#00ff88)"></div>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;margin-top:2px">
+                <input type="checkbox" name="prCurso" value="ia" style="accent-color:#00ff88;width:18px;height:18px;flex-shrink:0"/>
+                <div style="flex:1">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="font-weight:700">🧠 IA na Prática — Produtividade e Performance</div>
+                    <span style="background:linear-gradient(135deg,#00c8ff,#00ff88);color:#000;font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:.06em">NOVO</span>
+                  </div>
+                  <div style="font-size:.8rem;color:var(--muted)">ChatGPT · Copilot · Gemini · Claude · Perplexity</div>
+                </div>
+              </label>
+              <div style="padding:0 12px 12px;display:flex;align-items:center;gap:10px">
+                <span style="font-size:.8rem;color:var(--soft);font-weight:700;white-space:nowrap">💰 Valor (R$):</span>
+                <input id="prPrecoIA" class="fi" type="number" min="0" value="697" style="max-width:140px;padding:7px 11px"/>
+                <span style="font-size:.78rem;color:var(--muted)" id="prLabelIA">por aluno</span>
+              </div>
+            </div>
+
           </div>
           <!-- Resumo PJ -->
           <div id="prResumoValor" style="display:none;margin-top:14px;padding:12px 16px;border-radius:var(--rs);background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2)">
@@ -1550,6 +1572,7 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
                 <select id="npCurso" class="fi">
                   <option value="excel">Mentoria em Excel</option>
                   <option value="powerbi">Mentoria em Power BI</option>
+                  <option value="ia">🧠 IA na Prática — Produtividade e Performance</option>
                   <option value="projetos">Mentoria em Projetos</option>
                   <option value="combo">Combo Excel + Power BI</option>
                 </select>
@@ -1701,7 +1724,23 @@ hr.div{border:none;border-top:1px solid rgba(0,200,255,.1);margin:14px 0}
    ═══════════════════════════════════════════════ */
 
 let sb=null;
-try{sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
+try{
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+    auth:{persistSession:true,autoRefreshToken:true},
+    global:{headers:{'X-Client-Info':'esc-plataforma'}}
+  });
+}catch(e){console.warn('Supabase init error:',e);}
+/* Detecta ambiente de dev com origem bloqueada pelo CORS e avisa o admin */
+(function(){
+  const h=location.hostname,p=location.port;
+  const isDevIp=(h==='127.0.0.1'&&p==='5500');
+  if(isDevIp){
+    const warn=document.createElement('div');
+    warn.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:99999;background:#1a1000;border:1px solid #f59e0b;border-radius:10px;padding:10px 18px;font-size:.82rem;color:#f59e0b;font-family:monospace;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5)';
+    warn.innerHTML='⚠️ Live Server: acesse via <strong>localhost:5500</strong> (não 127.0.0.1) para evitar bloqueio de CORS';
+    document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(warn));
+  }
+})();
 let CU=null,CTurma=null,mods=[],actMod=null,actAula=null,wTimer=null,wSec=0,cdTimer=null,inactTimer=null,userIdleSec=0;
 // Track user idle time for progress (pauses if truly idle >2min)
 setInterval(()=>{userIdleSec++;},1000);
@@ -1739,7 +1778,29 @@ function loginAllowed(){
   _loginAttempts.count++;
   return _loginAttempts.count<=5;
 }
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function sha(s){
+  /* Usa crypto.subtle se disponível (HTTPS/localhost), fallback pure-JS para http://127.x */
+  if(window.isSecureContext||location.hostname==='localhost'){
+    const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  /* SHA-256 pure-JS fallback — funciona em qualquer origem */
+  function rr(v,n){return(v>>>n)|(v<<(32-n));}
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+  const b=new TextEncoder().encode(s),l=b.length,pad=new Uint8Array(l+1+((55-l)%64+64)%64+8);
+  pad.set(b);pad[l]=0x80;
+  const dv=new DataView(pad.buffer);dv.setUint32(pad.length-4,l*8,false);
+  for(let i=0;i<pad.length;i+=64){
+    const w=new Uint32Array(64);
+    for(let j=0;j<16;j++)w[j]=dv.getUint32(i+j*4,false);
+    for(let j=16;j<64;j++){const s0=rr(w[j-15],7)^rr(w[j-15],18)^(w[j-15]>>>3),s1=rr(w[j-2],17)^rr(w[j-2],19)^(w[j-2]>>>10);w[j]=(w[j-16]+s0+w[j-7]+s1)|0;}
+    let a=h0,b2=h1,c=h2,d=h3,e=h4,f=h5,g=h6,hh=h7;
+    for(let j=0;j<64;j++){const S1=rr(e,6)^rr(e,11)^rr(e,25),ch=(e&f)^(~e&g),t1=(hh+S1+ch+K[j]+w[j])|0,S0=rr(a,2)^rr(a,13)^rr(a,22),maj=(a&b2)^(a&c)^(b2&c),t2=(S0+maj)|0;hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0;}
+    h0=(h0+a)|0;h1=(h1+b2)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+hh)|0;
+  }
+  return [h0,h1,h2,h3,h4,h5,h6,h7].map(v=>v.toString(16).padStart(8,'0')).join('');
+}
 function fd(d){return d?new Date(d).toLocaleDateString('pt-BR'):'—';}
 function fdt(d){return d?new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';}
 function du(d){return d?Math.ceil((new Date(d)-new Date())/(864e5)):null;}
@@ -1961,10 +2022,10 @@ function doLogout(){
   chatOpen=false;chatInited=false;chatHistory=[];
   const msgs=document.getElementById('chatMsgs');
   if(msgs)msgs.innerHTML='';
-  CU=null;CTurma=null;actMod=null;actAula=null;mods=[];
   if(wTimer)clearInterval(wTimer);if(cdTimer)clearInterval(cdTimer);clearTimeout(inactTimer);
   clearSession();
-  if(sb&&sessionToken){sb.from('users').update({session_token:null}).eq('id',CU?.id||'');}
+  if(sb&&sessionToken&&CU){sb.from('users').update({session_token:null}).eq('id',CU.id);}
+  CU=null;CTurma=null;actMod=null;actAula=null;mods=[];sessionToken=null;
   $('#sa').classList.add('hidden');$('#aa').classList.add('hidden');
   $('#ls').style.display='flex';$('#lUser').value='';$('#lPass').value='';$('#lErr').textContent='';
 }
@@ -3578,8 +3639,8 @@ function setPrTipo(tipo){
   document.getElementById('prDadosTitle').textContent=isPJ?'🏢 Dados do Cliente — Pessoa Jurídica':'👤 Dados do Cliente — Pessoa Física';
   document.getElementById('prResumoValor').style.display=isPJ?'block':'none';
   // atualiza labels dos preços
-  const lbl=isPJ?'por aluno':'por aluno';
-  ['prLabelExcel','prLabelPBI','prLabelProjetos'].forEach(id=>{ const el=document.getElementById(id); if(el)el.textContent=lbl; });
+  const lbl=isPJ?'por colaborador':'por aluno';
+  ['prLabelExcel','prLabelPBI','prLabelProjetos','prLabelIA'].forEach(id=>{ const el=document.getElementById(id); if(el)el.textContent=lbl; });
   // mascara CNPJ
   if(isPJ){
     const cnpjEl=document.getElementById('prCNPJ');
@@ -3635,12 +3696,14 @@ function gerarPropostaHTML(){
     excel: parseFloat($('#prPrecoExcel').value)||497,
     powerbi: parseFloat($('#prPrecoPBI').value)||597,
     projetos: parseFloat($('#prPrecoProjetos').value)||597,
+    ia: parseFloat($('#prPrecoIA').value)||697,
   };
 
   const cursosMap={
     excel:{label:'Mentoria em Excel',sub:'Método dos Dados ao Dashboard',color:'#00c8ff',bg:'rgba(0,200,255,.08)',desc:'Do zero ao dashboard profissional em Excel. Domine fórmulas avançadas, tabelas dinâmicas, Power Query e criação de dashboards gerenciais aplicados a ambientes industriais e corporativos.'},
     powerbi:{label:'Mentoria em Power BI',sub:'Método dos Dados ao Dashboard',color:'#7c5cfc',bg:'rgba(124,92,252,.08)',desc:'Transforme dados brutos em dashboards interativos com Power BI. Do tratamento de dados à publicação de relatórios para decisão estratégica.'},
     projetos:{label:'Mentoria em Projetos de Análise de Dados',sub:'Consultoria e Desenvolvimento Aplicado',color:'#0fba81',bg:'rgba(15,186,129,.08)',desc:'Mentoria individualizada para desenvolvimento de projetos reais de análise de dados. Ideal para projetos industriais, manutenção preditiva, gestão de ativos ou BI corporativo.'},
+    ia:{label:'IA na Prática — Produtividade e Performance',sub:'ChatGPT · Copilot · Gemini · Claude · Perplexity',color:'#00d4aa',bg:'rgba(0,255,136,.07)',desc:'Domine as principais ferramentas de Inteligência Artificial e transforme sua rotina profissional. Prompt Engineering avançado, automação de tarefas, integração com Excel e Power BI, geração de relatórios e apresentações, gestão de e-mails e análise de documentos com casos práticos reais.'},
   };
 
   const selecionados=[...document.querySelectorAll('[name="prCurso"]:checked')].map(el=>el.value);
